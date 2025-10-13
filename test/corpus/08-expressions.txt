@@ -1,0 +1,208 @@
+=======================================
+Simple member expression
+=======================================
+
+Text {{ user.name }} here.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (inline_expression
+      (expression
+        (member_expression
+          (identifier)
+          (identifier))))
+    (text)))
+
+=======================================
+Nested member expression
+=======================================
+
+Value is {{ obj.prop.nested }}.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (inline_expression
+      (expression
+        (member_expression
+          (member_expression
+            (identifier)
+            (identifier))
+          (identifier))))
+    (text)))
+
+=======================================
+Array literal with numbers
+=======================================
+
+Items {{ [1, 2, 3] }} end.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (inline_expression
+      (expression
+        (array_literal
+          (expression
+            (number))
+          (expression
+            (number))
+          (expression
+            (number)))))
+    (text)))
+
+=======================================
+Array literal with strings
+=======================================
+
+Tags {{ ["one", "two"] }} done.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (inline_expression
+      (expression
+        (array_literal
+          (expression
+            (string))
+          (expression
+            (string)))))
+    (text)))
+
+=======================================
+Object literal simple
+=======================================
+
+Data {{ {key: "value"} }} text.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (inline_expression
+      (expression
+        (object_literal
+          (pair
+            (identifier)
+            (expression
+              (string))))))
+    (text)))
+
+=======================================
+Object literal multiple pairs
+=======================================
+
+Config {{ {name: "test", count: 5} }} end.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (inline_expression
+      (expression
+        (object_literal
+          (pair
+            (identifier)
+            (expression
+              (string)))
+          (pair
+            (identifier)
+            (expression
+              (number))))))
+    (text)))
+
+=======================================
+Call expression simple
+=======================================
+
+Result {{ func() }} here.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (inline_expression
+      (expression
+        (call_expression
+          (identifier)
+          (arguments))))
+    (text)))
+
+=======================================
+Call expression with arguments
+=======================================
+
+Value {{ add(1, 2) }} end.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (inline_expression
+      (expression
+        (call_expression
+          (identifier)
+          (arguments
+            (expression
+              (number))
+            (expression
+              (number))))))
+    (text)))
+
+=======================================
+Member call expression
+=======================================
+
+Output {{ user.getName() }} text.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (inline_expression
+      (expression
+        (call_expression
+          (member_expression
+            (identifier)
+            (identifier))
+          (arguments))))
+    (text)))
+
+=======================================
+Nested expressions
+=======================================
+
+Complex {{ obj.method(arr[0]) }} done.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (inline_expression
+      (expression
+        (call_expression
+          (member_expression
+            (identifier)
+            (identifier))
+          (arguments
+            (expression
+              (array_access
+                (identifier)
+                (expression
+                  (number))))))))
+    (text)))

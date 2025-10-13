@@ -1,0 +1,124 @@
+=======================================
+HTML block - simple div
+=======================================
+
+<div>
+Content inside
+</div>
+
+---
+
+(source_file
+  (html_block))
+
+=======================================
+HTML block with attributes
+=======================================
+
+<div class="container" id="main">
+Content
+</div>
+
+---
+
+(source_file
+  (html_block))
+
+=======================================
+Self-closing HTML tag
+=======================================
+
+<img src="image.png" alt="Image" />
+
+---
+
+(source_file
+  (html_block))
+
+=======================================
+HTML comment block
+=======================================
+
+<!-- This is a comment -->
+
+---
+
+(source_file
+  (html_comment))
+
+=======================================
+Inline HTML in paragraph
+=======================================
+
+This is text with <span>inline HTML</span> inside.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (html_inline)
+    (text)))
+
+=======================================
+Multiple inline HTML elements
+=======================================
+
+Text with <strong>bold</strong> and <em>italic</em> HTML.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (html_inline)
+    (text)
+    (html_inline)
+    (text)))
+
+=======================================
+HTML block before paragraph
+=======================================
+
+<div>HTML content</div>
+
+Regular paragraph text.
+
+---
+
+(source_file
+  (html_block)
+  (paragraph
+    (text)))
+
+=======================================
+HTML block after heading
+=======================================
+
+# Heading
+
+<div class="content">
+Some content
+</div>
+
+---
+
+(source_file
+  (heading
+    (heading_marker)
+    (heading_text))
+  (html_block))
+
+=======================================
+Inline HTML with self-closing tag
+=======================================
+
+Text with <br /> line break.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (html_inline)
+    (text)))

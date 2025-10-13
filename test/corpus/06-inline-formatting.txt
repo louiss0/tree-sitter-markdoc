@@ -1,0 +1,166 @@
+=======================================
+Emphasis with asterisks
+=======================================
+
+This is *emphasized text* in a sentence.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (emphasis)
+    (text)))
+
+=======================================
+Emphasis with underscores
+=======================================
+
+This is _emphasized text_ too.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (emphasis)
+    (text)))
+
+=======================================
+Strong with double asterisks
+=======================================
+
+This is **strong text** here.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (strong)
+    (text)))
+
+=======================================
+Strong with double underscores
+=======================================
+
+This is __strong text__ also.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (strong)
+    (text)))
+
+=======================================
+Mixed emphasis and strong
+=======================================
+
+Use *emphasis* and **strong** together.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (emphasis)
+    (text)
+    (strong)
+    (text)))
+
+=======================================
+Inline code
+=======================================
+
+Use the `console.log()` function.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (inline_code)
+    (text)))
+
+=======================================
+Link with text and URL
+=======================================
+
+Visit [GitHub](https://github.com) for more.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (link
+      (link_text)
+      (link_destination))
+    (text)))
+
+=======================================
+Image with alt text
+=======================================
+
+Here is an image: ![Logo](logo.png)
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (image
+      (image_alt)
+      (image_destination))))
+
+=======================================
+Multiple inline elements
+=======================================
+
+This has *emphasis*, **strong**, `code`, and a [link](url).
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (emphasis)
+    (text)
+    (strong)
+    (text)
+    (inline_code)
+    (text)
+    (link
+      (link_text)
+      (link_destination))
+    (text)))
+
+=======================================
+Inline formatting in list
+=======================================
+
+- Item with *emphasis*
+- Item with **strong**
+- Item with `code`
+
+---
+
+(source_file
+  (list
+    (list_item
+      (list_marker)
+      (paragraph
+        (text)
+        (emphasis)))
+    (list_item
+      (list_marker)
+      (paragraph
+        (text)
+        (strong)))
+    (list_item
+      (list_marker)
+      (paragraph
+        (text)
+        (inline_code)))))

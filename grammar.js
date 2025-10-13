@@ -37,6 +37,9 @@ module.exports = grammar({
       $.heading,
       $.fenced_code_block,
       prec(1, $.markdoc_tag),
+      $.list,
+      $.html_comment,
+      $.html_block,
       $.paragraph
     ),
 
@@ -151,16 +154,75 @@ module.exports = grammar({
     ),
 
     expression: $ => choice(
+      $.call_expression,
       $.member_expression,
+      $.array_access,
+      $.array_literal,
+      $.object_literal,
       $.identifier,
       $.number,
       $.string
     ),
 
+    call_expression: $ => prec.left(3, seq(
+      choice(
+        $.member_expression,
+        $.array_access,
+        $.identifier
+      ),
+      $.arguments
+    )),
+
+    arguments: $ => seq(
+      '(',
+      optional(seq(
+        $.expression,
+        repeat(seq(',', /[ \t]*/, $.expression))
+      )),
+      ')'
+    ),
+
     member_expression: $ => prec.left(2, seq(
-      $.identifier,
+      choice(
+        $.array_access,
+        $.identifier
+      ),
       repeat1(seq('.', $.identifier))
     )),
+
+    array_access: $ => prec.left(2, seq(
+      $.identifier,
+      '[',
+      $.expression,
+      ']'
+    )),
+
+    array_literal: $ => seq(
+      '[',
+      optional(seq(
+        $.expression,
+        repeat(seq(',', /[ \t]*/, $.expression)),
+        optional(',')  // trailing comma
+      )),
+      ']'
+    ),
+
+    object_literal: $ => seq(
+      '{',
+      optional(seq(
+        $.pair,
+        repeat(seq(',', /[ \t]*/, $.pair)),
+        optional(',')  // trailing comma
+      )),
+      '}'
+    ),
+
+    pair: $ => seq(
+      $.identifier,
+      ':',
+      /[ \t]*/,
+      $.expression
+    ),
 
     identifier: $ => /[a-zA-Z_][a-zA-Z0-9_]*/,
 
@@ -183,11 +245,125 @@ module.exports = grammar({
       '}}'
     ),
 
-    paragraph: $ => prec.left(seq(
-      choice($.inline_expression, $.text),
-      repeat(seq(/\n/, choice($.inline_expression, $.text)))
+    list: $ => prec.right(repeat1($.list_item)),
+
+    list_item: $ => prec.right(seq(
+      field('marker', $.list_marker),
+      field('content', seq(
+        $.paragraph,
+        optional(seq(
+          /\n/,
+          repeat(seq(
+            /[ \t]{2,}/,
+            choice($.list, $.paragraph),
+            optional(/\n/)
+          ))
+        ))
+      ))
     )),
 
-    text: $ => token(prec(-1, /[^\n{]+/)),
+    list_marker: $ => token(prec(2, choice(
+      /[-*+][ \t]+/,
+      /[0-9]+\.[ \t]+/
+    ))),
+
+    html_comment: $ => token(seq(
+      '<!--',
+      repeat(choice(
+        /[^-]+/,
+        /-[^-]/
+      )),
+      '-->'
+    )),
+
+    html_block: $ => choice(
+      // Multi-line HTML block (opening tag at start of line)
+      token(prec(2, seq(
+        '<',
+        /[a-zA-Z][a-zA-Z0-9]*/,
+        /[^>]*/,
+        '>',
+        /[\s\S]*?/,
+        '</',
+        /[a-zA-Z][a-zA-Z0-9]*/,
+        '>'
+      ))),
+      // Self-closing HTML tag
+      token(prec(2, seq(
+        '<',
+        /[a-zA-Z][a-zA-Z0-9]*/,
+        /[^/]*?/,
+        '/>'
+      )))
+    ),
+
+    html_inline: $ => choice(
+      // Opening and closing tag
+      token(prec(1, seq(
+        '<',
+        /[a-zA-Z][a-zA-Z0-9]*/,
+        optional(/[^>]*/),
+        '>',
+        optional(/[^<]*/),
+        '</',
+        /[a-zA-Z][a-zA-Z0-9]*/,
+        '>'
+      ))),
+      // Self-closing tag
+      token(prec(1, seq(
+        '<',
+        /[a-zA-Z][a-zA-Z0-9]*/,
+        optional(/[^>]*/),
+        '/>'
+      )))
+    ),
+
+    paragraph: $ => prec.left(repeat1(choice(
+      $.inline_expression,
+      $.strong,
+      $.emphasis,
+      $.inline_code,
+      $.link,
+      $.image,
+      $.html_inline,
+      $.text
+    ))),
+
+    emphasis: $ => prec.left(1, choice(
+      seq('*', token(prec(1, /[^*\n]+/)), '*'),
+      seq('_', token(prec(1, /[^_\n]+/)), '_')
+    )),
+
+    strong: $ => prec.left(2, choice(
+      seq('**', token(prec(2, /[^*\n]+/)), '**'),
+      seq('__', token(prec(2, /[^_\n]+/)), '__')
+    )),
+
+    inline_code: $ => seq(
+      '`',
+      token(prec(1, /[^`\n]+/)),
+      '`'
+    ),
+
+    link: $ => seq(
+      '[',
+      alias(token(prec(1, /[^\]\n]+/)), $.link_text),
+      ']',
+      '(',
+      alias(token(prec(1, /[^)\n]+/)), $.link_destination),
+      ')'
+    ),
+
+    image: $ => seq(
+      '!',
+      '[',
+      alias(token(prec(1, /[^\]\n]+/)), $.image_alt),
+      ']',
+      '(',
+      alias(token(prec(1, /[^)\n]+/)), $.image_destination),
+      ')'
+    ),
+
+    text: $ => token(prec(-1, /[^\n{*_`!\[<]+/)),
   }
 });

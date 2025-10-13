@@ -175,7 +175,8 @@ Hello {{ name }}
   (paragraph
     (text)
     (inline_expression
-      (identifier))))
+      (expression
+        (identifier)))))
 
 ================================================================================
 Inline expression with property access
@@ -189,9 +190,10 @@ Hello {{ user.name }}
   (paragraph
     (text)
     (inline_expression
-      (member_expression
-        (identifier)
-        (identifier)))))
+      (expression
+        (member_expression
+          (identifier)
+          (identifier))))))
 
 ================================================================================
 Multiple inline expressions in paragraph
@@ -204,10 +206,12 @@ Multiple inline expressions in paragraph
 (source_file
   (paragraph
     (inline_expression
-      (identifier))
+      (expression
+        (identifier)))
     (text)
     (inline_expression
-      (identifier))
+      (expression
+        (identifier)))
     (text)))
 
 ================================================================================
@@ -282,13 +286,15 @@ Regular {{ text }} here.
     (paragraph
       (text)
       (inline_expression
-        (identifier)))
+        (expression
+          (identifier))))
     (tag_close
       (tag_name)))
   (paragraph
     (text)
     (inline_expression
-      (identifier))
+      (expression
+        (identifier)))
     (text)))
 
 ================================================================================
