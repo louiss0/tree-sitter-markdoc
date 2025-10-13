@@ -8,7 +8,7 @@
 // @ts-check
 
 module.exports = grammar({
-  name: "tree_sitter_markdoc",
+  name: "markdoc",
 
   rules: {
     // TODO: add the actual grammar rules

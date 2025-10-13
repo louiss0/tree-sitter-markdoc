@@ -2,7 +2,7 @@
   "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/config.schema.json",
   "grammars": [
     {
-      "name": "tree_sitter_markdoc",
+      "name": "markdoc",
       "camelcase": "Markdoc",
       "title": "Markdoc",
       "scope": "source.markdoc",
@@ -10,12 +10,12 @@
         "mdoc",
         "markdoc"
       ],
-      "injection-regex": "^tree_sitter_markdoc$",
-      "class-name": "TreeSitterTreeSitterMarkdoc"
+      "injection-regex": "^markdoc$",
+      "class-name": "TreeSitterMarkdoc"
     }
   ],
   "metadata": {
-    "version": "0.1.0",
+    "version": "0.0.0",
     "license": "MIT",
     "description": "This is a tree sitter parser for markdoc",
     "authors": [
