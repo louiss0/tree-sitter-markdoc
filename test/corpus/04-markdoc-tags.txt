@@ -1,0 +1,317 @@
+================================================================================
+Self-closing tag
+================================================================================
+
+{% image /%}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_self_close
+      (tag_name))))
+
+================================================================================
+Block tag without content
+================================================================================
+
+{% callout %}
+{% /callout %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_open
+      (tag_name))
+    (tag_close
+      (tag_name))))
+
+================================================================================
+Block tag with paragraph content
+================================================================================
+
+{% callout %}
+Hello world
+{% /callout %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_open
+      (tag_name))
+    (paragraph
+      (text))
+    (tag_close
+      (tag_name))))
+
+================================================================================
+Block tag with multiple paragraphs
+================================================================================
+
+{% section %}
+First paragraph.
+
+Second paragraph.
+{% /section %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_open
+      (tag_name))
+    (paragraph
+      (text))
+    (paragraph
+      (text))
+    (tag_close
+      (tag_name))))
+
+================================================================================
+Nested block tags
+================================================================================
+
+{% outer %}
+{% inner %}
+Content
+{% /inner %}
+{% /outer %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_open
+      (tag_name))
+    (markdoc_tag
+      (tag_open
+        (tag_name))
+      (paragraph
+        (text))
+      (tag_close
+        (tag_name)))
+    (tag_close
+      (tag_name))))
+
+================================================================================
+Tag with string attribute
+================================================================================
+
+{% card title="Welcome" %}
+{% /card %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_open
+      (tag_name)
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (string))))
+    (tag_close
+      (tag_name))))
+
+================================================================================
+Tag with multiple attributes
+================================================================================
+
+{% button type="primary" size="large" %}
+Click me
+{% /button %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_open
+      (tag_name)
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (string)))
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (string))))
+    (paragraph
+      (text))
+    (tag_close
+      (tag_name))))
+
+================================================================================
+Self-closing tag with attributes
+================================================================================
+
+{% image src="photo.jpg" alt="A photo" /%}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_self_close
+      (tag_name)
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (string)))
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (string))))))
+
+================================================================================
+Simple inline expression
+================================================================================
+
+Hello {{ name }}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (paragraph
+    (text)
+    (inline_expression
+      (identifier))))
+
+================================================================================
+Inline expression with property access
+================================================================================
+
+Hello {{ user.name }}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (paragraph
+    (text)
+    (inline_expression
+      (member_expression
+        (identifier)
+        (identifier)))))
+
+================================================================================
+Multiple inline expressions in paragraph
+================================================================================
+
+{{ greeting }} {{ name }}!
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (paragraph
+    (inline_expression
+      (identifier))
+    (text)
+    (inline_expression
+      (identifier))
+    (text)))
+
+================================================================================
+Tag with heading inside
+================================================================================
+
+{% section %}
+# Heading
+Content here
+{% /section %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_open
+      (tag_name))
+    (heading
+      (heading_marker)
+      (heading_text))
+    (paragraph
+      (text))
+    (tag_close
+      (tag_name))))
+
+================================================================================
+Tag with code block inside
+================================================================================
+
+{% example %}
+```js
+code()
+```
+{% /example %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_open
+      (tag_name))
+    (fenced_code_block
+      (code_fence_open
+        (info_string
+          (language)))
+      (code)
+      (code_fence_close))
+    (tag_close
+      (tag_name))))
+
+================================================================================
+Mixed content with tags and expressions
+================================================================================
+
+# Title
+
+{% callout %}
+Important: {{ message }}
+{% /callout %}
+
+Regular {{ text }} here.
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (heading
+    (heading_marker)
+    (heading_text))
+  (markdoc_tag
+    (tag_open
+      (tag_name))
+    (paragraph
+      (text)
+      (inline_expression
+        (identifier)))
+    (tag_close
+      (tag_name)))
+  (paragraph
+    (text)
+    (inline_expression
+      (identifier))
+    (text)))
+
+================================================================================
+Tag with frontmatter
+================================================================================
+
+---
+title: Demo
+---
+
+{% callout %}
+Hello
+{% /callout %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (frontmatter
+    (yaml))
+  (markdoc_tag
+    (tag_open
+      (tag_name))
+    (paragraph
+      (text))
+    (tag_close
+      (tag_name))))

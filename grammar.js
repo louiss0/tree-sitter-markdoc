@@ -15,7 +15,8 @@ module.exports = grammar({
   ],
 
   conflicts: $ => [
-    [$.source_file]
+    [$.source_file],
+    [$.attribute, $.expression]
   ],
 
   rules: {
@@ -35,6 +36,7 @@ module.exports = grammar({
       $.frontmatter,
       $.heading,
       $.fenced_code_block,
+      prec(1, $.markdoc_tag),
       $.paragraph
     ),
 
@@ -94,11 +96,98 @@ module.exports = grammar({
       )
     ),
 
-    paragraph: $ => prec.left(seq(
-      $.text,
-      repeat(seq(/\n/, $.text))
+    markdoc_tag: $ => choice(
+      seq(
+        $.tag_open,
+        repeat($._block),
+        $.tag_close
+      ),
+      $.tag_self_close
+    ),
+
+    tag_open: $ => prec.right(seq(
+      '{%',
+      /[ \t]*/,
+      alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
+      repeat(seq(
+        /[ \t]+/,
+        $.attribute
+      )),
+      /[ \t]*/,
+      '%}',
+      optional(/\n/)
     )),
 
-    text: $ => token(prec(-1, /[^\n]+/)),
+    tag_close: $ => prec.right(seq(
+      '{%',
+      /[ \t]*/,
+      '/',
+      alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
+      /[ \t]*/,
+      '%}',
+      optional(/\n/)
+    )),
+
+    tag_self_close: $ => prec.right(seq(
+      '{%',
+      /[ \t]*/,
+      alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
+      repeat(seq(
+        /[ \t]+/,
+        $.attribute
+      )),
+      /[ \t]*/,
+      '/%}',
+      optional(/\n/)
+    )),
+
+    attribute: $ => seq(
+      alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.attribute_name),
+      '=',
+      field('attribute_value', choice(
+        $.string,
+        $.expression
+      ))
+    ),
+
+    expression: $ => choice(
+      $.member_expression,
+      $.identifier,
+      $.number,
+      $.string
+    ),
+
+    member_expression: $ => prec.left(2, seq(
+      $.identifier,
+      repeat1(seq('.', $.identifier))
+    )),
+
+    identifier: $ => /[a-zA-Z_][a-zA-Z0-9_]*/,
+
+    string: $ => seq(
+      '"',
+      repeat(choice(
+        /[^"\\\n]/,
+        seq('\\', /./)
+      )),
+      '"'
+    ),
+
+    number: $ => /-?[0-9]+(\.[0-9]+)?/,
+
+    inline_expression: $ => seq(
+      '{{',
+      /[ \t]*/,
+      $.expression,
+      /[ \t]*/,
+      '}}'
+    ),
+
+    paragraph: $ => prec.left(seq(
+      choice($.inline_expression, $.text),
+      repeat(seq(/\n/, choice($.inline_expression, $.text)))
+    )),
+
+    text: $ => token(prec(-1, /[^\n{]+/)),
   }
 });
