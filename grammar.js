@@ -37,6 +37,7 @@ module.exports = grammar({
       $.heading,
       $.fenced_code_block,
       prec(1, $.markdoc_tag),
+      $.list,
       $.paragraph
     ),
 
@@ -182,6 +183,28 @@ module.exports = grammar({
       /[ \t]*/,
       '}}'
     ),
+
+    list: $ => prec.right(repeat1($.list_item)),
+
+    list_item: $ => prec.right(seq(
+      field('marker', $.list_marker),
+      field('content', seq(
+        $.paragraph,
+        optional(seq(
+          /\n/,
+          repeat(seq(
+            /[ \t]{2,}/,
+            choice($.list, $.paragraph),
+            optional(/\n/)
+          ))
+        ))
+      ))
+    )),
+
+    list_marker: $ => token(prec(2, choice(
+      /[-*+][ \t]+/,
+      /[0-9]+\.[ \t]+/
+    ))),
 
     paragraph: $ => prec.left(seq(
       choice($.inline_expression, $.text),

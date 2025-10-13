@@ -193,6 +193,51 @@
     }
   },
   {
+    "type": "list",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "list_item",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "list_item",
+    "named": true,
+    "fields": {
+      "content": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "list",
+            "named": true
+          },
+          {
+            "type": "paragraph",
+            "named": true
+          }
+        ]
+      },
+      "marker": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "list_marker",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "markdoc_tag",
     "named": true,
     "fields": {},
@@ -210,6 +255,10 @@
         },
         {
           "type": "heading",
+          "named": true
+        },
+        {
+          "type": "list",
           "named": true
         },
         {
@@ -288,6 +337,10 @@
         },
         {
           "type": "heading",
+          "named": true
+        },
+        {
+          "type": "list",
           "named": true
         },
         {
@@ -422,6 +475,10 @@
   },
   {
     "type": "language",
+    "named": true
+  },
+  {
+    "type": "list_marker",
     "named": true
   },
   {

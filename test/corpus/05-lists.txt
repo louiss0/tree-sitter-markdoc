@@ -1,0 +1,175 @@
+=======================================
+Simple unordered list
+=======================================
+
+- Item one
+- Item two
+- Item three
+
+---
+
+(source_file
+  (list
+    (list_item
+      (list_marker)
+      (paragraph (text)))
+    (list_item
+      (list_marker)
+      (paragraph (text)))
+    (list_item
+      (list_marker)
+      (paragraph (text)))))
+
+=======================================
+Simple ordered list
+=======================================
+
+1. First item
+2. Second item
+3. Third item
+
+---
+
+(source_file
+  (list
+    (list_item
+      (list_marker)
+      (paragraph (text)))
+    (list_item
+      (list_marker)
+      (paragraph (text)))
+    (list_item
+      (list_marker)
+      (paragraph (text)))))
+
+=======================================
+Mixed unordered markers
+=======================================
+
+- Dash item
+* Asterisk item
++ Plus item
+
+---
+
+(source_file
+  (list
+    (list_item
+      (list_marker)
+      (paragraph (text)))
+    (list_item
+      (list_marker)
+      (paragraph (text)))
+    (list_item
+      (list_marker)
+      (paragraph (text)))))
+
+=======================================
+List with blank line separation
+=======================================
+
+- Item one
+
+- Item two
+
+---
+
+(source_file
+  (list
+    (list_item
+      (list_marker)
+      (paragraph (text))))
+  (list
+    (list_item
+      (list_marker)
+      (paragraph (text)))))
+
+=======================================
+List after heading
+=======================================
+
+# My List
+
+- Item one
+- Item two
+
+---
+
+(source_file
+  (heading
+    (heading_marker)
+    (heading_text))
+  (list
+    (list_item
+      (list_marker)
+      (paragraph (text)))
+    (list_item
+      (list_marker)
+      (paragraph (text)))))
+
+=======================================
+List before paragraph
+=======================================
+
+- Item one
+- Item two
+
+Regular paragraph text.
+
+---
+
+(source_file
+  (list
+    (list_item
+      (list_marker)
+      (paragraph (text)))
+    (list_item
+      (list_marker)
+      (paragraph (text))))
+  (paragraph (text)))
+
+=======================================
+Nested unordered list (simple)
+=======================================
+
+- Parent item
+  - Child item
+  - Another child
+
+---
+
+(source_file
+  (list
+    (list_item
+      (list_marker)
+      (paragraph (text))
+      (list
+        (list_item
+          (list_marker)
+          (paragraph (text)))
+        (list_item
+          (list_marker)
+          (paragraph (text)))))))
+
+=======================================
+Nested ordered list
+=======================================
+
+1. First level
+   1. Second level
+   2. Another second level
+
+---
+
+(source_file
+  (list
+    (list_item
+      (list_marker)
+      (paragraph (text))
+      (list
+        (list_item
+          (list_marker)
+          (paragraph (text)))
+        (list_item
+          (list_marker)
+          (paragraph (text)))))))
