@@ -15,6 +15,32 @@
     }
   },
   {
+    "type": "heading",
+    "named": true,
+    "fields": {
+      "heading_marker": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "heading_marker",
+            "named": true
+          }
+        ]
+      },
+      "heading_text": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "heading_text",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "paragraph",
     "named": true,
     "fields": {},
@@ -43,6 +69,10 @@
           "named": true
         },
         {
+          "type": "heading",
+          "named": true
+        },
+        {
           "type": "paragraph",
           "named": true
         }
@@ -57,6 +87,14 @@
   {
     "type": "---",
     "named": false
+  },
+  {
+    "type": "heading_marker",
+    "named": true
+  },
+  {
+    "type": "heading_text",
+    "named": true
   },
   {
     "type": "text",
