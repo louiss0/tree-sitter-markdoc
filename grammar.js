@@ -154,16 +154,75 @@ module.exports = grammar({
     ),
 
     expression: $ => choice(
+      $.call_expression,
       $.member_expression,
+      $.array_access,
+      $.array_literal,
+      $.object_literal,
       $.identifier,
       $.number,
       $.string
     ),
 
+    call_expression: $ => prec.left(3, seq(
+      choice(
+        $.member_expression,
+        $.array_access,
+        $.identifier
+      ),
+      $.arguments
+    )),
+
+    arguments: $ => seq(
+      '(',
+      optional(seq(
+        $.expression,
+        repeat(seq(',', /[ \t]*/, $.expression))
+      )),
+      ')'
+    ),
+
     member_expression: $ => prec.left(2, seq(
-      $.identifier,
+      choice(
+        $.array_access,
+        $.identifier
+      ),
       repeat1(seq('.', $.identifier))
     )),
+
+    array_access: $ => prec.left(2, seq(
+      $.identifier,
+      '[',
+      $.expression,
+      ']'
+    )),
+
+    array_literal: $ => seq(
+      '[',
+      optional(seq(
+        $.expression,
+        repeat(seq(',', /[ \t]*/, $.expression)),
+        optional(',')  // trailing comma
+      )),
+      ']'
+    ),
+
+    object_literal: $ => seq(
+      '{',
+      optional(seq(
+        $.pair,
+        repeat(seq(',', /[ \t]*/, $.pair)),
+        optional(',')  // trailing comma
+      )),
+      '}'
+    ),
+
+    pair: $ => seq(
+      $.identifier,
+      ':',
+      /[ \t]*/,
+      $.expression
+    ),
 
     identifier: $ => /[a-zA-Z_][a-zA-Z0-9_]*/,
 
