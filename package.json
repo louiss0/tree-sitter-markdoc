@@ -1,7 +1,7 @@
 {
-  "name": "tree-sitter-tree-sitter-markdoc",
+  "name": "tree-sitter-markdoc",
   "version": "0.1.0",
-  "description": "This is a tree sitter parser for markdoc",
+  "description": "Tree-sitter grammar for Markdoc (Zed compatible)",
   "repository": "http://github.com/louiss0/tree-sitter-markdoc",
   "license": "MIT",
   "author": {
@@ -44,9 +44,13 @@
     }
   },
   "scripts": {
+    "gen": "tree-sitter generate",
+    "test": "tree-sitter test",
+    "playground": "tree-sitter playground",
+    "highlight": "tree-sitter highlight",
     "install": "node-gyp-build",
     "prestart": "tree-sitter build --wasm",
     "start": "tree-sitter playground",
-    "test": "node --test bindings/node/*_test.js"
+    "test:node": "node --test bindings/node/*_test.js"
   }
 }
