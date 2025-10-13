@@ -38,6 +38,8 @@ module.exports = grammar({
       $.fenced_code_block,
       prec(1, $.markdoc_tag),
       $.list,
+      $.html_comment,
+      $.html_block,
       $.paragraph
     ),
 
@@ -206,6 +208,57 @@ module.exports = grammar({
       /[0-9]+\.[ \t]+/
     ))),
 
+    html_comment: $ => token(seq(
+      '<!--',
+      repeat(choice(
+        /[^-]+/,
+        /-[^-]/
+      )),
+      '-->'
+    )),
+
+    html_block: $ => choice(
+      // Multi-line HTML block (opening tag at start of line)
+      token(prec(2, seq(
+        '<',
+        /[a-zA-Z][a-zA-Z0-9]*/,
+        /[^>]*/,
+        '>',
+        /[\s\S]*?/,
+        '</',
+        /[a-zA-Z][a-zA-Z0-9]*/,
+        '>'
+      ))),
+      // Self-closing HTML tag
+      token(prec(2, seq(
+        '<',
+        /[a-zA-Z][a-zA-Z0-9]*/,
+        /[^/]*?/,
+        '/>'
+      )))
+    ),
+
+    html_inline: $ => choice(
+      // Opening and closing tag
+      token(prec(1, seq(
+        '<',
+        /[a-zA-Z][a-zA-Z0-9]*/,
+        optional(/[^>]*/),
+        '>',
+        optional(/[^<]*/),
+        '</',
+        /[a-zA-Z][a-zA-Z0-9]*/,
+        '>'
+      ))),
+      // Self-closing tag
+      token(prec(1, seq(
+        '<',
+        /[a-zA-Z][a-zA-Z0-9]*/,
+        optional(/[^>]*/),
+        '/>'
+      )))
+    ),
+
     paragraph: $ => prec.left(repeat1(choice(
       $.inline_expression,
       $.strong,
@@ -213,6 +266,7 @@ module.exports = grammar({
       $.inline_code,
       $.link,
       $.image,
+      $.html_inline,
       $.text
     ))),
 
@@ -251,6 +305,6 @@ module.exports = grammar({
       ')'
     ),
 
-    text: $ => token(prec(-1, /[^\n{*_`!\[]+/)),
+    text: $ => token(prec(-1, /[^\n{*_`!\[<]+/)),
   }
 });

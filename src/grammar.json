@@ -90,6 +90,14 @@
         },
         {
           "type": "SYMBOL",
+          "name": "html_comment"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "html_block"
+        },
+        {
+          "type": "SYMBOL",
           "name": "paragraph"
         }
       ]
@@ -836,6 +844,216 @@
         }
       }
     },
+    "html_comment": {
+      "type": "TOKEN",
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "<!--"
+          },
+          {
+            "type": "REPEAT",
+            "content": {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "PATTERN",
+                  "value": "[^-]+"
+                },
+                {
+                  "type": "PATTERN",
+                  "value": "-[^-]"
+                }
+              ]
+            }
+          },
+          {
+            "type": "STRING",
+            "value": "-->"
+          }
+        ]
+      }
+    },
+    "html_block": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "TOKEN",
+          "content": {
+            "type": "PREC",
+            "value": 2,
+            "content": {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "<"
+                },
+                {
+                  "type": "PATTERN",
+                  "value": "[a-zA-Z][a-zA-Z0-9]*"
+                },
+                {
+                  "type": "PATTERN",
+                  "value": "[^>]*"
+                },
+                {
+                  "type": "STRING",
+                  "value": ">"
+                },
+                {
+                  "type": "PATTERN",
+                  "value": "[\\s\\S]*?"
+                },
+                {
+                  "type": "STRING",
+                  "value": "</"
+                },
+                {
+                  "type": "PATTERN",
+                  "value": "[a-zA-Z][a-zA-Z0-9]*"
+                },
+                {
+                  "type": "STRING",
+                  "value": ">"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "TOKEN",
+          "content": {
+            "type": "PREC",
+            "value": 2,
+            "content": {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "<"
+                },
+                {
+                  "type": "PATTERN",
+                  "value": "[a-zA-Z][a-zA-Z0-9]*"
+                },
+                {
+                  "type": "PATTERN",
+                  "value": "[^/]*?"
+                },
+                {
+                  "type": "STRING",
+                  "value": "/>"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "html_inline": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "TOKEN",
+          "content": {
+            "type": "PREC",
+            "value": 1,
+            "content": {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "<"
+                },
+                {
+                  "type": "PATTERN",
+                  "value": "[a-zA-Z][a-zA-Z0-9]*"
+                },
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "PATTERN",
+                      "value": "[^>]*"
+                    },
+                    {
+                      "type": "BLANK"
+                    }
+                  ]
+                },
+                {
+                  "type": "STRING",
+                  "value": ">"
+                },
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "PATTERN",
+                      "value": "[^<]*"
+                    },
+                    {
+                      "type": "BLANK"
+                    }
+                  ]
+                },
+                {
+                  "type": "STRING",
+                  "value": "</"
+                },
+                {
+                  "type": "PATTERN",
+                  "value": "[a-zA-Z][a-zA-Z0-9]*"
+                },
+                {
+                  "type": "STRING",
+                  "value": ">"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "TOKEN",
+          "content": {
+            "type": "PREC",
+            "value": 1,
+            "content": {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "<"
+                },
+                {
+                  "type": "PATTERN",
+                  "value": "[a-zA-Z][a-zA-Z0-9]*"
+                },
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "PATTERN",
+                      "value": "[^>]*"
+                    },
+                    {
+                      "type": "BLANK"
+                    }
+                  ]
+                },
+                {
+                  "type": "STRING",
+                  "value": "/>"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
     "paragraph": {
       "type": "PREC_LEFT",
       "value": 0,
@@ -867,6 +1085,10 @@
             {
               "type": "SYMBOL",
               "name": "image"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "html_inline"
             },
             {
               "type": "SYMBOL",
@@ -1131,7 +1353,7 @@
         "value": -1,
         "content": {
           "type": "PATTERN",
-          "value": "[^\\n{*_`!\\[]+"
+          "value": "[^\\n{*_`!\\[<]+"
         }
       }
     }
