@@ -11,37 +11,61 @@ module.exports = grammar({
   name: "markdoc",
 
   extras: $ => [
-    /\s/
+    /[ \t\r]/
+  ],
+
+  conflicts: $ => [
+    [$.source_file]
   ],
 
   rules: {
-    source_file: $ => seq(
-      optional($.frontmatter),
-      repeat($._block)
-    ),
-
-    frontmatter: $ => seq(
-      token(prec(1, '---')),
-      token(prec(1, /\r?\n/)),
-      alias($.yaml_content, $.yaml),
-      token(prec(1, '---')),
-      optional(token(prec(1, /\r?\n/)))
-    ),
-
-    yaml_content: $ => repeat1(
-      /[^\r\n-][^\r\n]*\r?\n|\r?\n/
-    ),
+    source_file: $ => prec.right(seq(
+      repeat(/\n/),
+      optional(seq(
+        $._block,
+        repeat(seq(
+          repeat1(/\n/),
+          $._block
+        ))
+      )),
+      repeat(/\n/)
+    )),
 
     _block: $ => choice(
+      $.frontmatter,
+      $.heading,
       $.paragraph
     ),
 
-    paragraph: $ => prec.right(seq(
-      $.text,
-      repeat(seq(/\r?\n/, $.text)),
-      optional(/\r?\n/)
+    frontmatter: $ => seq(
+      token(prec(2, '---')),
+      /\n/,
+      alias($.yaml_content, $.yaml),
+      token(prec(2, '---'))
+    ),
+
+    yaml_content: $ => repeat1(
+      choice(
+        /[^\n-][^\n]*\n/,
+        /\n/
+      )
+    ),
+
+
+    heading: $ => prec.right(2, seq(
+      field('heading_marker', $.heading_marker),
+      field('heading_text', optional($.heading_text))
     )),
 
-    text: $ => /[^\r\n]+/
+    heading_marker: $ => token(prec(1, /#{1,6}[ \t]+/)),
+
+    heading_text: $ => /[^\n]+/,
+
+    paragraph: $ => prec.left(seq(
+      $.text,
+      repeat(seq(/\n/, $.text))
+    )),
+
+    text: $ => token(prec(-1, /[^\n]+/)),
   }
 });

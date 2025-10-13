@@ -3,26 +3,78 @@
   "name": "markdoc",
   "rules": {
     "source_file": {
-      "type": "SEQ",
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "REPEAT",
+            "content": {
+              "type": "PATTERN",
+              "value": "\\n"
+            }
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "_block"
+                  },
+                  {
+                    "type": "REPEAT",
+                    "content": {
+                      "type": "SEQ",
+                      "members": [
+                        {
+                          "type": "REPEAT1",
+                          "content": {
+                            "type": "PATTERN",
+                            "value": "\\n"
+                          }
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "_block"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          },
+          {
+            "type": "REPEAT",
+            "content": {
+              "type": "PATTERN",
+              "value": "\\n"
+            }
+          }
+        ]
+      }
+    },
+    "_block": {
+      "type": "CHOICE",
       "members": [
         {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "frontmatter"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
+          "type": "SYMBOL",
+          "name": "frontmatter"
         },
         {
-          "type": "REPEAT",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_block"
-          }
+          "type": "SYMBOL",
+          "name": "heading"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "paragraph"
         }
       ]
     },
@@ -33,7 +85,7 @@
           "type": "TOKEN",
           "content": {
             "type": "PREC",
-            "value": 1,
+            "value": 2,
             "content": {
               "type": "STRING",
               "value": "---"
@@ -41,15 +93,8 @@
           }
         },
         {
-          "type": "TOKEN",
-          "content": {
-            "type": "PREC",
-            "value": 1,
-            "content": {
-              "type": "PATTERN",
-              "value": "\\r?\\n"
-            }
-          }
+          "type": "PATTERN",
+          "value": "\\n"
         },
         {
           "type": "ALIAS",
@@ -64,52 +109,81 @@
           "type": "TOKEN",
           "content": {
             "type": "PREC",
-            "value": 1,
+            "value": 2,
             "content": {
               "type": "STRING",
               "value": "---"
             }
           }
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "TOKEN",
-              "content": {
-                "type": "PREC",
-                "value": 1,
-                "content": {
-                  "type": "PATTERN",
-                  "value": "\\r?\\n"
-                }
-              }
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
         }
       ]
     },
     "yaml_content": {
       "type": "REPEAT1",
       "content": {
-        "type": "PATTERN",
-        "value": "[^\\r\\n-][^\\r\\n]*\\r?\\n|\\r?\\n"
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "PATTERN",
+            "value": "[^\\n-][^\\n]*\\n"
+          },
+          {
+            "type": "PATTERN",
+            "value": "\\n"
+          }
+        ]
       }
     },
-    "_block": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "paragraph"
+    "heading": {
+      "type": "PREC_RIGHT",
+      "value": 2,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "FIELD",
+            "name": "heading_marker",
+            "content": {
+              "type": "SYMBOL",
+              "name": "heading_marker"
+            }
+          },
+          {
+            "type": "FIELD",
+            "name": "heading_text",
+            "content": {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "heading_text"
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "heading_marker": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PREC",
+        "value": 1,
+        "content": {
+          "type": "PATTERN",
+          "value": "#{1,6}[ \\t]+"
         }
-      ]
+      }
+    },
+    "heading_text": {
+      "type": "PATTERN",
+      "value": "[^\\n]+"
     },
     "paragraph": {
-      "type": "PREC_RIGHT",
+      "type": "PREC_LEFT",
       "value": 0,
       "content": {
         "type": "SEQ",
@@ -125,7 +199,7 @@
               "members": [
                 {
                   "type": "PATTERN",
-                  "value": "\\r?\\n"
+                  "value": "\\n"
                 },
                 {
                   "type": "SYMBOL",
@@ -133,34 +207,33 @@
                 }
               ]
             }
-          },
-          {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "PATTERN",
-                "value": "\\r?\\n"
-              },
-              {
-                "type": "BLANK"
-              }
-            ]
           }
         ]
       }
     },
     "text": {
-      "type": "PATTERN",
-      "value": "[^\\r\\n]+"
+      "type": "TOKEN",
+      "content": {
+        "type": "PREC",
+        "value": -1,
+        "content": {
+          "type": "PATTERN",
+          "value": "[^\\n]+"
+        }
+      }
     }
   },
   "extras": [
     {
       "type": "PATTERN",
-      "value": "\\s"
+      "value": "[ \\t\\r]"
     }
   ],
-  "conflicts": [],
+  "conflicts": [
+    [
+      "source_file"
+    ]
+  ],
   "precedences": [],
   "externals": [],
   "inline": [],
