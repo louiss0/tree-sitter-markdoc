@@ -34,6 +34,7 @@ module.exports = grammar({
     _block: $ => choice(
       $.frontmatter,
       $.heading,
+      $.fenced_code_block,
       $.paragraph
     ),
 
@@ -60,6 +61,38 @@ module.exports = grammar({
     heading_marker: $ => token(prec(1, /#{1,6}[ \t]+/)),
 
     heading_text: $ => /[^\n]+/,
+
+    fenced_code_block: $ => seq(
+      field('open', $.code_fence_open),
+      optional(field('code', $.code)),
+      field('close', $.code_fence_close)
+    ),
+
+    code_fence_open: $ => seq(
+      choice(
+        token(prec(3, '```')),
+        token(prec(3, '~~~'))
+      ),
+      optional($.info_string),
+      /\n/
+    ),
+
+    info_string: $ => seq(
+      alias(/[a-zA-Z0-9_+-]+/, $.language),
+      optional(seq(
+        /[ \t]+/,
+        alias(/\{[^}\n]*\}/, $.attributes)
+      ))
+    ),
+
+    code: $ => repeat1(/[^\n]+\n/),
+
+    code_fence_close: $ => seq(
+      choice(
+        token(prec(3, '```')),
+        token(prec(3, '~~~'))
+      )
+    ),
 
     paragraph: $ => prec.left(seq(
       $.text,
