@@ -2,6 +2,16 @@
 
 This file provides guidance to WARP (warp.dev) when working with code in this repository.
 
+
+## Tree Sitter Limitations
+
+Tree sitter doesn't allow lookahead's
+Every regex you use must be Rust compatable! 
+Don't use flag regex at all! 
+Don't use capture groups regex at all! 
+Don't use two regexes that are the same or capture the same thing at all!
+
+
 ## Core Development Commands
 
 - Generate the parser from grammar.js
