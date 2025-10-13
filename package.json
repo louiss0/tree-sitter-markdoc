@@ -1,6 +1,6 @@
 {
   "name": "tree-sitter-markdoc",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Tree-sitter grammar for Markdoc (Zed compatible)",
   "repository": "http://github.com/louiss0/tree-sitter-markdoc",
   "license": "MIT",
