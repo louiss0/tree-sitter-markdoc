@@ -206,11 +206,51 @@ module.exports = grammar({
       /[0-9]+\.[ \t]+/
     ))),
 
-    paragraph: $ => prec.left(seq(
-      choice($.inline_expression, $.text),
-      repeat(seq(/\n/, choice($.inline_expression, $.text)))
+    paragraph: $ => prec.left(repeat1(choice(
+      $.inline_expression,
+      $.strong,
+      $.emphasis,
+      $.inline_code,
+      $.link,
+      $.image,
+      $.text
+    ))),
+
+    emphasis: $ => prec.left(1, choice(
+      seq('*', token(prec(1, /[^*\n]+/)), '*'),
+      seq('_', token(prec(1, /[^_\n]+/)), '_')
     )),
 
-    text: $ => token(prec(-1, /[^\n{]+/)),
+    strong: $ => prec.left(2, choice(
+      seq('**', token(prec(2, /[^*\n]+/)), '**'),
+      seq('__', token(prec(2, /[^_\n]+/)), '__')
+    )),
+
+    inline_code: $ => seq(
+      '`',
+      token(prec(1, /[^`\n]+/)),
+      '`'
+    ),
+
+    link: $ => seq(
+      '[',
+      alias(token(prec(1, /[^\]\n]+/)), $.link_text),
+      ']',
+      '(',
+      alias(token(prec(1, /[^)\n]+/)), $.link_destination),
+      ')'
+    ),
+
+    image: $ => seq(
+      '!',
+      '[',
+      alias(token(prec(1, /[^\]\n]+/)), $.image_alt),
+      ']',
+      '(',
+      alias(token(prec(1, /[^)\n]+/)), $.image_destination),
+      ')'
+    ),
+
+    text: $ => token(prec(-1, /[^\n{*_`!\[]+/)),
   }
 });

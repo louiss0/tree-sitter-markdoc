@@ -55,6 +55,11 @@
     }
   },
   {
+    "type": "emphasis",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "expression",
     "named": true,
     "fields": {},
@@ -159,6 +164,25 @@
     }
   },
   {
+    "type": "image",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "image_alt",
+          "named": true
+        },
+        {
+          "type": "image_destination",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "info_string",
     "named": true,
     "fields": {},
@@ -178,6 +202,11 @@
     }
   },
   {
+    "type": "inline_code",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "inline_expression",
     "named": true,
     "fields": {},
@@ -187,6 +216,25 @@
       "types": [
         {
           "type": "expression",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "link",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "link_destination",
+          "named": true
+        },
+        {
+          "type": "link_text",
           "named": true
         }
       ]
@@ -308,7 +356,27 @@
       "required": true,
       "types": [
         {
+          "type": "emphasis",
+          "named": true
+        },
+        {
+          "type": "image",
+          "named": true
+        },
+        {
+          "type": "inline_code",
+          "named": true
+        },
+        {
           "type": "inline_expression",
+          "named": true
+        },
+        {
+          "type": "link",
+          "named": true
+        },
+        {
+          "type": "strong",
           "named": true
         },
         {
@@ -356,6 +424,11 @@
   },
   {
     "type": "string",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "strong",
     "named": true,
     "fields": {}
   },
@@ -418,11 +491,31 @@
     "fields": {}
   },
   {
+    "type": "!",
+    "named": false
+  },
+  {
     "type": "\"",
     "named": false
   },
   {
     "type": "%}",
+    "named": false
+  },
+  {
+    "type": "(",
+    "named": false
+  },
+  {
+    "type": ")",
+    "named": false
+  },
+  {
+    "type": "*",
+    "named": false
+  },
+  {
+    "type": "**",
     "named": false
   },
   {
@@ -446,7 +539,27 @@
     "named": false
   },
   {
+    "type": "[",
+    "named": false
+  },
+  {
     "type": "\\",
+    "named": false
+  },
+  {
+    "type": "]",
+    "named": false
+  },
+  {
+    "type": "_",
+    "named": false
+  },
+  {
+    "type": "__",
+    "named": false
+  },
+  {
+    "type": "`",
     "named": false
   },
   {
@@ -474,7 +587,23 @@
     "named": true
   },
   {
+    "type": "image_alt",
+    "named": true
+  },
+  {
+    "type": "image_destination",
+    "named": true
+  },
+  {
     "type": "language",
+    "named": true
+  },
+  {
+    "type": "link_destination",
+    "named": true
+  },
+  {
+    "type": "link_text",
     "named": true
   },
   {
