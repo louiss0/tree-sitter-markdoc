@@ -1,0 +1,65 @@
+[
+  {
+    "type": "frontmatter",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "yaml",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "paragraph",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "text",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "source_file",
+    "named": true,
+    "root": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "frontmatter",
+          "named": true
+        },
+        {
+          "type": "paragraph",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "yaml",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "---",
+    "named": false
+  },
+  {
+    "type": "text",
+    "named": true
+  }
+]
