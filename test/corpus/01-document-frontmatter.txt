@@ -1,0 +1,51 @@
+==================
+Empty document
+==================
+
+---
+
+(source_file)
+
+==================
+Frontmatter only
+==================
+
+---
+title: Hello
+---
+
+---
+
+(source_file
+  (frontmatter
+    (yaml)))
+
+==================
+Document without frontmatter
+==================
+
+Hello world
+
+---
+
+(source_file
+  (paragraph
+    (text)))
+
+==================
+Frontmatter and body
+==================
+
+---
+title: Doc
+---
+
+First paragraph
+
+---
+
+(source_file
+  (frontmatter
+    (yaml))
+  (paragraph
+    (text)))
