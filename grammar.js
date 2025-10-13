@@ -157,6 +157,7 @@ module.exports = grammar({
       $.call_expression,
       $.member_expression,
       $.array_access,
+      $.variable,
       $.array_literal,
       $.object_literal,
       $.identifier,
@@ -164,12 +165,14 @@ module.exports = grammar({
       $.string
     ),
 
-    call_expression: $ => prec.left(3, seq(
-      choice(
+    variable: $ => seq('$', $.identifier),
+
+    call_expression: $ => prec.left(4, seq(
+      field('function', choice(
         $.member_expression,
         $.array_access,
         $.identifier
-      ),
+      )),
       $.arguments
     )),
 
@@ -182,19 +185,17 @@ module.exports = grammar({
       ')'
     ),
 
-    member_expression: $ => prec.left(2, seq(
-      choice(
+    member_expression: $ => prec.left(3, seq(
+      field('object', choice(
         $.array_access,
         $.identifier
-      ),
-      repeat1(seq('.', $.identifier))
+      )),
+      repeat1(seq('.', field('property', $.identifier)))
     )),
 
-    array_access: $ => prec.left(2, seq(
-      $.identifier,
-      '[',
-      $.expression,
-      ']'
+    array_access: $ => prec.left(3, seq(
+      field('array', $.identifier),
+      repeat1(seq('[', field('index', $.expression), ']'))
     )),
 
     array_literal: $ => seq(
