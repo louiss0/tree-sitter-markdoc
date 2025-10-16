@@ -1567,6 +1567,34 @@
               "type": "SYMBOL",
               "name": "_inline_content"
             }
+          },
+          {
+            "type": "REPEAT",
+            "content": {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "PATTERN",
+                  "value": "\\n"
+                },
+                {
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "_inline_first"
+                    },
+                    {
+                      "type": "REPEAT",
+                      "content": {
+                        "type": "SYMBOL",
+                        "name": "_inline_content"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
           }
         ]
       }

@@ -359,10 +359,14 @@ module.exports = grammar({
       )))
     ),
 
-    // Paragraph: one or more inline elements on a line
+    // Paragraph: consecutive lines of content (separated by single newlines, not double)
     paragraph: $ => prec.left(1, seq(
       $._inline_first,
-      repeat($._inline_content)
+      repeat($._inline_content),
+      repeat(seq(
+        /\n/,
+        seq($._inline_first, repeat($._inline_content))
+      ))
     )),
 
     emphasis: $ => prec.left(1, choice(
