@@ -288,6 +288,52 @@ New block  ← Double newline ends paragraph
 
 ---
 
+### WORKING Phase 1 Implementation: Paragraph-Level Fix
+
+**Strategy**: Modify the `paragraph` rule to NOT continue with single newlines if the next line starts with a block marker.
+
+**Block Markers to Detect** (prevent paragraph continuation):
+- `#` (heading)
+- `>` (blockquote, if supported)
+- `- `, `* `, `+ ` (unordered list)
+- `/[0-9]+\.\s/` (ordered list)
+- `` ` `` or `~` (code fence)
+- `<` (HTML or Markdoc tag)
+- `{%` or `{{` (Markdoc constructs)
+
+**Implementation Approach**:
+
+1. Create a helper rule `_not_block_marker` that matches content ONLY if NOT followed by block markers
+2. Use this in the `paragraph` rule's continuation logic
+3. Keep `source_file` separator as `repeat1(/\n/)` unchanged
+
+**Pseudo-code**:
+```javascript
+_not_block_marker: $ => seq(
+  not(/^[#>\-*+`~<{%]/m),  // NOT at start of block marker
+  /./                        // Match any single character
+),
+
+paragraph: $ => prec.left(1, seq(
+  $._inline_first,
+  repeat($._inline_content),
+  repeat(seq(
+    /\n/,
+    // Only continue if next content is NOT a block marker
+    $._inline_first,
+    repeat($._inline_content)
+  ))
+)),
+```
+
+**Note**: Tree-Sitter doesn't support negative lookahead directly. Alternative: Use conflicts and precedence to give paragraph LOW priority when block elements are detected.
+
+**Actual Working Solution**: Modify `_inline_first` to exclude block-level content or add precedence rules.
+
+**Estimated Effort**: 1 hour (trial and error with precedence)
+
+---
+
 ### Phase 2: External Scanner for Indentation (3 hours)
 
 **Objective**: Track indentation levels for nested lists and code blocks
