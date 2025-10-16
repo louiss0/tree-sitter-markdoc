@@ -42,7 +42,10 @@ module.exports = grammar({
           $._block
         ),
         repeat(seq(
-          repeat1(/\n/),
+          choice(
+            $._BLANK_LINE,  // Scanner emits for blank lines or block boundaries
+            /\n/             // Fallback for single newlines between non-paragraph blocks
+          ),
           choice(
             $.frontmatter,
             $._block
@@ -431,7 +434,7 @@ module.exports = grammar({
       $._inline_first,
       repeat($._inline_content),
       repeat(seq(
-        /\n/,
+        $._NEWLINE,  // Use ONLY scanner token for context-aware line continuation
         seq($._inline_first, repeat($._inline_content))
       ))
     )),

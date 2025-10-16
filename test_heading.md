@@ -1,3 +1,2 @@
-# Title
-
-Paragraph below heading.
+# Heading
+Paragraph text

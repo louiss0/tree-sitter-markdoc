@@ -65,37 +65,69 @@ void tree_sitter_markdoc_external_scanner_deserialize(void *payload, const char 
   }
 }
 
+// Helper: Check if character starts a block-level element
+static inline bool is_block_marker(int32_t ch) {
+  return ch == '#' ||   // Heading
+         ch == '-' ||   // List or thematic break
+         ch == '*' ||   // List or thematic break  
+         ch == '+' ||   // List
+         ch == '_' ||   // Thematic break
+         ch == '>' ||   // Blockquote
+         ch == '`' ||   // Code fence
+         ch == '~' ||   // Code fence
+         ch == '<' ||   // HTML
+         ch == '{' ||   // Markdoc tag or expression
+         (ch >= '0' && ch <= '9');  // Ordered list
+}
+
 bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
                                              const bool *valid_symbols) {
   Scanner *scanner = (Scanner *)payload;
 
-  // NEWLINE: Explicit newline token outside code blocks
-  if (valid_symbols[NEWLINE] && !scanner->in_code_block) {
-    if (is_newline(lexer->lookahead)) {
-      // Handle CRLF: CR LF as single newline
+  // Process newlines only outside code blocks
+  if (!scanner->in_code_block && is_newline(lexer->lookahead)) {
+    // Count consecutive newlines
+    int newline_count = 0;
+    while (is_newline(lexer->lookahead)) {
       if (lexer->lookahead == '\r') {
         lexer->advance(lexer, false);
       }
-      // Now consume the LF if present
       if (lexer->lookahead == '\n') {
-        lexer->advance(lexer, true);  // Mark end of token
-        lexer->result_symbol = NEWLINE;
-        return true;
+        lexer->advance(lexer, false);
+        newline_count++;
       }
     }
+    
+    lexer->mark_end(lexer);  // Mark end after consuming newlines
+    
+    // Look ahead past whitespace
+    int32_t next_char = lexer->lookahead;
+    while (is_space_char(next_char)) {
+      lexer->advance(lexer, false);
+      next_char = lexer->lookahead;
+    }
+    
+    // Check if we're at EOF
+    if (next_char == 0) {
+      // At EOF - don't emit tokens for trailing newlines
+      // Let the grammar's repeat(/\n/) handle them
+      return false;
+    }
+    
+    bool at_block_boundary = is_block_marker(next_char);
+    
+    // BLANK_LINE: Emit for true blank lines (2+ newlines) OR block boundaries
+    if (valid_symbols[BLANK_LINE] && (newline_count >= 2 || at_block_boundary)) {
+      lexer->result_symbol = BLANK_LINE;
+      return true;
+    }
+    
+    // NEWLINE: Emit for line continuation (single newline, not at block boundary)
+    if (valid_symbols[NEWLINE] && newline_count == 1 && !at_block_boundary) {
+      lexer->result_symbol = NEWLINE;
+      return true;
+    }
   }
-
-  // BLANK_LINE: Whitespace-only line (disabled pending grammar wiring)
-  // if (valid_symbols[BLANK_LINE] && !scanner->in_code_block && lexer->get_column(lexer) == 0) {
-  //   if (is_newline(lexer->lookahead)) {
-  //     if (lexer->lookahead == '\r') lexer->advance(lexer, false);
-  //     if (lexer->lookahead == '\n') {
-  //       lexer->advance(lexer, true);
-  //       lexer->result_symbol = BLANK_LINE;
-  //       return true;
-  //     }
-  //   }
-  // }
 
   // CODE_CONTENT: Consume all content until we hit a closing fence
   if (valid_symbols[CODE_CONTENT]) {
