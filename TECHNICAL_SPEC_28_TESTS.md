@@ -248,11 +248,43 @@ repeat(seq(
 
 **No other changes needed**. The paragraph rule already handles multi-line content correctly once the block separator changes.
 
+### CRITICAL FINDING: Phase 1 Approach Conflict 🚨
+
+**DISCOVERY**: Testing revealed that the simple `/\n\n+/` change creates regressions:
+- ✓ Fixes tests 1, 2, 12, 13, 26-28 (multi-line paragraphs)
+- ✗ BREAKS tests 8, 10 (consecutive headings with single newlines)
+
+**Why**: Markdown/Markdoc allows consecutive blocks (headings, lists) to be separated by single newlines:
+```markdown
+#### H4
+##### H5       ← Only single newline between headings
+###### H6
+```
+
+But paragraphs need multi-line support with single newlines as continuation:
+```markdown
+Line one
+Line two   ← Single newline continues paragraph
+
+New block  ← Double newline ends paragraph
+```
+
+**Requirement**: To distinguish "newline within block" from "newline separating blocks", we need **context awareness** that standard grammar alone cannot provide.
+
+**Actual Solution**: This REQUIRES Phase 2 (external scanner) to emit special tokens that distinguish between:
+- Newline at end of inline content (potential continuation)
+- Newline before block marker like `#`, `-`, `{%` (always ends block)
+
+### REVISED Phase 1 Status
+
+**DEFER Phase 1 GRAMMAR CHANGE**: Cannot implement simple separator change without breaking tests.
+
+**ALTERNATIVE**: Implement a **targeted fix for the paragraph rule only** that prevents it from consuming newlines when the next line starts with a block marker.
+
 **Benefits**: 
-- Fixes tests 1, 2, 26-28 (5 tests)
-- Enables proper multi-line paragraph handling
-- Foundation for Phase 5 (list_paragraph support)
-- No regressions expected (only makes block separation more strict)
+- Fixes tests 1, 2, 12, 13, 26-28 (multi-line paragraphs)
+- No regressions to tests 8, 10 (keeps single-newline block separation)
+- Allows Phase 2 to build on working foundation
 
 ---
 
