@@ -28,7 +28,8 @@ module.exports = grammar({
     [$.paragraph],
     [$.attribute, $._primary_expression],
     [$.markdoc_tag, $.paragraph],
-    [$.attribute_value, $._primary_expression]
+    [$.attribute_value, $._primary_expression],
+    [$.tag_open, $.tag_close]
   ],
 
   rules: {
@@ -144,7 +145,7 @@ module.exports = grammar({
     tag_close: $ => prec.right(seq(
       repeat(/\n/),
       token(prec(6, seq('{%', /[ \t]*/))),
-      token('/'),
+      optional(token('/')),  // Allow optional slash for alternative syntax
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
       token(prec(6, seq(/[ \t]*/, '%}'))),
       optional(/\n/)
