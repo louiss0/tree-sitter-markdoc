@@ -2,6 +2,7 @@
 #include <wctype.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 enum TokenType {
   CODE_CONTENT,
@@ -61,9 +62,20 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
                                              const bool *valid_symbols) {
   Scanner *scanner = (Scanner *)payload;
   
-  // Handle NEWLINE token
-  if (valid_symbols[NEWLINE] && !scanner->in_code_block) {
-    if (is_newline(lexer->lookahead)) {
+  // Debug: Log which symbols are valid
+  static int call_count = 0;
+  if (call_count < 20) {  // Only first 20 calls to avoid spam
+    fprintf(stderr, "[SCAN %d] lookahead='%c'(0x%02x) valid:[%d,%d,%d] col=%d\n",
+      call_count++, 
+      (lexer->lookahead > 31 && lexer->lookahead < 127) ? lexer->lookahead : '?',
+      lexer->lookahead,
+      valid_symbols[CODE_CONTENT], valid_symbols[NEWLINE], valid_symbols[BLANK_LINE],
+      lexer->get_column(lexer));
+  }
+  
+  // Handle NEWLINE token - ALWAYS emit if lookahead is newline and not in code block
+  if (is_newline(lexer->lookahead) && !scanner->in_code_block) {
+    if (valid_symbols[NEWLINE]) {
       // Advance past CR if present
       if (lexer->lookahead == '\r') {
         lexer->advance(lexer, false);
@@ -72,6 +84,7 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
       if (lexer->lookahead == '\n') {
         lexer->advance(lexer, true);
         lexer->result_symbol = NEWLINE;
+        fprintf(stderr, "  -> EMIT NEWLINE\n");
         return true;
       }
     }
@@ -79,7 +92,6 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
   
   // Handle BLANK_LINE token
   if (valid_symbols[BLANK_LINE] && !scanner->in_code_block) {
-    // Save position
     int32_t start_col = lexer->get_column(lexer);
     
     // Check if we're at line start
@@ -99,6 +111,7 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
         if (lexer->lookahead == '\n') {
           lexer->advance(lexer, true);
           lexer->result_symbol = BLANK_LINE;
+          fprintf(stderr, "  -> EMIT BLANK_LINE\n");
           return true;
         }
       }
@@ -106,7 +119,6 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
   }
   
   // CODE_CONTENT: Consume all content until we hit a closing fence
-  // The grammar ensures this is only called between code fences
   if (valid_symbols[CODE_CONTENT]) {
     // Only emit CODE_CONTENT when inside code blocks
     if (!scanner->in_code_block) {
@@ -154,6 +166,7 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
     
     if (has_content) {
       lexer->result_symbol = CODE_CONTENT;
+      fprintf(stderr, "  -> EMIT CODE_CONTENT\n");
       return true;
     }
   }
