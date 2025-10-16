@@ -66,11 +66,58 @@ Once inline_expression works (38, 39, 42):
 
 Run full test suite after each change to ensure 66/100 baseline maintained.
 
+## Investigation Results
+
+### External Scanner Analysis
+
+**Finding**: The `_code_content` external scanner IS necessary for code fence handling. Removing it causes regression from 66→54 tests.
+
+**Issue**: Parser state conflict between:
+- `inline_expression` context (should use member_expression with `.`)
+- `code` rule context (can use external scanner)
+
+When parser sees `{{ user . `, both `member_expression` and `_code_content` are valid, causing ERROR nodes.
+
+**Solution Complexity**: High - requires detailed state machine analysis or grammar restructuring.
+
+### Multi-line Paragraph Analysis
+
+**Current Behavior**: Paragraphs are still being split by single newlines due to block separator `repeat1(/\n/)`
+- Test 12 shows last paragraph HAS multi-line support, earlier ones don't
+- This is the fundamental issue identified in Phase 1
+
+**Why It's Stuck**: 
+- `/repeat1(/\n/)/` separator: Breaks paragraphs into lines
+- `/\n\n+/` separator: Breaks consecutive headings/lists
+- **Cannot fix without external scanner**
+
+### Critical Insight
+
+**Both inline expressions AND multi-line paragraphs are blocked by external scanner issues:**
+1. Expressions: scanner interferes with member access parsing
+2. Paragraphs: separator needs context awareness scanner can provide
+
+## Recommended Path Forward
+
+**Option A** (Recommended): Implement proper Phase 2 external scanner
+- Fix current `_code_content` scanner to not interfere with expressions
+- Add `_NEWLINE` and `_BLANK_LINE` tokens for paragraph control
+- This solves BOTH inline expression AND multi-line paragraph issues
+- Estimated: 4-6 hours
+
+**Option B**: Continue patching around scanner
+- Focus on tests NOT affected by scanner conflicts (HTML, operators, etc.)
+- Could reach 70-75/100 but with fundamental issues remaining
+- Estimated: 2-3 hours, limited success
+
+**Option C**: Revert to earlier stable commit and take simpler approach
+- Current state is complex; may be better to restart from a known good point
+- Estimated: Unknown, depends on finding stable baseline
+
 ## Next Immediate Action
 
-1. Inspect `_code_content` external scanner - is it necessary?
-2. Try removing it or constraining its scope
-3. Re-test "Inline expression with property access" (test 38)
-4. If fix works → commit and proceed to 6.2
-5. If fails → revert and try option 2
+Given findings, recommend proceeding with **Option A**: Implement proper Phase 2 external scanner that:
+1. Fixes `_code_content` to not interfere with expression parsing
+2. Adds proper `_NEWLINE` and `_BLANK_LINE` token handling
+3. Allows both multi-line paragraphs AND single-newline block separation
 
