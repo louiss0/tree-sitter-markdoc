@@ -359,30 +359,10 @@ module.exports = grammar({
       )))
     ),
 
-    // One or more lines of text ending at block starters or blank lines
-    paragraph: $ => prec.left(1, choice(
-      seq(
-        $._inline_first,
-        repeat($._inline_content)
-      ),
-      seq(
-        $._inline_content,
-        repeat($._inline_content),
-        repeat(seq(
-          /\n[ \t]*/,  // Single line break with optional whitespace
-          choice(
-            seq($._inline_first, repeat($._inline_content)),
-            $._inline_content
-          )
-        ))
-      )
-    )),
-
-    _paragraph_line: $ => prec.right(seq(
-      repeat1(seq(
-        optional(/[ \t]*/),
-        $._inline_content
-      ))
+    // Paragraph: one or more inline elements on a line
+    paragraph: $ => prec.left(1, seq(
+      $._inline_first,
+      repeat($._inline_content)
     )),
 
     emphasis: $ => prec.left(1, choice(
