@@ -308,7 +308,7 @@ module.exports = grammar({
 
     // Content that can appear in a list item
     _list_item_content: $ => choice(
-      $.paragraph,
+      $.list_paragraph,
       $.list,
       $.fenced_code_block,
       $.html_block
@@ -378,6 +378,12 @@ module.exports = grammar({
         /\n/,
         seq($._inline_first, repeat($._inline_content))
       ))
+    )),
+
+    // List paragraph: paragraph content within list items (typically single line)
+    list_paragraph: $ => prec.left(1, seq(
+      $._inline_first,
+      repeat($._inline_content)
     )),
 
     emphasis: $ => prec.left(1, choice(
