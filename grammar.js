@@ -36,21 +36,21 @@ module.exports = grammar({
 
   rules: {
     source_file: $ => prec.right(seq(
-      repeat(/\n/),
+      repeat($._NEWLINE),
       optional(seq(
         choice(
           $.frontmatter,
           $._block
         ),
         repeat(seq(
-          repeat1(/\n/),
+          repeat1($._NEWLINE),
           choice(
             $.frontmatter,
             $._block
           )
         ))
       )),
-      repeat(/\n/)
+      repeat($._NEWLINE)
     )),
 
     _block: $ => choice(
@@ -66,15 +66,15 @@ module.exports = grammar({
 
     frontmatter: $ => seq(
       token(prec(2, '---')),
-      /\n/,
+      $._NEWLINE,
       alias($.yaml_content, $.yaml),
       token(prec(2, '---'))
     ),
 
     yaml_content: $ => repeat1(
       choice(
-        /[^\n-][^\n]*\n/,
-        /\n/
+        /[^\n-][^\n]*/,
+        $._NEWLINE
       )
     ),
 
@@ -100,7 +100,7 @@ module.exports = grammar({
         token(prec(3, '~~~'))
       ),
       optional($.info_string),
-      /\n/
+      $._NEWLINE
     ),
 
     info_string: $ => seq(
@@ -119,7 +119,7 @@ module.exports = grammar({
         token(prec(3, '```')),
         token(prec(3, '~~~'))
       ),
-      optional(/\n/)
+      optional($._NEWLINE)
     ),
 
     // Markdoc comment block: {% comment %}...{% /comment %}
@@ -127,7 +127,7 @@ module.exports = grammar({
       token(prec(10, seq('{%', /[ \t]*/, 'comment', /[ \t]*/, '%}'))),
       repeat(choice(
         /[^{\n]+/,
-        /\n/,
+        $._NEWLINE,
         /\{/
       )),
       token(prec(10, seq('{%', /[ \t]*/, '\/', /[ \t]*/, 'comment', /[ \t]*/, '%}')))
@@ -137,7 +137,7 @@ module.exports = grammar({
       seq(
         $.tag_open,
         repeat(seq(
-          repeat(/\n/),
+          repeat($._NEWLINE),
           $._block
         )),
         $.tag_close
@@ -153,16 +153,16 @@ module.exports = grammar({
         $.attribute
       )),
       token(prec(6, seq(/[ \t]*/, '%}'))),
-      optional(/\n/)
+      optional($._NEWLINE)
     )),
 
     tag_close: $ => prec.right(seq(
-      repeat(/\n/),
+      repeat($._NEWLINE),
       token(prec(6, seq('{%', /[ \t]*/))),
       optional(token('/')),  // Allow optional slash for alternative syntax
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
       token(prec(6, seq(/[ \t]*/, '%}'))),
-      optional(/\n/)
+      optional($._NEWLINE)
     )),
 
     tag_self_close: $ => prec.right(seq(
@@ -173,7 +173,7 @@ module.exports = grammar({
         $.attribute
       )),
       token(prec(6, seq(/[ \t]*/, '/%}'))),
-      optional(/\n/)
+      optional($._NEWLINE)
     )),
 
     attribute: $ => seq(
@@ -310,8 +310,8 @@ module.exports = grammar({
     // A blank line between items terminates the list (separate list)
     list: $ => prec.right(seq(
       $.list_item,
-      repeat(seq(/\n/, $.list_item)),
-      optional(/\n/)  // Optional trailing newline after last item
+      repeat(seq($._NEWLINE, $.list_item)),
+      optional($._NEWLINE)  // Optional trailing newline after last item
     )),
 
     // A list item with content and optional continuation lines
@@ -389,7 +389,7 @@ module.exports = grammar({
       $._inline_first,
       repeat($._inline_content),
       repeat(seq(
-        /\n/,
+        $._NEWLINE,
         seq($._inline_first, repeat($._inline_content))
       ))
     )),

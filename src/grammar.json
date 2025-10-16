@@ -11,8 +11,8 @@
           {
             "type": "REPEAT",
             "content": {
-              "type": "PATTERN",
-              "value": "\\n"
+              "type": "SYMBOL",
+              "name": "_NEWLINE"
             }
           },
           {
@@ -42,8 +42,8 @@
                         {
                           "type": "REPEAT1",
                           "content": {
-                            "type": "PATTERN",
-                            "value": "\\n"
+                            "type": "SYMBOL",
+                            "name": "_NEWLINE"
                           }
                         },
                         {
@@ -72,8 +72,8 @@
           {
             "type": "REPEAT",
             "content": {
-              "type": "PATTERN",
-              "value": "\\n"
+              "type": "SYMBOL",
+              "name": "_NEWLINE"
             }
           }
         ]
@@ -131,8 +131,8 @@
           }
         },
         {
-          "type": "PATTERN",
-          "value": "\\n"
+          "type": "SYMBOL",
+          "name": "_NEWLINE"
         },
         {
           "type": "ALIAS",
@@ -163,11 +163,11 @@
         "members": [
           {
             "type": "PATTERN",
-            "value": "[^\\n-][^\\n]*\\n"
+            "value": "[^\\n-][^\\n]*"
           },
           {
-            "type": "PATTERN",
-            "value": "\\n"
+            "type": "SYMBOL",
+            "name": "_NEWLINE"
           }
         ]
       }
@@ -300,8 +300,8 @@
           ]
         },
         {
-          "type": "PATTERN",
-          "value": "\\n"
+          "type": "SYMBOL",
+          "name": "_NEWLINE"
         }
       ]
     },
@@ -395,8 +395,8 @@
           "type": "CHOICE",
           "members": [
             {
-              "type": "PATTERN",
-              "value": "\\n"
+              "type": "SYMBOL",
+              "name": "_NEWLINE"
             },
             {
               "type": "BLANK"
@@ -450,8 +450,8 @@
                 "value": "[^{\\n]+"
               },
               {
-                "type": "PATTERN",
-                "value": "\\n"
+                "type": "SYMBOL",
+                "name": "_NEWLINE"
               },
               {
                 "type": "PATTERN",
@@ -523,8 +523,8 @@
                     {
                       "type": "REPEAT",
                       "content": {
-                        "type": "PATTERN",
-                        "value": "\\n"
+                        "type": "SYMBOL",
+                        "name": "_NEWLINE"
                       }
                     },
                     {
@@ -622,8 +622,8 @@
             "type": "CHOICE",
             "members": [
               {
-                "type": "PATTERN",
-                "value": "\\n"
+                "type": "SYMBOL",
+                "name": "_NEWLINE"
               },
               {
                 "type": "BLANK"
@@ -642,8 +642,8 @@
           {
             "type": "REPEAT",
             "content": {
-              "type": "PATTERN",
-              "value": "\\n"
+              "type": "SYMBOL",
+              "name": "_NEWLINE"
             }
           },
           {
@@ -714,8 +714,8 @@
             "type": "CHOICE",
             "members": [
               {
-                "type": "PATTERN",
-                "value": "\\n"
+                "type": "SYMBOL",
+                "name": "_NEWLINE"
               },
               {
                 "type": "BLANK"
@@ -800,8 +800,8 @@
             "type": "CHOICE",
             "members": [
               {
-                "type": "PATTERN",
-                "value": "\\n"
+                "type": "SYMBOL",
+                "name": "_NEWLINE"
               },
               {
                 "type": "BLANK"
@@ -1384,8 +1384,8 @@
               "type": "SEQ",
               "members": [
                 {
-                  "type": "PATTERN",
-                  "value": "\\n"
+                  "type": "SYMBOL",
+                  "name": "_NEWLINE"
                 },
                 {
                   "type": "SYMBOL",
@@ -1398,8 +1398,8 @@
             "type": "CHOICE",
             "members": [
               {
-                "type": "PATTERN",
-                "value": "\\n"
+                "type": "SYMBOL",
+                "name": "_NEWLINE"
               },
               {
                 "type": "BLANK"
@@ -1708,8 +1708,8 @@
               "type": "SEQ",
               "members": [
                 {
-                  "type": "PATTERN",
-                  "value": "\\n"
+                  "type": "SYMBOL",
+                  "name": "_NEWLINE"
                 },
                 {
                   "type": "SEQ",
