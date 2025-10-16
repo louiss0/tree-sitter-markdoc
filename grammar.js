@@ -121,7 +121,10 @@ module.exports = grammar({
     markdoc_tag: $ => prec.dynamic(10, choice(
       seq(
         $.tag_open,
-        repeat($._block),
+        repeat(seq(
+          repeat(/\n/),
+          $._block
+        )),
         $.tag_close
       ),
       $.tag_self_close
@@ -139,6 +142,7 @@ module.exports = grammar({
     )),
 
     tag_close: $ => prec.right(seq(
+      repeat(/\n/),
       token(prec(6, seq('{%', /[ \t]*/))),
       token('/'),
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
