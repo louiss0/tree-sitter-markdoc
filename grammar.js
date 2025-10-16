@@ -57,6 +57,8 @@ module.exports = grammar({
       $.markdoc_tag,
       $.fenced_code_block,
       $.heading,
+      $.thematic_break,
+      $.blockquote,
       $.html_block,
       $.list,
       $.html_comment,
@@ -64,10 +66,10 @@ module.exports = grammar({
     ),
 
     frontmatter: $ => seq(
-      token(prec(2, '---')),
+      token(prec(10, '---')),
       /\n/,
       alias($.yaml_content, $.yaml),
-      token(prec(2, '---'))
+      token(prec(10, '---'))
     ),
 
     yaml_content: $ => repeat1(
@@ -86,6 +88,19 @@ module.exports = grammar({
     heading_marker: $ => token(prec(1, /#{1,6}[ \t]+/)),
 
     heading_text: $ => /[^\n]+/,
+
+    // Thematic break (horizontal rule) - must be at least 3 chars
+    thematic_break: $ => token(prec(1, choice(
+      /\*[ \t]*\*[ \t]*\*[ \t*]*/,
+      /-[ \t]*-[ \t]*-[ \t-]*/,
+      /_[ \t]*_[ \t]*_[ \t_]*/
+    ))),
+
+    // Blockquote
+    blockquote: $ => prec.right(seq(
+      token(prec(2, seq('>', optional(/[ \t]+/)))),
+      optional($._block)
+    )),
 
     fenced_code_block: $ => seq(
       field('open', $.code_fence_open),
@@ -191,6 +206,8 @@ module.exports = grammar({
     // Top-level expressions have highest precedence to contain their
     // own operations and prevent ambiguity with attribute_value
     expression: $ => choice(
+      $.binary_expression,
+      $.unary_expression,
       $.call_expression,
       $.member_expression,
       $.array_access,
@@ -205,11 +222,15 @@ module.exports = grammar({
       $.number,
       $.array_literal,
       $.object_literal,
-      $.boolean
+      $.boolean,
+      $.null
     ),
 
     // Boolean literals
     boolean: $ => choice('true', 'false'),
+
+    // Null literal
+    null: $ => 'null',
 
     // Alias: object is same as object_literal for test compatibility
     object: $ => $.object_literal,
@@ -220,8 +241,24 @@ module.exports = grammar({
     // Variable prefixed with $
     variable: $ => seq('$', $.identifier),
 
+    // Binary operators (in order of precedence)
+    binary_expression: $ => choice(
+      prec.left(1, seq($.expression, '||', $.expression)),
+      prec.left(2, seq($.expression, '&&', $.expression)),
+      prec.left(3, seq($.expression, choice('==', '!='), $.expression)),
+      prec.left(4, seq($.expression, choice('<', '>', '<=', '>='), $.expression)),
+      prec.left(5, seq($.expression, choice('+', '-'), $.expression)),
+      prec.left(6, seq($.expression, choice('*', '/', '%'), $.expression))
+    ),
+
+    // Unary operators
+    unary_expression: $ => prec.right(7, seq(
+      choice('!', '-', '+'),
+      $.expression
+    )),
+
     // Ordered by precedence - call > member > array access 
-    call_expression: $ => prec.left(2, seq(
+    call_expression: $ => prec.left(4, seq(
       field('function', choice(
         $.member_expression,
         $.identifier
@@ -286,13 +323,23 @@ module.exports = grammar({
 
     identifier: $ => /[a-zA-Z_][a-zA-Z0-9_]*/,
 
-    string: $ => seq(
-      '"',
-      repeat(choice(
-        /[^"\\\n]/,
-        seq('\\', /./)
-      )),
-      '"'
+    string: $ => choice(
+      seq(
+        '"',
+        repeat(choice(
+          /[^"\\\n]/,
+          seq('\\', /./)
+        )),
+        '"'
+      ),
+      seq(
+        "'",
+        repeat(choice(
+          /[^'\\\n]/,
+          seq('\\', /./)
+        )),
+        "'"
+      )
     ),
 
     number: $ => /-?[0-9]+(\.[0-9]+)?/,
@@ -441,6 +488,6 @@ module.exports = grammar({
       $.image
     ),
 
-    text: $ => token(/[^\n{*_`\[<\r]+|!/),
+    text: $ => token(/[^\n{<`*_\[\]!]+/),
   }
 });
