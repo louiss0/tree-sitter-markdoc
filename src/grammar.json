@@ -72,8 +72,21 @@
           {
             "type": "REPEAT",
             "content": {
-              "type": "PATTERN",
-              "value": "\\n"
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "PATTERN",
+                  "value": "\\n"
+                },
+                {
+                  "type": "PATTERN",
+                  "value": " "
+                },
+                {
+                  "type": "PATTERN",
+                  "value": "\\t"
+                }
+              ]
             }
           }
         ]
@@ -1180,6 +1193,18 @@
                 }
               ]
             }
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "PATTERN",
+                "value": "\\n"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
           }
         ]
       }

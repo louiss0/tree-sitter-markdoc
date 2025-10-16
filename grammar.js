@@ -47,7 +47,7 @@ module.exports = grammar({
           )
         ))
       )),
-      repeat(/\n/)
+      repeat(choice(/\n/, / /, /\t/))
     )),
 
     _block: $ => choice(
@@ -285,7 +285,8 @@ module.exports = grammar({
     // A blank line between items terminates the list (separate list)
     list: $ => prec.right(seq(
       $.list_item,
-      repeat(seq(/\n/, $.list_item))
+      repeat(seq(/\n/, $.list_item)),
+      optional(/\n/)  // Optional trailing newline after last item
     )),
 
     // A list item with content and optional continuation lines
