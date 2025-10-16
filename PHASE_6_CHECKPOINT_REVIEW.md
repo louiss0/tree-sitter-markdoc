@@ -112,3 +112,76 @@ Before Phase 6B, confirm:
 
 **Ready to proceed with Grammar Wiring (Phase 6B)?**
 
+
+---
+
+## Phase 6B Attempt: Grammar Wiring (ecceb96)
+
+### What Was Done
+
+Executed full grammar rewrite to replace all `/\n/` regex patterns with `$._NEWLINE` tokens:
+- 16 instances of `/\n/` replaced across grammar rules
+- Fixed yaml_content regex pattern that included `\n` terminator  
+- Parser regenerated cleanly with no new conflicts
+- Build succeeds
+
+### Test Results
+
+**Regression:** 67/200 → 55/200 tests passing (-12 tests)
+
+### Root Cause Analysis
+
+The grammar now requests `$._NEWLINE` tokens throughout, but the parser isn't receiving them from the scanner. Likely causes:
+
+1. **Index Mismatch:** Scanner's `valid_symbols[NEWLINE]` may not align with parser's expected index
+   - Scanner enum: `CODE_CONTENT=0, NEWLINE=1, BLANK_LINE=2`
+   - Parser likely passes different indices based on its internal symbol table
+
+2. **Parser State Issue:** `valid_symbols[NEWLINE]` may never be true during parse
+   - Tree-sitter's LR parser sets `valid_symbols` based on parse states
+   - Grammar rewrite changed parse states; NEWLINE may not be requested
+
+3. **Gating Logic:** Scanner checks `!scanner->in_code_block` before emitting
+   - Initially `in_code_block` is false, so condition should pass
+   - But `in_code_block` is never updated (no state transitions implemented yet)
+
+### Recommended Fix Path
+
+**Option 1 (Correct):** Use parser-agnostic lookahead
+```c
+// Instead of: if (valid_symbols[NEWLINE])
+// Try: if (lexer->lookahead is newline) { emit token}
+// Let parser decide if it wants the token via backtracking
+```
+
+**Option 2 (Debug):** Add diagnostic logging
+```c
+fprintf(stderr, "Scanner: lookahead=%d, valid_symbols[0..3]={%d,%d,%d,%d}\n",
+  lexer->lookahead, valid_symbols[0], valid_symbols[1], valid_symbols[2], valid_symbols[3]);
+```
+
+**Option 3 (Safer Path):** Revert to Option B approach
+- Undo grammar rewrite (git revert ecceb96)
+- Keep `parser.js` using `/\n/` regex
+- Only implement CODE_CONTENT gating (Option A core fix)
+- Fix inline expression conflicts without full NEWLINE refactor
+
+### Lessons Learned
+
+1. **Tree-sitter External Scanners:** Require precise `valid_symbols` alignment with parser's symbol table
+2. **Wholesale Grammar Changes:** Risky due to parse state redistribution; incremental changes safer
+3. **Testing Complexity:** Simple test count doesn't indicate parse tree correctness
+
+---
+
+## Recommendation
+
+**Choose One:**
+1. **Deep Dive (4+ hours):** Debug scanner/parser alignment, get NEWLINE tokens flowing
+2. **Strategic Pivot (2 hours):** Revert, implement CODE_CONTENT fix only (Option B), achieve quick wins
+3. **Hybrid (3 hours):** Revert, implement CODE_CONTENT + selective NEWLINE wiring (Phase rules only)
+
+---
+
+**Current Status:** 2 commits toward Phase 6, infrastructure solid but integration incomplete.
+
