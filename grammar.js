@@ -27,7 +27,8 @@ module.exports = grammar({
     [$.paragraph, $._inline_content],
     [$.paragraph],
     [$.attribute, $._primary_expression],
-    [$.markdoc_tag, $.paragraph]
+    [$.markdoc_tag, $.paragraph],
+    [$.attribute_value, $._primary_expression]
   ],
 
   rules: {
@@ -161,10 +162,12 @@ module.exports = grammar({
       /[ \t]*/,
       '=',
       /[ \t]*/,
-      field('attribute_value', choice(
-        $.string,
-        $.expression
-      ))
+      $.attribute_value
+    ),
+
+    attribute_value: $ => choice(
+      $.string,
+      $.expression
     ),
 
     // Top-level expressions have highest precedence to contain their

@@ -708,21 +708,21 @@
           "value": "[ \\t]*"
         },
         {
-          "type": "FIELD",
-          "name": "attribute_value",
-          "content": {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "string"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "expression"
-              }
-            ]
-          }
+          "type": "SYMBOL",
+          "name": "attribute_value"
+        }
+      ]
+    },
+    "attribute_value": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "string"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "expression"
         }
       ]
     },
@@ -1987,6 +1987,10 @@
     [
       "markdoc_tag",
       "paragraph"
+    ],
+    [
+      "attribute_value",
+      "_primary_expression"
     ]
   ],
   "precedences": [],
