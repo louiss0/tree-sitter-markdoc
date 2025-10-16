@@ -11,8 +11,6 @@ module.exports = grammar({
   name: "markdoc",
 
   externals: $ => [
-    $._expression_start,
-    $._expression_end,
     $._code_content
   ],
 
@@ -28,7 +26,8 @@ module.exports = grammar({
     [$.code_fence_close],
     [$.paragraph, $._inline_content],
     [$.paragraph],
-    [$.attribute, $._primary_expression]
+    [$.attribute, $._primary_expression],
+    [$.markdoc_tag, $.paragraph]
   ],
 
   rules: {
@@ -47,17 +46,17 @@ module.exports = grammar({
           )
         ))
       )),
-      repeat(choice(/\n/, / /, /\t/))
+      repeat(/\n/)
     )),
 
     _block: $ => choice(
-      $.heading,
-      $.paragraph,
-      $.fenced_code_block,
-      $.html_block,
       $.markdoc_tag,
+      $.fenced_code_block,
+      $.heading,
+      $.html_block,
       $.list,
-      $.html_comment
+      $.html_comment,
+      $.paragraph
     ),
 
     frontmatter: $ => seq(
@@ -118,48 +117,42 @@ module.exports = grammar({
       optional(/\n/)
     ),
 
-    markdoc_tag: $ => choice(
+    markdoc_tag: $ => prec.dynamic(10, choice(
       seq(
         $.tag_open,
         repeat($._block),
         $.tag_close
       ),
       $.tag_self_close
-    ),
+    )),
 
-    tag_open: $ => prec.right(2, seq(
-      token('{%'),
-      /[ \t]*/,
+    tag_open: $ => prec.right(seq(
+      token(prec(6, seq('{%', /[ \t]*/))),
       field('name', alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, 'tag_name')),
       repeat(seq(
         /[ \t]+/,
         $.attribute
       )),
-      /[ \t]*/,
-      token('%}'),
+      token(prec(6, seq(/[ \t]*/, '%}'))),
       optional(/\n/)
     )),
 
-    tag_close: $ => prec.right(2, seq(
-      token('{%'),
-      /[ \t]*/,
+    tag_close: $ => prec.right(seq(
+      token(prec(6, seq('{%', /[ \t]*/))),
       token('/'),
       field('name', alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, 'tag_name')),
-      /[ \t]*/,
-      token('%}'),
+      token(prec(6, seq(/[ \t]*/, '%}'))),
       optional(/\n/)
     )),
 
-    tag_self_close: $ => prec.right(2, seq(
-      token('{%'),
-      /[ \t]*/,
+    tag_self_close: $ => prec.right(seq(
+      token(prec(6, seq('{%', /[ \t]*/))),
       field('name', alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, 'tag_name')),
       repeat(seq(
         /[ \t]+/,
         $.attribute
       )),
-      /[ \t]*/,
-      token('/%}'),
+      token(prec(6, seq(/[ \t]*/, '/%}'))),
       optional(/\n/)
     )),
 
@@ -274,11 +267,11 @@ module.exports = grammar({
     number: $ => /-?[0-9]+(\.[0-9]+)?/,
 
     inline_expression: $ => prec.right(4, seq(
-      $._expression_start,
+      token(prec(5, '{{')),
       optional(/[ \t]*/),
       field('content', prec.right(3, $.expression)),
       optional(/[ \t]*/),
-      $._expression_end
+      token(prec(5, '}}'))
     )),
 
     // Lists: one or more list items separated by a single newline

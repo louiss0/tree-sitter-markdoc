@@ -72,21 +72,8 @@
           {
             "type": "REPEAT",
             "content": {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "PATTERN",
-                  "value": "\\n"
-                },
-                {
-                  "type": "PATTERN",
-                  "value": " "
-                },
-                {
-                  "type": "PATTERN",
-                  "value": "\\t"
-                }
-              ]
+              "type": "PATTERN",
+              "value": "\\n"
             }
           }
         ]
@@ -97,11 +84,7 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "heading"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "paragraph"
+          "name": "markdoc_tag"
         },
         {
           "type": "SYMBOL",
@@ -109,11 +92,11 @@
         },
         {
           "type": "SYMBOL",
-          "name": "html_block"
+          "name": "heading"
         },
         {
           "type": "SYMBOL",
-          "name": "markdoc_tag"
+          "name": "html_block"
         },
         {
           "type": "SYMBOL",
@@ -122,6 +105,10 @@
         {
           "type": "SYMBOL",
           "name": "html_comment"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "paragraph"
         }
       ]
     },
@@ -415,50 +402,63 @@
       ]
     },
     "markdoc_tag": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "tag_open"
-            },
-            {
-              "type": "REPEAT",
-              "content": {
+      "type": "PREC_DYNAMIC",
+      "value": 10,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SEQ",
+            "members": [
+              {
                 "type": "SYMBOL",
-                "name": "_block"
+                "name": "tag_open"
+              },
+              {
+                "type": "REPEAT",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_block"
+                }
+              },
+              {
+                "type": "SYMBOL",
+                "name": "tag_close"
               }
-            },
-            {
-              "type": "SYMBOL",
-              "name": "tag_close"
-            }
-          ]
-        },
-        {
-          "type": "SYMBOL",
-          "name": "tag_self_close"
-        }
-      ]
+            ]
+          },
+          {
+            "type": "SYMBOL",
+            "name": "tag_self_close"
+          }
+        ]
+      }
     },
     "tag_open": {
       "type": "PREC_RIGHT",
-      "value": 2,
+      "value": 0,
       "content": {
         "type": "SEQ",
         "members": [
           {
             "type": "TOKEN",
             "content": {
-              "type": "STRING",
-              "value": "{%"
+              "type": "PREC",
+              "value": 6,
+              "content": {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "STRING",
+                    "value": "{%"
+                  },
+                  {
+                    "type": "PATTERN",
+                    "value": "[ \\t]*"
+                  }
+                ]
+              }
             }
-          },
-          {
-            "type": "PATTERN",
-            "value": "[ \\t]*"
           },
           {
             "type": "FIELD",
@@ -490,14 +490,23 @@
             }
           },
           {
-            "type": "PATTERN",
-            "value": "[ \\t]*"
-          },
-          {
             "type": "TOKEN",
             "content": {
-              "type": "STRING",
-              "value": "%}"
+              "type": "PREC",
+              "value": 6,
+              "content": {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "PATTERN",
+                    "value": "[ \\t]*"
+                  },
+                  {
+                    "type": "STRING",
+                    "value": "%}"
+                  }
+                ]
+              }
             }
           },
           {
@@ -517,20 +526,29 @@
     },
     "tag_close": {
       "type": "PREC_RIGHT",
-      "value": 2,
+      "value": 0,
       "content": {
         "type": "SEQ",
         "members": [
           {
             "type": "TOKEN",
             "content": {
-              "type": "STRING",
-              "value": "{%"
+              "type": "PREC",
+              "value": 6,
+              "content": {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "STRING",
+                    "value": "{%"
+                  },
+                  {
+                    "type": "PATTERN",
+                    "value": "[ \\t]*"
+                  }
+                ]
+              }
             }
-          },
-          {
-            "type": "PATTERN",
-            "value": "[ \\t]*"
           },
           {
             "type": "TOKEN",
@@ -553,14 +571,23 @@
             }
           },
           {
-            "type": "PATTERN",
-            "value": "[ \\t]*"
-          },
-          {
             "type": "TOKEN",
             "content": {
-              "type": "STRING",
-              "value": "%}"
+              "type": "PREC",
+              "value": 6,
+              "content": {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "PATTERN",
+                    "value": "[ \\t]*"
+                  },
+                  {
+                    "type": "STRING",
+                    "value": "%}"
+                  }
+                ]
+              }
             }
           },
           {
@@ -580,20 +607,29 @@
     },
     "tag_self_close": {
       "type": "PREC_RIGHT",
-      "value": 2,
+      "value": 0,
       "content": {
         "type": "SEQ",
         "members": [
           {
             "type": "TOKEN",
             "content": {
-              "type": "STRING",
-              "value": "{%"
+              "type": "PREC",
+              "value": 6,
+              "content": {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "STRING",
+                    "value": "{%"
+                  },
+                  {
+                    "type": "PATTERN",
+                    "value": "[ \\t]*"
+                  }
+                ]
+              }
             }
-          },
-          {
-            "type": "PATTERN",
-            "value": "[ \\t]*"
           },
           {
             "type": "FIELD",
@@ -625,14 +661,23 @@
             }
           },
           {
-            "type": "PATTERN",
-            "value": "[ \\t]*"
-          },
-          {
             "type": "TOKEN",
             "content": {
-              "type": "STRING",
-              "value": "/%}"
+              "type": "PREC",
+              "value": 6,
+              "content": {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "PATTERN",
+                    "value": "[ \\t]*"
+                  },
+                  {
+                    "type": "STRING",
+                    "value": "/%}"
+                  }
+                ]
+              }
             }
           },
           {
@@ -1122,8 +1167,15 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "SYMBOL",
-            "name": "_expression_start"
+            "type": "TOKEN",
+            "content": {
+              "type": "PREC",
+              "value": 5,
+              "content": {
+                "type": "STRING",
+                "value": "{{"
+              }
+            }
           },
           {
             "type": "CHOICE",
@@ -1162,8 +1214,15 @@
             ]
           },
           {
-            "type": "SYMBOL",
-            "name": "_expression_end"
+            "type": "TOKEN",
+            "content": {
+              "type": "PREC",
+              "value": 5,
+              "content": {
+                "type": "STRING",
+                "value": "}}"
+              }
+            }
           }
         ]
       }
@@ -1936,18 +1995,14 @@
     [
       "attribute",
       "_primary_expression"
+    ],
+    [
+      "markdoc_tag",
+      "paragraph"
     ]
   ],
   "precedences": [],
   "externals": [
-    {
-      "type": "SYMBOL",
-      "name": "_expression_start"
-    },
-    {
-      "type": "SYMBOL",
-      "name": "_expression_end"
-    },
     {
       "type": "SYMBOL",
       "name": "_code_content"
