@@ -12,7 +12,8 @@ module.exports = grammar({
 
   externals: $ => [
     $._expression_start,
-    $._expression_end
+    $._expression_end,
+    $._code_content
   ],
 
   extras: $ => [
@@ -107,14 +108,7 @@ module.exports = grammar({
       ))
     ),
 
-    code: $ => token(prec(-1, repeat1(choice(
-      /[^`~\n][^\n]*\n/,  // Line not starting with fence marker
-      /`[^`\n][^\n]*\n/,  // Line starting with 1 backtick (not a fence)
-      /``[^`\n][^\n]*\n/, // Line starting with 2 backticks  
-      /~[^~\n][^\n]*\n/,  // Line starting with 1 tilde
-      /~~[^~\n][^\n]*\n/, // Line starting with 2 tildes
-      /\n/                 // Empty line
-    )))),
+    code: $ => $._code_content,
 
     code_fence_close: $ => seq(
       optional(/[ \t]*/),
