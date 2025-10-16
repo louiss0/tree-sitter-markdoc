@@ -1,0 +1,210 @@
+=============================================================================
+Complex member access expressions
+=============================================================================
+
+{{ user.profile.name }}
+{{ items[0].title }}
+{{ data['key'].value }}
+
+-----------------------------------------------------------------------------
+
+(source_file
+  (paragraph
+    (inline_expression
+      (expression
+        (member_expression
+          (member_expression
+            (identifier)
+            (identifier))
+          (identifier))))
+    (inline_expression
+      (expression
+        (member_expression
+          (subscript_expression
+            (identifier)
+            (number))
+          (identifier))))
+    (inline_expression
+      (expression
+        (member_expression
+          (subscript_expression
+            (identifier)
+            (string))
+          (identifier))))))
+
+=============================================================================
+Function call expressions
+=============================================================================
+
+{{ formatDate(date) }}
+{{ calculate(1, 2, 3) }}
+{{ process(user.name, options['default']) }}
+
+-----------------------------------------------------------------------------
+
+(source_file
+  (paragraph
+    (inline_expression
+      (expression
+        (call_expression
+          (identifier)
+          (expression
+            (identifier)))))
+    (inline_expression
+      (expression
+        (call_expression
+          (identifier)
+          (expression
+            (number))
+          (expression
+            (number))
+          (expression
+            (number)))))
+    (inline_expression
+      (expression
+        (call_expression
+          (identifier)
+          (expression
+            (member_expression
+              (identifier)
+              (identifier)))
+          (expression
+            (subscript_expression
+              (identifier)
+              (string))))))))
+
+=============================================================================
+Object and array expressions
+=============================================================================
+
+{{ { name: user.name, age: 25 } }}
+{{ ['first', 2, user.items[0]] }}
+
+-----------------------------------------------------------------------------
+
+(source_file
+  (paragraph
+    (inline_expression
+      (expression
+        (object
+          (pair
+            (identifier)
+            (expression
+              (member_expression
+                (identifier)
+                (identifier))))
+          (pair
+            (identifier)
+            (expression
+              (number))))))
+    (inline_expression
+      (expression
+        (array
+          (expression
+            (string))
+          (expression
+            (number))
+          (expression
+            (member_expression
+              (member_expression
+                (identifier)
+                (identifier))
+              (number))))))))
+
+=============================================================================
+Binary and unary expressions
+=============================================================================
+
+{{ age > 18 }}
+{{ !isDone && count < 10 }}
+{{ -value }}
+
+-----------------------------------------------------------------------------
+
+(source_file
+  (paragraph
+    (inline_expression
+      (expression
+        (binary_expression
+          (expression
+            (identifier))
+          (expression
+            (number)))))
+    (inline_expression
+      (expression
+        (binary_expression
+          (unary_expression
+            (expression
+              (identifier)))
+          (binary_expression
+            (expression
+              (identifier))
+            (expression
+              (number))))))
+    (inline_expression
+      (expression
+        (unary_expression
+          (expression
+            (identifier)))))))
+
+=============================================================================
+Tag with complex attribute expressions
+=============================================================================
+
+{% component
+  items=[1, 2, 3]
+  config={
+    enabled: true,
+    user: currentUser.name
+  }
+  callback={() => process(value)}
+%}
+Content
+{% /component %}
+
+-----------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_open
+      (tag_name)
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (expression
+            (array
+              (expression
+                (number))
+              (expression
+                (number))
+              (expression
+                (number))))))
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (expression
+            (object
+              (pair
+                (identifier)
+                (expression
+                  (boolean)))
+              (pair
+                (identifier)
+                (expression
+                  (member_expression
+                    (identifier)
+                    (identifier))))))))
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (expression
+            (arrow_function
+              (expression
+                (call_expression
+                  (identifier)
+                  (expression
+                    (identifier)))))))))
+    (paragraph
+      (text))
+    (tag_close
+      (tag_name))))

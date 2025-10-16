@@ -10,37 +10,60 @@
 module.exports = grammar({
   name: "markdoc",
 
+  externals: $ => [
+    $._expression_start,
+    $._expression_end
+  ],
+
   extras: $ => [
-    /[ \t\r]/
+    /[\t\r]/  // Horizontal whitespace
   ],
 
   conflicts: $ => [
-    [$.source_file],
+    [$.list_item],
+    [$.list_item, $._list_item_content],
+    [$.list_paragraph],
     [$.attribute, $.expression]
   ],
 
   rules: {
-    source_file: $ => prec.right(seq(
-      repeat(/\n/),
-      optional(seq(
-        $._block,
-        repeat(seq(
-          repeat1(/\n/),
-          $._block
-        ))
-      )),
-      repeat(/\n/)
+    source_file: $ => choice(
+      // Empty document
+      repeat1(/[ \t\n]/),
+
+      // Just frontmatter
+      $.frontmatter,
+
+      // Just blocks
+      $._block_sequence,
+
+      // Frontmatter followed by blocks
+      seq(
+        $.frontmatter,
+        /[ \t]*\n[ \t]*\n+/,
+        $._block_sequence
+      )
+    ),
+
+    _block_sequence: $ => prec.right(2, seq(
+      $._block,
+      repeat(seq(
+        choice(
+          /\n\n+/,             // Two or more blank lines
+          /[ \t]*\n[ \t]*\n+/  // Lines with only whitespace
+        ),
+        $._block
+      ))
     )),
 
     _block: $ => choice(
-      $.frontmatter,
       $.heading,
+      $.paragraph,
       $.fenced_code_block,
-      prec(1, $.markdoc_tag),
-      $.list,
-      $.html_comment,
       $.html_block,
-      $.paragraph
+      $.markdoc_tag,
+      $.list,
+      $.html_comment
     ),
 
     frontmatter: $ => seq(
@@ -90,13 +113,18 @@ module.exports = grammar({
       ))
     ),
 
-    code: $ => repeat1(/[^\n]+\n/),
+    code: $ => repeat1(
+      // Match any non-closing lines, including empty lines
+      token(prec(-1, /(?!```|~~~|[ \t]*```|[ \t]*~~~)[^\n]*\n/))
+    ),
 
     code_fence_close: $ => seq(
+      optional(/[ \t]*/),
       choice(
         token(prec(3, '```')),
         token(prec(3, '~~~'))
-      )
+      ),
+      optional(/\n/)
     ),
 
     markdoc_tag: $ => choice(
@@ -108,72 +136,82 @@ module.exports = grammar({
       $.tag_self_close
     ),
 
-    tag_open: $ => prec.right(seq(
-      '{%',
-      /[ \t]*/,
-      alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
+    tag_open: $ => prec.right(2, seq(
+      token(prec(3, '{%')),
+      repeat(/[ \t]/),
+      field('name', alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, 'tag_name')),
       repeat(seq(
         /[ \t]+/,
         $.attribute
       )),
-      /[ \t]*/,
-      '%}',
+      repeat(/[ \t]/),
+      token(prec(3, '%}')),
       optional(/\n/)
     )),
 
-    tag_close: $ => prec.right(seq(
-      '{%',
-      /[ \t]*/,
-      '/',
-      alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
-      /[ \t]*/,
-      '%}',
+    tag_close: $ => prec.right(2, seq(
+      token(prec(3, '{%')),
+      repeat(/[ \t]/),
+      token('/'),
+      field('name', alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, 'tag_name')),
+      repeat(/[ \t]/),
+      token(prec(3, '%}')),
       optional(/\n/)
     )),
 
-    tag_self_close: $ => prec.right(seq(
-      '{%',
-      /[ \t]*/,
-      alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
+    tag_self_close: $ => prec.right(2, seq(
+      token(prec(3, '{%')),
+      repeat(/[ \t]/),
+      field('name', alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, 'tag_name')),
       repeat(seq(
         /[ \t]+/,
         $.attribute
       )),
-      /[ \t]*/,
-      '/%}',
+      repeat(/[ \t]/),
+      token(prec(3, '/%}')),
       optional(/\n/)
     )),
 
     attribute: $ => seq(
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.attribute_name),
+      /[ \t]*/,
       '=',
+      /[ \t]*/,
       field('attribute_value', choice(
         $.string,
         $.expression
       ))
     ),
 
-    expression: $ => choice(
+    // Top-level expressions have highest precedence to contain their
+    // own operations and prevent ambiguity with attribute_value
+    expression: $ => prec.right(3, choice(
       $.call_expression,
       $.member_expression,
       $.array_access,
+      $._primary_expression
+    )),
+
+    // Atomic expressions
+    _primary_expression: $ => choice(
       $.variable,
-      $.array_literal,
-      $.object_literal,
       $.identifier,
+      $.string,
       $.number,
-      $.string
+      $.array_literal,
+      $.object_literal
     ),
 
+    // Variable prefixed with $
     variable: $ => seq('$', $.identifier),
 
-    call_expression: $ => prec.left(4, seq(
+    // Ordered by precedence - call > member > array access 
+    call_expression: $ => prec.right(4, seq(
       field('function', choice(
         $.member_expression,
-        $.array_access,
         $.identifier
       )),
-      $.arguments
+      field('arguments', $.arguments)
     )),
 
     arguments: $ => seq(
@@ -185,17 +223,23 @@ module.exports = grammar({
       ')'
     ),
 
-    member_expression: $ => prec.left(3, seq(
+    member_expression: $ => prec.right(3, seq(
       field('object', choice(
-        $.array_access,
-        $.identifier
+        $.member_expression,
+        $._primary_expression
       )),
-      repeat1(seq('.', field('property', $.identifier)))
+      '.',
+      field('property', $.identifier)
     )),
 
-    array_access: $ => prec.left(3, seq(
-      field('array', $.identifier),
-      repeat1(seq('[', field('index', $.expression), ']'))
+    array_access: $ => prec.right(2, seq(
+      field('array', choice(
+        $.member_expression,
+        $._primary_expression
+      )),
+      '[',
+      field('index', $.expression),
+      ']'
     )),
 
     array_literal: $ => seq(
@@ -238,30 +282,39 @@ module.exports = grammar({
 
     number: $ => /-?[0-9]+(\.[0-9]+)?/,
 
-    inline_expression: $ => seq(
-      '{{',
-      /[ \t]*/,
-      $.expression,
-      /[ \t]*/,
-      '}}'
+    inline_expression: $ => prec.right(4, seq(
+      $._expression_start,
+      optional(/[ \t]*/),
+      field('content', prec.right(3, $.expression)),
+      optional(/[ \t]*/),
+      $._expression_end
     ),
 
-    list: $ => prec.right(repeat1($.list_item)),
+    // Lists: one or more list items separated by a single newline
+    // A blank line between items terminates the list (separate list)
+    list: $ => prec.right(seq(
+      $.list_item,
+      repeat(seq(/\n/, $.list_item))
+    )),
 
+    // A list item with content and optional continuation lines
     list_item: $ => prec.right(seq(
       field('marker', $.list_marker),
-      field('content', seq(
-        $.paragraph,
-        optional(seq(
-          /\n/,
-          repeat(seq(
-            /[ \t]{2,}/,
-            choice($.list, $.paragraph),
-            optional(/\n/)
-          ))
-        ))
-      ))
+      field('content', $._list_item_content) 
     )),
+
+    // Content that can appear in a list item
+    _list_item_content: $ => choice(
+      $.list_paragraph,
+      $.fenced_code_block,
+      $.html_block
+    ),
+
+    // A single-line paragraph for list items
+    list_paragraph: $ => prec.right(1, alias(seq(
+      $._inline_first,
+      repeat($._inline_content) 
+    ), 'paragraph')),
 
     list_marker: $ => token(prec(2, choice(
       /[-*+][ \t]+/,
@@ -319,16 +372,31 @@ module.exports = grammar({
       )))
     ),
 
-    paragraph: $ => prec.left(repeat1(choice(
-      $.inline_expression,
-      $.strong,
-      $.emphasis,
-      $.inline_code,
-      $.link,
-      $.image,
-      $.html_inline,
-      $.text
-    ))),
+    // One or more lines of text ending at block starters or blank lines
+    paragraph: $ => prec.left(1, choice(
+      seq(
+        $._inline_first,
+        repeat($._inline_content)
+      ),
+      seq(
+        $._inline_content,
+        repeat($._inline_content),
+        repeat(seq(
+          /\n[ \t]*/,  // Single line break with optional whitespace
+          choice(
+            seq($._inline_first, repeat($._inline_content)),
+            $._inline_content
+          )
+        ))
+      )
+    )),
+
+    _paragraph_line: $ => prec.right(seq(
+      repeat1(seq(
+        optional(/[ \t]*/),
+        $._inline_content
+      ))
+    )),
 
     emphasis: $ => prec.left(1, choice(
       seq('*', token(prec(1, /[^*\n]+/)), '*'),
@@ -365,6 +433,23 @@ module.exports = grammar({
       ')'
     ),
 
-    text: $ => token(prec(-1, /[^\n{*_`!\[<]+/)),
+    // First inline element in a paragraph/line
+    _inline_first: $ => choice(
+      $.inline_expression,
+      $.text,
+      $.html_inline,
+      $.link,
+      $.emphasis,
+      $.strong,
+      $.inline_code
+    ),
+
+    // Inline content after first element
+    _inline_content: $ => choice(
+      $._inline_first,
+      $.image
+    ),
+
+    text: $ => token(prec(-2, /[^\n{*_`!\[<\r]+/)),
   }
 });

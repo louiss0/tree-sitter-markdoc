@@ -1,0 +1,153 @@
+=============================================================================
+Alternative tag closing syntax (without slash)
+=============================================================================
+
+{% tag %}
+Content here
+{% tag %}
+
+-----------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_open
+      (tag_name))
+    (paragraph
+      (text))
+    (tag_close
+      (tag_name))))
+
+=============================================================================
+Tag with extra whitespace
+=============================================================================
+
+{%   spacey   %}
+Text with space
+{%   /spacey   %}
+
+-----------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_open
+      (tag_name))
+    (paragraph
+      (text))
+    (tag_close
+      (tag_name))))
+
+=============================================================================
+Nested list indentation
+=============================================================================
+
+- First level
+  - Second level
+    - Third level
+      Content at level 3
+  - Back to level 2
+    Content at level 2
+
+-----------------------------------------------------------------------------
+
+(source_file
+  (list
+    (list_item
+      (paragraph
+        (text))
+      (list
+        (list_item
+          (paragraph
+            (text))
+          (list
+            (list_item
+              (paragraph
+                (text))
+              (paragraph
+                (text)))))
+        (list_item
+          (paragraph
+            (text))
+          (paragraph
+            (text)))))))
+
+=============================================================================
+Mixed list and tag indentation
+=============================================================================
+
+- List item
+  {% note %}
+  - Nested list in tag
+    - Even deeper
+  {% /note %}
+  - Back in original list
+
+-----------------------------------------------------------------------------
+
+(source_file
+  (list
+    (list_item
+      (paragraph
+        (text))
+      (markdoc_tag
+        (tag_open
+          (tag_name))
+        (list
+          (list_item
+            (paragraph
+              (text))
+            (list
+              (list_item
+                (paragraph
+                  (text))))))
+        (tag_close
+          (tag_name)))
+      (list
+        (list_item
+          (paragraph
+            (text)))))))
+
+=============================================================================
+Tag with blank lines in content
+=============================================================================
+
+{% section %}
+
+First paragraph with space above
+
+Second paragraph with blank line between
+
+{% /section %}
+
+-----------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_open
+      (tag_name))
+    (paragraph
+      (text))
+    (paragraph
+      (text))
+    (tag_close
+      (tag_name))))
+
+=============================================================================
+Indented code block in tag
+=============================================================================
+
+{% example %}
+    This is a code block
+    indented with 4 spaces
+    inside a tag
+{% /example %}
+
+-----------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_open
+      (tag_name))
+    (code_block
+      (code))
+    (tag_close
+      (tag_name))))
