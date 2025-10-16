@@ -437,8 +437,11 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "STRING",
-            "value": "{%"
+            "type": "TOKEN",
+            "content": {
+              "type": "STRING",
+              "value": "{%"
+            }
           },
           {
             "type": "PATTERN",
@@ -478,8 +481,11 @@
             "value": "[ \\t]*"
           },
           {
-            "type": "STRING",
-            "value": "%}"
+            "type": "TOKEN",
+            "content": {
+              "type": "STRING",
+              "value": "%}"
+            }
           },
           {
             "type": "CHOICE",
@@ -503,16 +509,22 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "STRING",
-            "value": "{%"
+            "type": "TOKEN",
+            "content": {
+              "type": "STRING",
+              "value": "{%"
+            }
           },
           {
             "type": "PATTERN",
             "value": "[ \\t]*"
           },
           {
-            "type": "STRING",
-            "value": "/"
+            "type": "TOKEN",
+            "content": {
+              "type": "STRING",
+              "value": "/"
+            }
           },
           {
             "type": "FIELD",
@@ -532,8 +544,11 @@
             "value": "[ \\t]*"
           },
           {
-            "type": "STRING",
-            "value": "%}"
+            "type": "TOKEN",
+            "content": {
+              "type": "STRING",
+              "value": "%}"
+            }
           },
           {
             "type": "CHOICE",
@@ -557,8 +572,11 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "STRING",
-            "value": "{%"
+            "type": "TOKEN",
+            "content": {
+              "type": "STRING",
+              "value": "{%"
+            }
           },
           {
             "type": "PATTERN",
@@ -598,8 +616,11 @@
             "value": "[ \\t]*"
           },
           {
-            "type": "STRING",
-            "value": "/%}"
+            "type": "TOKEN",
+            "content": {
+              "type": "STRING",
+              "value": "/%}"
+            }
           },
           {
             "type": "CHOICE",
