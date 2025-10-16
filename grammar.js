@@ -52,6 +52,7 @@ module.exports = grammar({
     )),
 
     _block: $ => choice(
+      $.comment_block,  // Must come before markdoc_tag to match {% comment %}
       $.markdoc_tag,
       $.fenced_code_block,
       $.heading,
@@ -117,6 +118,17 @@ module.exports = grammar({
         token(prec(3, '~~~'))
       ),
       optional(/\n/)
+    ),
+
+    // Markdoc comment block: {% comment %}...{% /comment %}
+    comment_block: $ => seq(
+      token(prec(10, seq('{%', /[ \t]*/, 'comment', /[ \t]*/, '%}'))),
+      repeat(choice(
+        /[^{\n]+/,
+        /\n/,
+        /\{/
+      )),
+      token(prec(10, seq('{%', /[ \t]*/, '\/', /[ \t]*/, 'comment', /[ \t]*/, '%}')))
     ),
 
     markdoc_tag: $ => prec.dynamic(10, choice(

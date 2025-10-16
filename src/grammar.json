@@ -84,6 +84,10 @@
       "members": [
         {
           "type": "SYMBOL",
+          "name": "comment_block"
+        },
+        {
+          "type": "SYMBOL",
           "name": "markdoc_tag"
         },
         {
@@ -398,6 +402,103 @@
               "type": "BLANK"
             }
           ]
+        }
+      ]
+    },
+    "comment_block": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "TOKEN",
+          "content": {
+            "type": "PREC",
+            "value": 10,
+            "content": {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "{%"
+                },
+                {
+                  "type": "PATTERN",
+                  "value": "[ \\t]*"
+                },
+                {
+                  "type": "STRING",
+                  "value": "comment"
+                },
+                {
+                  "type": "PATTERN",
+                  "value": "[ \\t]*"
+                },
+                {
+                  "type": "STRING",
+                  "value": "%}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "PATTERN",
+                "value": "[^{\\n]+"
+              },
+              {
+                "type": "PATTERN",
+                "value": "\\n"
+              },
+              {
+                "type": "PATTERN",
+                "value": "\\{"
+              }
+            ]
+          }
+        },
+        {
+          "type": "TOKEN",
+          "content": {
+            "type": "PREC",
+            "value": 10,
+            "content": {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "{%"
+                },
+                {
+                  "type": "PATTERN",
+                  "value": "[ \\t]*"
+                },
+                {
+                  "type": "STRING",
+                  "value": "/"
+                },
+                {
+                  "type": "PATTERN",
+                  "value": "[ \\t]*"
+                },
+                {
+                  "type": "STRING",
+                  "value": "comment"
+                },
+                {
+                  "type": "PATTERN",
+                  "value": "[ \\t]*"
+                },
+                {
+                  "type": "STRING",
+                  "value": "%}"
+                }
+              ]
+            }
+          }
         }
       ]
     },
@@ -804,8 +905,33 @@
         {
           "type": "SYMBOL",
           "name": "object_literal"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "boolean"
         }
       ]
+    },
+    "boolean": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "true"
+        },
+        {
+          "type": "STRING",
+          "value": "false"
+        }
+      ]
+    },
+    "object": {
+      "type": "SYMBOL",
+      "name": "object_literal"
+    },
+    "array": {
+      "type": "SYMBOL",
+      "name": "array_literal"
     },
     "variable": {
       "type": "SEQ",
@@ -1313,7 +1439,7 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "paragraph"
+          "name": "list_paragraph"
         },
         {
           "type": "SYMBOL",
@@ -1602,6 +1728,26 @@
                   ]
                 }
               ]
+            }
+          }
+        ]
+      }
+    },
+    "list_paragraph": {
+      "type": "PREC_LEFT",
+      "value": 1,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_inline_first"
+          },
+          {
+            "type": "REPEAT",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_inline_content"
             }
           }
         ]

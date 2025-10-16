@@ -27,6 +27,10 @@
             "named": true
           },
           {
+            "type": "boolean",
+            "named": true
+          },
+          {
             "type": "identifier",
             "named": true
           },
@@ -118,6 +122,11 @@
     }
   },
   {
+    "type": "boolean",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "call_expression",
     "named": true,
     "fields": {
@@ -173,6 +182,11 @@
     }
   },
   {
+    "type": "comment_block",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "emphasis",
     "named": true,
     "fields": {}
@@ -191,6 +205,10 @@
         },
         {
           "type": "array_literal",
+          "named": true
+        },
+        {
+          "type": "boolean",
           "named": true
         },
         {
@@ -425,7 +443,7 @@
             "named": true
           },
           {
-            "type": "paragraph",
+            "type": "list_paragraph",
             "named": true
           }
         ]
@@ -443,6 +461,49 @@
     }
   },
   {
+    "type": "list_paragraph",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "emphasis",
+          "named": true
+        },
+        {
+          "type": "html_inline",
+          "named": true
+        },
+        {
+          "type": "image",
+          "named": true
+        },
+        {
+          "type": "inline_code",
+          "named": true
+        },
+        {
+          "type": "inline_expression",
+          "named": true
+        },
+        {
+          "type": "link",
+          "named": true
+        },
+        {
+          "type": "strong",
+          "named": true
+        },
+        {
+          "type": "text",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "markdoc_tag",
     "named": true,
     "fields": {},
@@ -450,6 +511,10 @@
       "multiple": true,
       "required": true,
       "types": [
+        {
+          "type": "comment_block",
+          "named": true
+        },
         {
           "type": "fenced_code_block",
           "named": true
@@ -503,6 +568,10 @@
         "types": [
           {
             "type": "array_literal",
+            "named": true
+          },
+          {
+            "type": "boolean",
             "named": true
           },
           {
@@ -629,6 +698,10 @@
       "multiple": true,
       "required": false,
       "types": [
+        {
+          "type": "comment_block",
+          "named": true
+        },
         {
           "type": "fenced_code_block",
           "named": true
@@ -836,6 +909,10 @@
     "named": true
   },
   {
+    "type": "false",
+    "named": false
+  },
+  {
     "type": "heading_marker",
     "named": true
   },
@@ -886,6 +963,10 @@
   {
     "type": "text",
     "named": true
+  },
+  {
+    "type": "true",
+    "named": false
   },
   {
     "type": "{",
