@@ -90,3 +90,32 @@ Successfully implemented a functional Tree-Sitter parser for the Markdoc markdow
 **Status as of**: October 16, 2025
 **Parser Model**: Tree-Sitter
 **Markdoc Version**: 1.0.0
+
+## Phase 1.5 Investigation Results
+
+### What Was Attempted:
+1. **List Paragraph Support**: Added `list_paragraph` rule to distinguish list item paragraphs from regular paragraphs
+2. **Expression Operators**: Attempted to add binary_expression, unary_expression, arrow_function, subscript_expression nodes
+
+### What Was Accomplished:
+- ✓ Added `list_paragraph` rule and updated `_list_item_content` to use it
+- ✓ Maintained 72 passing tests with no regressions
+
+### What Was Deferred:
+- Binary and unary operators - requires complete re-architecture of expression hierarchy with proper precedence
+- HTML block restructuring - needs token-based decomposition instead of current monolithic regex approach
+- Nested list indentation - still dependent on indentation tracking (external scanner territory)
+
+### Key Learning:
+The grammar currently has conflicting design goals:
+- Tree-Sitter's GLR parser can handle ambiguity, but the current expression design doesn't have clear precedence
+- Adding new operator nodes as alternatives in `choice()` doesn't establish precedence; they're just parsed as alternatives
+- To properly fix operator support, the entire expression hierarchy needs to be restructured with explicit precedence levels
+
+### Recommended Next Phase:
+Rather than continuing with patchwork fixes, the next major phase should be:
+1. Complete Expression Hierarchy Refactor (with proper precedence for all operators)
+2. Token-based HTML parsing (decompose current regex-based approach)
+3. Then tackle the remaining 28 failing tests systematically
+
+Current Status: **72/100 tests passing (72%)**
