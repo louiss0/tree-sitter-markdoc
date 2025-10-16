@@ -65,12 +65,13 @@ void tree_sitter_markdoc_external_scanner_deserialize(void *payload, const char 
   }
 }
 
-// Helper: Check if character starts a block-level element
-static inline bool is_block_marker(int32_t ch) {
+// Helper: Check if character starts a block-level element for NEWLINE (paragraph termination)
+// This includes list markers because paragraphs should not continue into list items
+static inline bool is_paragraph_terminator(int32_t ch) {
   return ch == '#' ||   // Heading
-         ch == '-' ||   // List or thematic break
-         ch == '*' ||   // List or thematic break  
-         ch == '+' ||   // List
+         ch == '-' ||   // List marker
+         ch == '*' ||   // List marker
+         ch == '+' ||   // List marker
          ch == '_' ||   // Thematic break
          ch == '>' ||   // Blockquote
          ch == '`' ||   // Code fence
@@ -78,6 +79,17 @@ static inline bool is_block_marker(int32_t ch) {
          ch == '<' ||   // HTML
          ch == '{' ||   // Markdoc tag or expression
          (ch >= '0' && ch <= '9');  // Ordered list
+}
+
+// Helper: Check if character starts a major block (for BLANK_LINE emission)
+// Excludes list markers - consecutive list items don't need blank lines
+static inline bool is_major_block_marker(int32_t ch) {
+  return ch == '#' ||   // Heading
+         ch == '>' ||   // Blockquote  
+         ch == '`' ||   // Code fence
+         ch == '~' ||   // Code fence
+         ch == '<' ||   // HTML
+         ch == '{';     // Markdoc tag or expression
 }
 
 bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
@@ -114,16 +126,19 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
       return false;
     }
     
-    bool at_block_boundary = is_block_marker(next_char);
+    // Check what type of boundary we're at
+    bool at_major_block = is_major_block_marker(next_char);
+    bool at_paragraph_end = is_paragraph_terminator(next_char);
     
-    // BLANK_LINE: Emit for true blank lines (2+ newlines) OR block boundaries
-    if (valid_symbols[BLANK_LINE] && (newline_count >= 2 || at_block_boundary)) {
+    // BLANK_LINE: Emit for true blank lines OR major block boundaries
+    // (but NOT for list markers - lists use single newlines)
+    if (valid_symbols[BLANK_LINE] && (newline_count >= 2 || at_major_block)) {
       lexer->result_symbol = BLANK_LINE;
       return true;
     }
     
-    // NEWLINE: Emit for line continuation (single newline, not at block boundary)
-    if (valid_symbols[NEWLINE] && newline_count == 1 && !at_block_boundary) {
+    // NEWLINE: Emit for line continuation (single newline, not at paragraph terminator)
+    if (valid_symbols[NEWLINE] && newline_count == 1 && !at_paragraph_end) {
       lexer->result_symbol = NEWLINE;
       return true;
     }

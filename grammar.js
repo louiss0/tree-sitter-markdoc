@@ -363,15 +363,12 @@ module.exports = grammar({
       optional(/\n/)  // Optional trailing newline after last item
     )),
 
-    // A list item with content and optional continuation lines
-    list_item: $ => prec.right(seq(
+    // A list item with content
+    // Note: Nested lists require indentation tracking (not yet implemented)
+    list_item: $ => seq(
       field('marker', $.list_marker),
-      field('content', $.paragraph),
-      optional(seq(
-        /\n/,
-        $.list
-      ))
-    )),
+      field('content', $.paragraph)
+    ),
 
     list_marker: $ => token(prec(2, choice(
       /[-*+][ \t]+/,
@@ -435,6 +432,16 @@ module.exports = grammar({
       repeat($._inline_content),
       repeat(seq(
         $._NEWLINE,  // Use ONLY scanner token for context-aware line continuation
+        seq($._inline_first, repeat($._inline_content))
+      ))
+    )),
+
+    // List paragraph: same as paragraph but semantically distinct for list items
+    list_paragraph: $ => prec.left(1, seq(
+      $._inline_first,
+      repeat($._inline_content),
+      repeat(seq(
+        $._NEWLINE,
         seq($._inline_first, repeat($._inline_content))
       ))
     )),

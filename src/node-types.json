@@ -528,16 +528,6 @@
           }
         ]
       }
-    },
-    "children": {
-      "multiple": false,
-      "required": false,
-      "types": [
-        {
-          "type": "list",
-          "named": true
-        }
-      ]
     }
   },
   {
