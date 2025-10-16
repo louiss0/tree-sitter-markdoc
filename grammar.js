@@ -12,7 +12,8 @@ module.exports = grammar({
 
   externals: $ => [
     $._code_content,
-    $._NEWLINE
+    $._NEWLINE,
+    $._BLANK_LINE,
   ],
 
   extras: $ => [
