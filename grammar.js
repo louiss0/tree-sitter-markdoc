@@ -129,38 +129,38 @@ module.exports = grammar({
     ),
 
     tag_open: $ => prec.right(2, seq(
-      token(prec(3, '{%')),
-      repeat(/[ \t]/),
+      '{%',
+      /[ \t]*/,
       field('name', alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, 'tag_name')),
       repeat(seq(
         /[ \t]+/,
         $.attribute
       )),
-      repeat(/[ \t]/),
-      token(prec(3, '%}')),
+      /[ \t]*/,
+      '%}',
       optional(/\n/)
     )),
 
     tag_close: $ => prec.right(2, seq(
-      token(prec(3, '{%')),
-      repeat(/[ \t]/),
-      token('/'),
+      '{%',
+      /[ \t]*/,
+      '/',
       field('name', alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, 'tag_name')),
-      repeat(/[ \t]/),
-      token(prec(3, '%}')),
+      /[ \t]*/,
+      '%}',
       optional(/\n/)
     )),
 
     tag_self_close: $ => prec.right(2, seq(
-      token(prec(3, '{%')),
-      repeat(/[ \t]/),
+      '{%',
+      /[ \t]*/,
       field('name', alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, 'tag_name')),
       repeat(seq(
         /[ \t]+/,
         $.attribute
       )),
-      repeat(/[ \t]/),
-      token(prec(3, '/%}')),
+      /[ \t]*/,
+      '/%}',
       optional(/\n/)
     )),
 

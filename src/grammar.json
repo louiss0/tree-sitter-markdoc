@@ -437,22 +437,12 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "TOKEN",
-            "content": {
-              "type": "PREC",
-              "value": 3,
-              "content": {
-                "type": "STRING",
-                "value": "{%"
-              }
-            }
+            "type": "STRING",
+            "value": "{%"
           },
           {
-            "type": "REPEAT",
-            "content": {
-              "type": "PATTERN",
-              "value": "[ \\t]"
-            }
+            "type": "PATTERN",
+            "value": "[ \\t]*"
           },
           {
             "type": "FIELD",
@@ -484,22 +474,12 @@
             }
           },
           {
-            "type": "REPEAT",
-            "content": {
-              "type": "PATTERN",
-              "value": "[ \\t]"
-            }
+            "type": "PATTERN",
+            "value": "[ \\t]*"
           },
           {
-            "type": "TOKEN",
-            "content": {
-              "type": "PREC",
-              "value": 3,
-              "content": {
-                "type": "STRING",
-                "value": "%}"
-              }
-            }
+            "type": "STRING",
+            "value": "%}"
           },
           {
             "type": "CHOICE",
@@ -523,29 +503,16 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "TOKEN",
-            "content": {
-              "type": "PREC",
-              "value": 3,
-              "content": {
-                "type": "STRING",
-                "value": "{%"
-              }
-            }
+            "type": "STRING",
+            "value": "{%"
           },
           {
-            "type": "REPEAT",
-            "content": {
-              "type": "PATTERN",
-              "value": "[ \\t]"
-            }
+            "type": "PATTERN",
+            "value": "[ \\t]*"
           },
           {
-            "type": "TOKEN",
-            "content": {
-              "type": "STRING",
-              "value": "/"
-            }
+            "type": "STRING",
+            "value": "/"
           },
           {
             "type": "FIELD",
@@ -561,22 +528,12 @@
             }
           },
           {
-            "type": "REPEAT",
-            "content": {
-              "type": "PATTERN",
-              "value": "[ \\t]"
-            }
+            "type": "PATTERN",
+            "value": "[ \\t]*"
           },
           {
-            "type": "TOKEN",
-            "content": {
-              "type": "PREC",
-              "value": 3,
-              "content": {
-                "type": "STRING",
-                "value": "%}"
-              }
-            }
+            "type": "STRING",
+            "value": "%}"
           },
           {
             "type": "CHOICE",
@@ -600,22 +557,12 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "TOKEN",
-            "content": {
-              "type": "PREC",
-              "value": 3,
-              "content": {
-                "type": "STRING",
-                "value": "{%"
-              }
-            }
+            "type": "STRING",
+            "value": "{%"
           },
           {
-            "type": "REPEAT",
-            "content": {
-              "type": "PATTERN",
-              "value": "[ \\t]"
-            }
+            "type": "PATTERN",
+            "value": "[ \\t]*"
           },
           {
             "type": "FIELD",
@@ -647,22 +594,12 @@
             }
           },
           {
-            "type": "REPEAT",
-            "content": {
-              "type": "PATTERN",
-              "value": "[ \\t]"
-            }
+            "type": "PATTERN",
+            "value": "[ \\t]*"
           },
           {
-            "type": "TOKEN",
-            "content": {
-              "type": "PREC",
-              "value": 3,
-              "content": {
-                "type": "STRING",
-                "value": "/%}"
-              }
-            }
+            "type": "STRING",
+            "value": "/%}"
           },
           {
             "type": "CHOICE",
