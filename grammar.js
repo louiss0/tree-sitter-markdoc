@@ -11,7 +11,8 @@ module.exports = grammar({
   name: "markdoc",
 
   externals: $ => [
-    $._code_content
+    $._code_content,
+    $._NEWLINE
   ],
 
   extras: $ => [
@@ -21,7 +22,6 @@ module.exports = grammar({
   conflicts: $ => [
     [$.source_file],
     [$.list_item],
-    [$.list_item, $._list_item_content],
     [$.attribute, $.expression],
     [$.code_fence_close],
     [$.paragraph, $._inline_content],
@@ -189,12 +189,12 @@ module.exports = grammar({
 
     // Top-level expressions have highest precedence to contain their
     // own operations and prevent ambiguity with attribute_value
-    expression: $ => prec.right(3, choice(
+    expression: $ => choice(
       $.call_expression,
       $.member_expression,
       $.array_access,
       $._primary_expression
-    )),
+    ),
 
     // Atomic expressions
     _primary_expression: $ => choice(
@@ -220,7 +220,7 @@ module.exports = grammar({
     variable: $ => seq('$', $.identifier),
 
     // Ordered by precedence - call > member > array access 
-    call_expression: $ => prec.right(4, seq(
+    call_expression: $ => prec.left(2, seq(
       field('function', choice(
         $.member_expression,
         $.identifier
@@ -296,13 +296,11 @@ module.exports = grammar({
 
     number: $ => /-?[0-9]+(\.[0-9]+)?/,
 
-    inline_expression: $ => prec.right(4, seq(
-      token(prec(5, '{{')),
-      optional(/[ \t]*/),
-      field('content', prec.right(3, $.expression)),
-      optional(/[ \t]*/),
-      token(prec(5, '}}'))
-    )),
+    inline_expression: $ => seq(
+      '{{',
+      field('content', $.expression),
+      '}}'
+    ),
 
     // Lists: one or more list items separated by a single newline
     // A blank line between items terminates the list (separate list)
@@ -315,16 +313,12 @@ module.exports = grammar({
     // A list item with content and optional continuation lines
     list_item: $ => prec.right(seq(
       field('marker', $.list_marker),
-      field('content', $._list_item_content) 
+      field('content', $.paragraph),
+      optional(seq(
+        /\n/,
+        $.list
+      ))
     )),
-
-    // Content that can appear in a list item
-    _list_item_content: $ => choice(
-      $.list_paragraph,
-      $.list,
-      $.fenced_code_block,
-      $.html_block
-    ),
 
     list_marker: $ => token(prec(2, choice(
       /[-*+][ \t]+/,
@@ -390,12 +384,6 @@ module.exports = grammar({
         /\n/,
         seq($._inline_first, repeat($._inline_content))
       ))
-    )),
-
-    // List paragraph: paragraph content within list items (typically single line)
-    list_paragraph: $ => prec.left(1, seq(
-      $._inline_first,
-      repeat($._inline_content)
     )),
 
     emphasis: $ => prec.left(1, choice(
