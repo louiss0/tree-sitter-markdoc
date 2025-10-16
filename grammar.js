@@ -20,40 +20,34 @@ module.exports = grammar({
   ],
 
   conflicts: $ => [
+    [$.source_file],
     [$.list_item],
     [$.list_item, $._list_item_content],
     [$.list_paragraph],
-    [$.attribute, $.expression]
+    [$.attribute, $.expression],
+    [$.code_fence_close],
+    [$.paragraph, $._inline_content],
+    [$.paragraph],
+    [$.attribute, $._primary_expression]
   ],
 
   rules: {
-    source_file: $ => choice(
-      // Empty document
-      repeat1(/[ \t\n]/),
-
-      // Just frontmatter
-      $.frontmatter,
-
-      // Just blocks
-      $._block_sequence,
-
-      // Frontmatter followed by blocks
-      seq(
-        $.frontmatter,
-        /[ \t]*\n[ \t]*\n+/,
-        $._block_sequence
-      )
-    ),
-
-    _block_sequence: $ => prec.right(2, seq(
-      $._block,
-      repeat(seq(
+    source_file: $ => prec.right(seq(
+      repeat(/\n/),
+      optional(seq(
         choice(
-          /\n\n+/,             // Two or more blank lines
-          /[ \t]*\n[ \t]*\n+/  // Lines with only whitespace
+          $.frontmatter,
+          $._block
         ),
-        $._block
-      ))
+        repeat(seq(
+          repeat1(/\n/),
+          choice(
+            $.frontmatter,
+            $._block
+          )
+        ))
+      )),
+      repeat(/\n/)
     )),
 
     _block: $ => choice(
@@ -113,10 +107,7 @@ module.exports = grammar({
       ))
     ),
 
-    code: $ => repeat1(
-      // Match any non-closing lines, including empty lines
-      token(prec(-1, /(?!```|~~~|[ \t]*```|[ \t]*~~~)[^\n]*\n/))
-    ),
+    code: $ => repeat1(/[^\n]+\n/),
 
     code_fence_close: $ => seq(
       optional(/[ \t]*/),
@@ -288,7 +279,7 @@ module.exports = grammar({
       field('content', prec.right(3, $.expression)),
       optional(/[ \t]*/),
       $._expression_end
-    ),
+    )),
 
     // Lists: one or more list items separated by a single newline
     // A blank line between items terminates the list (separate list)
