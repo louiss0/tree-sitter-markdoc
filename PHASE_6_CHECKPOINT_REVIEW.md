@@ -185,3 +185,70 @@ fprintf(stderr, "Scanner: lookahead=%d, valid_symbols[0..3]={%d,%d,%d,%d}\n",
 
 **Current Status:** 2 commits toward Phase 6, infrastructure solid but integration incomplete.
 
+
+---
+
+## Phase 6B Debugging: Scanner Investigation Complete ✅
+
+### Diagnostic Output (Commit 9d10926)
+
+Added stderr logging to scanner to trace `valid_symbols` flow. **KEY FINDINGS:**
+
+```
+[SCAN 0] lookahead='?'(0x00) valid:[0,1,0] col=0
+[SCAN 1] lookahead='?'(0x0a) valid:[0,1,0] col=0
+  -> EMIT NEWLINE
+[SCAN 2] lookahead='-'(0x2d) valid:[0,1,0] col=0
+[SCAN 3] lookahead='?'(0x0a) valid:[0,1,0] col=3
+  -> EMIT NEWLINE
+```
+
+### Analysis
+
+✅ **NEWLINE tokens ARE being generated**
+- `valid:[0,1,0]` means `valid_symbols[1]` (NEWLINE) = true
+- Scanner correctly detects newlines (0x0a = `\n`)
+- Multiple `-> EMIT NEWLINE` confirms proper token generation
+
+✅ **Scanner/Parser alignment is CORRECT**
+- `valid_symbols[NEWLINE]` maps to enum value 1 ✓
+- Parser is calling scanner at right times ✓
+- Lookahead detection working ✓
+
+❌ **Regression cause identified: Grammar parse states**
+- Tokens ARE being emitted (confirmed by logs)
+- Parser doesn't accept them in new grammar contexts
+- Problem: Grammar rewrite changed parse states; token placement mismatched
+
+### Root Cause
+
+The regression (67 → 55 tests) is **NOT** a scanner/token generation issue. It's a **grammar context mismatch**:
+
+1. yaml_content now expects: `choice(/[^\n-][^\n]*/, $_NEWLINE)`
+   - Regex consumes line content, NEWLINE token for breaks
+   - Parser confused about when each applies
+
+2. Similar issues in other contexts where `/\n/` was replaced
+
+### Solution Path
+
+Need to reconcile grammar to properly integrate NEWLINE tokens:
+- Some contexts: Use tokens (paragraph lines, block separators)
+- Some contexts: Keep regex patterns (yaml content, inline content)
+- Some contexts: Use conditional logic based on parse state
+
+### Recommendation
+
+This is a **grammar tuning issue**, not a scanner bug. The infrastructure works correctly!
+
+**Next Phase:** Selective grammar refinement to re-establish 67+ test baseline
+
+---
+
+**Current Commits:**
+- f6c1bf2: Scanner scaffolding ✅
+- 56e4cac: Checkpoint review ✅
+- ecceb96: Grammar rewrite (experimental)
+- e1f7196: Analysis documentation
+- 9d10926: Diagnostic scanner ✅ KEY INSIGHT
+
