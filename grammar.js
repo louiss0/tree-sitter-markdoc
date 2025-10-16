@@ -107,7 +107,14 @@ module.exports = grammar({
       ))
     ),
 
-    code: $ => repeat1(/[^\n]+\n/),
+    code: $ => token(prec(-1, repeat1(choice(
+      /[^`~\n][^\n]*\n/,  // Line not starting with fence marker
+      /`[^`\n][^\n]*\n/,  // Line starting with 1 backtick (not a fence)
+      /``[^`\n][^\n]*\n/, // Line starting with 2 backticks  
+      /~[^~\n][^\n]*\n/,  // Line starting with 1 tilde
+      /~~[^~\n][^\n]*\n/, // Line starting with 2 tildes
+      /\n/                 // Empty line
+    )))),
 
     code_fence_close: $ => seq(
       optional(/[ \t]*/),

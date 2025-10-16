@@ -342,10 +342,42 @@
       ]
     },
     "code": {
-      "type": "REPEAT1",
+      "type": "TOKEN",
       "content": {
-        "type": "PATTERN",
-        "value": "[^\\n]+\\n"
+        "type": "PREC",
+        "value": -1,
+        "content": {
+          "type": "REPEAT1",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "PATTERN",
+                "value": "[^`~\\n][^\\n]*\\n"
+              },
+              {
+                "type": "PATTERN",
+                "value": "`[^`\\n][^\\n]*\\n"
+              },
+              {
+                "type": "PATTERN",
+                "value": "``[^`\\n][^\\n]*\\n"
+              },
+              {
+                "type": "PATTERN",
+                "value": "~[^~\\n][^\\n]*\\n"
+              },
+              {
+                "type": "PATTERN",
+                "value": "~~[^~\\n][^\\n]*\\n"
+              },
+              {
+                "type": "PATTERN",
+                "value": "\\n"
+              }
+            ]
+          }
+        }
       }
     },
     "code_fence_close": {

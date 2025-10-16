@@ -140,11 +140,6 @@
     }
   },
   {
-    "type": "code",
-    "named": true,
-    "fields": {}
-  },
-  {
     "type": "code_fence_close",
     "named": true,
     "fields": {}
@@ -849,6 +844,10 @@
   },
   {
     "type": "attributes",
+    "named": true
+  },
+  {
+    "type": "code",
     "named": true
   },
   {
