@@ -413,7 +413,11 @@
             "named": true
           },
           {
-            "type": "list_paragraph",
+            "type": "list",
+            "named": true
+          },
+          {
+            "type": "paragraph",
             "named": true
           }
         ]
@@ -429,11 +433,6 @@
         ]
       }
     }
-  },
-  {
-    "type": "list_paragraph",
-    "named": true,
-    "fields": {}
   },
   {
     "type": "markdoc_tag",

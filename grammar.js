@@ -24,7 +24,6 @@ module.exports = grammar({
     [$.source_file],
     [$.list_item],
     [$.list_item, $._list_item_content],
-    [$.list_paragraph],
     [$.attribute, $.expression],
     [$.code_fence_close],
     [$.paragraph, $._inline_content],
@@ -297,16 +296,11 @@ module.exports = grammar({
 
     // Content that can appear in a list item
     _list_item_content: $ => choice(
-      $.list_paragraph,
+      $.paragraph,
+      $.list,
       $.fenced_code_block,
       $.html_block
     ),
-
-    // A single-line paragraph for list items
-    list_paragraph: $ => prec.right(1, alias(seq(
-      $._inline_first,
-      repeat($._inline_content) 
-    ), 'paragraph')),
 
     list_marker: $ => token(prec(2, choice(
       /[-*+][ \t]+/,

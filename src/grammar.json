@@ -1214,7 +1214,11 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "list_paragraph"
+          "name": "paragraph"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "list"
         },
         {
           "type": "SYMBOL",
@@ -1225,31 +1229,6 @@
           "name": "html_block"
         }
       ]
-    },
-    "list_paragraph": {
-      "type": "PREC_RIGHT",
-      "value": 1,
-      "content": {
-        "type": "ALIAS",
-        "content": {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "_inline_first"
-            },
-            {
-              "type": "REPEAT",
-              "content": {
-                "type": "SYMBOL",
-                "name": "_inline_content"
-              }
-            }
-          ]
-        },
-        "named": false,
-        "value": "paragraph"
-      }
     },
     "list_marker": {
       "type": "TOKEN",
@@ -1914,9 +1893,6 @@
     [
       "list_item",
       "_list_item_content"
-    ],
-    [
-      "list_paragraph"
     ],
     [
       "attribute",
