@@ -354,7 +354,43 @@ These cannot both be true simultaneously without context-aware parsing.
 
 ---
 
-### Phase 2: External Scanner for Indentation (3 hours)
+## Phase 1.5: PRAGMATIC APPROACH ✅
+
+**DECISION**: Skip external scanner complexity. Instead, implement high-impact grammar fixes:
+
+### Scope of Phase 1.5
+
+Focus on fixes that DON'T require context-aware newline handling:
+
+**Will Fix**:
+1. **Binary/Unary Operators** (10 tests: 58-62, 88-97)
+   - Add `+`, `-`, `*`, `/`, `%` operators
+   - Add `||`, `&&`, `==`, `!=`, `<`, `>`, `<=`, `>=` comparisons
+   - Add unary `!`, `-`, `+`
+   - Proper operator precedence
+
+2. **List Paragraphs** (5 tests: 27, 33-34, 99-100)
+   - Create `list_paragraph` rule
+   - Use in `_list_item_content` instead of `paragraph`
+
+3. **HTML Block Structure** (3 tests: 6, 7, 9)
+   - Parse HTML into structured nodes
+   - Emit `html_attr` and `html_content` sub-elements
+
+**Will NOT Fix (Deferred to Phase 2 w/ Scanner)**:
+- Multi-line paragraphs (tests 1, 2, 12, 13, 26, 28)
+- Nested list indentation (tests 10, 11, 56-57, 84-87)
+- Complex expressions (tests 38-39, 42-49)
+
+### Estimated Impact
+- Current: 72/100 passing
+- Target: 80-85/100 passing
+- Time: 3-4 hours
+- Regressions: Minimal (only grammar additions, no restructuring)
+
+---
+
+### Phase 2: External Scanner for Indentation (3 hours) - DEFERRED
 
 **Objective**: Track indentation levels for nested lists and code blocks
 
