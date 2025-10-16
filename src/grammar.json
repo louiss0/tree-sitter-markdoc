@@ -461,17 +461,13 @@
             }
           },
           {
-            "type": "FIELD",
-            "name": "name",
+            "type": "ALIAS",
             "content": {
-              "type": "ALIAS",
-              "content": {
-                "type": "PATTERN",
-                "value": "[a-zA-Z_][a-zA-Z0-9_-]*"
-              },
-              "named": false,
-              "value": "tag_name"
-            }
+              "type": "PATTERN",
+              "value": "[a-zA-Z_][a-zA-Z0-9_-]*"
+            },
+            "named": true,
+            "value": "tag_name"
           },
           {
             "type": "REPEAT",
@@ -558,17 +554,13 @@
             }
           },
           {
-            "type": "FIELD",
-            "name": "name",
+            "type": "ALIAS",
             "content": {
-              "type": "ALIAS",
-              "content": {
-                "type": "PATTERN",
-                "value": "[a-zA-Z_][a-zA-Z0-9_-]*"
-              },
-              "named": false,
-              "value": "tag_name"
-            }
+              "type": "PATTERN",
+              "value": "[a-zA-Z_][a-zA-Z0-9_-]*"
+            },
+            "named": true,
+            "value": "tag_name"
           },
           {
             "type": "TOKEN",
@@ -632,17 +624,13 @@
             }
           },
           {
-            "type": "FIELD",
-            "name": "name",
+            "type": "ALIAS",
             "content": {
-              "type": "ALIAS",
-              "content": {
-                "type": "PATTERN",
-                "value": "[a-zA-Z_][a-zA-Z0-9_-]*"
-              },
-              "named": false,
-              "value": "tag_name"
-            }
+              "type": "PATTERN",
+              "value": "[a-zA-Z_][a-zA-Z0-9_-]*"
+            },
+            "named": true,
+            "value": "tag_name"
           },
           {
             "type": "REPEAT",

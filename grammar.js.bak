@@ -50,13 +50,13 @@ module.exports = grammar({
     )),
 
     _block: $ => choice(
-      $.markdoc_tag,
-      $.fenced_code_block,
       $.heading,
+      $.paragraph,
+      $.fenced_code_block,
       $.html_block,
+      $.markdoc_tag,
       $.list,
-      $.html_comment,
-      $.paragraph
+      $.html_comment
     ),
 
     frontmatter: $ => seq(
@@ -126,33 +126,39 @@ module.exports = grammar({
       $.tag_self_close
     )),
 
-    tag_open: $ => prec.right(seq(
-      token(prec(6, seq('{%', /[ \t]*/))),
-      alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
+    tag_open: $ => prec.right(4, seq(
+      token(seq('{', token.immediate('%'))),
+      /[ \t]*/,
+      field('name', alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, 'tag_name')),
       repeat(seq(
         /[ \t]+/,
         $.attribute
       )),
-      token(prec(6, seq(/[ \t]*/, '%}'))),
+      /[ \t]*/,
+      token(seq('%', token.immediate('}'))),
       optional(/\n/)
     )),
 
-    tag_close: $ => prec.right(seq(
-      token(prec(6, seq('{%', /[ \t]*/))),
-      token('/'),
-      alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
-      token(prec(6, seq(/[ \t]*/, '%}'))),
+    tag_close: $ => prec.right(4, seq(
+      token(seq('{', token.immediate('%'))),
+      /[ \t]*/,
+      '/',
+      field('name', alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, 'tag_name')),
+      /[ \t]*/,
+      token(seq('%', token.immediate('}'))),
       optional(/\n/)
     )),
 
-    tag_self_close: $ => prec.right(seq(
-      token(prec(6, seq('{%', /[ \t]*/))),
-      alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
+    tag_self_close: $ => prec.right(4, seq(
+      token(seq('{', token.immediate('%'))),
+      /[ \t]*/,
+      field('name', alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, 'tag_name')),
       repeat(seq(
         /[ \t]+/,
         $.attribute
       )),
-      token(prec(6, seq(/[ \t]*/, '/%}'))),
+      /[ \t]*/,
+      token(seq('/', token.immediate('%'), token.immediate('}'))),
       optional(/\n/)
     )),
 
