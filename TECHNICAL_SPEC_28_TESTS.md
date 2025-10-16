@@ -334,6 +334,26 @@ paragraph: $ => prec.left(1, seq(
 
 ---
 
+## Phase 1 Investigation: GRAMMAR-ONLY APPROACH IMPOSSIBLE ❌
+
+**DECISION MADE**: After extensive testing, **Phase 1 as a grammar-only change is mathematically impossible**.
+
+**Why**:
+The requirements are contradictory in a context-free grammar:
+1. Paragraphs must allow multi-line continuation with single `\n`
+2. Blocks must allow single `\n` separation (e.g., consecutive headings)
+
+These cannot both be true simultaneously without context-aware parsing.
+
+**Test Results**:
+- `/\n\n+/` separator: Fixes multi-line paragraphs but BREAKS consecutive headings
+- `/repeat1(/\n/)/` separator: Breaks multi-line paragraphs but fixes headings
+- Grammar-level precedence: No effect (doesn't control block separation)
+
+**Solution**: **Jump to Phase 2** (External Scanner) which provides the context awareness needed.
+
+---
+
 ### Phase 2: External Scanner for Indentation (3 hours)
 
 **Objective**: Track indentation levels for nested lists and code blocks
