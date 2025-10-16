@@ -298,7 +298,9 @@ module.exports = grammar({
 
     inline_expression: $ => seq(
       '{{',
+      repeat(/[ \t]/),
       field('content', $.expression),
+      repeat(/[ \t]/),
       '}}'
     ),
 
