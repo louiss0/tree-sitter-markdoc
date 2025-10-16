@@ -2112,6 +2112,14 @@
     {
       "type": "SYMBOL",
       "name": "_code_content"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_NEWLINE"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_BLANK_LINE"
     }
   ],
   "inline": [],
