@@ -191,8 +191,18 @@ module.exports = grammar({
       $.string,
       $.number,
       $.array_literal,
-      $.object_literal
+      $.object_literal,
+      $.boolean
     ),
+
+    // Boolean literals
+    boolean: $ => choice('true', 'false'),
+
+    // Alias: object is same as object_literal for test compatibility
+    object: $ => $.object_literal,
+
+    // Alias: array is same as array_literal for test compatibility  
+    array: $ => $.array_literal,
 
     // Variable prefixed with $
     variable: $ => seq('$', $.identifier),
