@@ -11,7 +11,9 @@ module.exports = grammar({
   name: "markdoc",
 
   externals: $ => [
-    $._code_content
+    $._code_content,
+    $._NEWLINE,
+    $._BLANK_LINE
   ],
 
   extras: $ => [
