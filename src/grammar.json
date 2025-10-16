@@ -1994,12 +1994,8 @@
     "text": {
       "type": "TOKEN",
       "content": {
-        "type": "PREC",
-        "value": -2,
-        "content": {
-          "type": "PATTERN",
-          "value": "[^\\n{*_`!\\[<\\r]+"
-        }
+        "type": "PATTERN",
+        "value": "[^\\n{*_`\\[<\\r]+|!"
       }
     }
   },

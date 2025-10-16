@@ -440,6 +440,6 @@ module.exports = grammar({
       $.image
     ),
 
-    text: $ => token(prec(-2, /[^\n{*_`!\[<\r]+/)),
+    text: $ => token(/[^\n{*_`\[<\r]+|!/),
   }
 });
