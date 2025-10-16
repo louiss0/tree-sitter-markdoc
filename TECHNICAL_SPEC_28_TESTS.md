@@ -191,57 +191,68 @@ Current:
 
 ## Part 2: Implementation Roadmap
 
-### Phase 1: Newline/Blank Line Distinction (2 hours)
+### Phase 1: Newline/Blank Line Distinction (30 minutes)
 
-**Objective**: Allow grammar to distinguish single newlines from blank lines (paragraph breaks)
+**Objective**: Fix multi-line paragraph parsing by changing block separators from single newlines to blank lines.
 
-**Changes Required**:
+**Root Cause**: In `source_file`, blocks are separated by `repeat1(/\n/)` which treats ANY newline as a separator. This causes each line to become a separate paragraph.
 
-1. **Add Newline Tracking to Grammar**:
-   ```javascript
-   // In externals array
-   externals: $ => [
-     $._code_content,
-     $._newline,           // Single newline (paragraph continuation)
-     $._blank_line         // Double+ newline (paragraph separator)
-   ]
-   ```
+**Key Semantic Change**:
+- **Single newline** (`\n`): Soft line break; continues the same paragraph
+- **Blank line** (`\n\n+`): Hard break; separates paragraphs/blocks
 
-2. **Update Paragraph Rule**:
-   ```javascript
-   paragraph: $ => seq(
-     $._inline_segment,
-     repeat(seq(
-       $._newline,         // Only single newline, not blank line
-       $._inline_segment
-     ))
-   ),
-   
-   _inline_segment: $ => seq(
-     $._inline_first,
-     repeat($._inline_content)
-   )
-   ```
+**Example**:
+```markdown
+Line one
+Line two
+Line three
 
-3. **Update Source File Rule**:
-   ```javascript
-   source_file: $ => prec.right(seq(
-     repeat(/\n/),
-     optional(seq(
-       choice($.frontmatter, $._block),
-       repeat(seq(
-         /\n\n+/,        // Blank lines (2+)
-         choice($.frontmatter, $._block)
-       ))
-     )),
-     repeat(/\n/)
-   ))
-   ```
+New paragraph
+```
+
+**Expected AST**:
+```
+(source_file
+  (paragraph (text) (text) (text))
+  (paragraph (text)))
+```
+
+**Affected Tests**: 1, 2, 26-28
+
+**Changes Required - MINIMAL AND SURGICAL**:
+
+In `grammar.js`, modify the `source_file` rule (lines 36-52).
+
+**ONLY change line 44**:
+
+**BEFORE** (current line 44):
+```javascript
+repeat(seq(
+  repeat1(/\n/),        // <-- THIS LINE
+  choice(
+```
+
+**AFTER** (new line 44):
+```javascript
+repeat(seq(
+  /\n\n+/,              // <-- CHANGE TO THIS
+  choice(
+```
+
+**Why this works**:
+1. `repeat1(/\n/)` accepts ANY 1+ newlines between blocks (even single newlines)
+2. `/\n\n+/` requires exactly 2+ newlines (a blank line) to separate blocks
+3. Single `\n` is no longer a block separator
+4. The `paragraph` rule (line 374-381) already supports multi-line: `repeat(seq(/\n/, ...))`
+5. Result: consecutive lines stay in the same paragraph until a blank line is encountered
+
+**No other changes needed**. The paragraph rule already handles multi-line content correctly once the block separator changes.
 
 **Benefits**: 
-- Fixes tests 1, 2, 26-28
-- Enables proper paragraph multi-line handling
-- Foundation for list paragraph parsing
+- Fixes tests 1, 2, 26-28 (5 tests)
+- Enables proper multi-line paragraph handling
+- Foundation for Phase 5 (list_paragraph support)
+- No regressions expected (only makes block separation more strict)
 
 ---
 
