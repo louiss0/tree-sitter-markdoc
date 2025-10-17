@@ -378,10 +378,11 @@ module.exports = grammar({
       optional(/\n/)  // Optional trailing newline after last item
     )),
 
-    // A list item with content (nested lists disabled for now)
+    // A list item with content (nested lists now supported)
     list_item: $ => seq(
       field('marker', $.list_marker),
-      field('content', $.paragraph)
+      field('content', $.paragraph),
+      optional(repeat(seq(/\n/, $.list)))
     ),
 
     list_marker: $ => token(prec(2, choice(
