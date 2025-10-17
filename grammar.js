@@ -13,11 +13,11 @@ module.exports = grammar({
   externals: $ => [
     $._code_content,
     $._NEWLINE,
-    $._BLANK_LINE,
+    $._BLANK_LINE
   ],
 
   extras: $ => [
-    /[\t\r]/  // Horizontal whitespace
+    /[ \t\r]/  // Horizontal whitespace including space
   ],
 
   conflicts: $ => [
@@ -30,7 +30,8 @@ module.exports = grammar({
     [$.attribute, $._primary_expression],
     [$.markdoc_tag, $.paragraph],
     [$.attribute_value, $._primary_expression],
-    [$.tag_open, $.tag_close]
+    [$.tag_open, $.tag_close],
+    [$.binary_expression]
   ],
 
   rules: {
@@ -208,14 +209,14 @@ module.exports = grammar({
 
     // Top-level expressions have highest precedence to contain their
     // own operations and prevent ambiguity with attribute_value
-    expression: $ => choice(
+    expression: $ => prec.left(choice(
       $.binary_expression,
       $.unary_expression,
       $.call_expression,
       $.member_expression,
       $.array_access,
       $._primary_expression
-    ),
+    )),
 
     // Atomic expressions
     _primary_expression: $ => choice(
@@ -245,13 +246,14 @@ module.exports = grammar({
     variable: $ => seq('$', $.identifier),
 
     // Binary operators (in order of precedence)
+    // Use token(prec()) for operators to give them priority over conflicting markdown tokens
     binary_expression: $ => choice(
-      prec.left(1, seq($.expression, '||', $.expression)),
-      prec.left(2, seq($.expression, '&&', $.expression)),
-      prec.left(3, seq($.expression, choice('==', '!='), $.expression)),
-      prec.left(4, seq($.expression, choice('<', '>', '<=', '>='), $.expression)),
-      prec.left(5, seq($.expression, choice('+', '-'), $.expression)),
-      prec.left(6, seq($.expression, choice('*', '/', '%'), $.expression))
+      prec.left(1, seq($.expression, token(prec(5, '||')), $.expression)),
+      prec.left(2, seq($.expression, token(prec(5, '&&')), $.expression)),
+      prec.left(3, seq($.expression, token(prec(5, choice('==', '!='))), $.expression)),
+      prec.left(4, seq($.expression, token(prec(5, choice('<', '>', '<=', '>='))), $.expression)),
+      prec.left(5, seq($.expression, token(prec(5, choice('+', '-'))), $.expression)),
+      prec.left(6, seq($.expression, token(prec(5, choice('*', '/', '%'))), $.expression))
     ),
 
     // Unary operators
@@ -363,8 +365,7 @@ module.exports = grammar({
       optional(/\n/)  // Optional trailing newline after last item
     )),
 
-    // A list item with content
-    // Note: Nested lists require indentation tracking (not yet implemented)
+    // A list item with content (nested lists disabled for now)
     list_item: $ => seq(
       field('marker', $.list_marker),
       field('content', $.paragraph)
@@ -472,8 +473,7 @@ module.exports = grammar({
     ),
 
     image: $ => seq(
-      '!',
-      '[',
+      token('!['),
       alias(token(prec(1, /[^\]\n]+/)), $.image_alt),
       ']',
       '(',
@@ -495,9 +495,13 @@ module.exports = grammar({
     // Inline content after first element
     _inline_content: $ => choice(
       $._inline_first,
-      $.image
+      $.image,
+      alias($.standalone_punct, $.text)
     ),
 
     text: $ => token(/[^\n{<`*_\[\]!]+/),
+    
+    // Fallback for standalone punctuation that doesn't start special syntax
+    standalone_punct: $ => '!',
   }
 });

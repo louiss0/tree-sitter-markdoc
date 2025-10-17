@@ -1,1 +1,1 @@
-﻿{{ greeting }} {{ name }}!
+{{ greeting }} {{ name }}!

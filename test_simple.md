@@ -1,1 +1,1 @@
-Simple paragraph
+{{ age }}

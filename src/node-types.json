@@ -848,6 +848,11 @@
     }
   },
   {
+    "type": "text",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "unary_expression",
     "named": true,
     "fields": {},
@@ -887,7 +892,7 @@
     "named": false
   },
   {
-    "type": "!=",
+    "type": "![",
     "named": false
   },
   {
@@ -896,10 +901,6 @@
   },
   {
     "type": "$",
-    "named": false
-  },
-  {
-    "type": "%",
     "named": false
   },
   {
@@ -955,27 +956,7 @@
     "named": false
   },
   {
-    "type": "<",
-    "named": false
-  },
-  {
-    "type": "<=",
-    "named": false
-  },
-  {
     "type": "=",
-    "named": false
-  },
-  {
-    "type": "==",
-    "named": false
-  },
-  {
-    "type": ">",
-    "named": false
-  },
-  {
-    "type": ">=",
     "named": false
   },
   {
@@ -1068,10 +1049,6 @@
   },
   {
     "type": "tag_name",
-    "named": true
-  },
-  {
-    "type": "text",
     "named": true
   },
   {
