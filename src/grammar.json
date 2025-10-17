@@ -1868,6 +1868,30 @@
             "type": "SYMBOL",
             "name": "paragraph"
           }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "REPEAT",
+              "content": {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "PATTERN",
+                    "value": "\\n"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "list"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         }
       ]
     },
