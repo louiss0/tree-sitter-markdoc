@@ -210,6 +210,7 @@ module.exports = grammar({
     // Top-level expressions have highest precedence to contain their
     // own operations and prevent ambiguity with attribute_value
     expression: $ => prec.left(choice(
+      $.arrow_function,
       $.binary_expression,
       $.unary_expression,
       $.call_expression,
@@ -245,6 +246,20 @@ module.exports = grammar({
     // Variable prefixed with $
     variable: $ => seq('$', $.identifier),
 
+    // Arrow function: () => expr or (params) => expr
+    arrow_function: $ => seq(
+      '(',
+      optional(seq(
+        $.identifier,
+        repeat(seq(',', /[ \t]*/, $.identifier))
+      )),
+      ')',
+      /[ \t]*/,
+      '=>',
+      /[ \t]*/,
+      $.expression
+    ),
+
     // Binary operators (in order of precedence)
     // Use token(prec()) for operators to give them priority over conflicting markdown tokens
     binary_expression: $ => choice(
@@ -264,21 +279,17 @@ module.exports = grammar({
 
     // Ordered by precedence - call > member > array access 
     call_expression: $ => prec.left(4, seq(
-      field('function', choice(
+      choice(
         $.member_expression,
         $.identifier
-      )),
-      field('arguments', $.arguments)
-    )),
-
-    arguments: $ => seq(
+      ),
       '(',
       optional(seq(
         $.expression,
         repeat(seq(',', /[ \t]*/, $.expression))
       )),
       ')'
-    ),
+    )),
 
     member_expression: $ => prec.right(3, seq(
       field('object', choice(
@@ -298,6 +309,9 @@ module.exports = grammar({
       field('index', $.expression),
       ']'
     )),
+
+    // Alias for backward compatibility with tests
+    subscript_expression: $ => $.array_access,
 
     array_literal: $ => seq(
       '[',

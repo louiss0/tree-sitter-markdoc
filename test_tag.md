@@ -1,1 +1,3 @@
-{% image /%}
+{% tag %}
+Content here
+{% tag %}
