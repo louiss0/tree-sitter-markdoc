@@ -608,11 +608,25 @@
                   "type": "SEQ",
                   "members": [
                     {
-                      "type": "REPEAT1",
-                      "content": {
-                        "type": "PATTERN",
-                        "value": "\\n"
-                      }
+                      "type": "CHOICE",
+                      "members": [
+                        {
+                          "type": "CHOICE",
+                          "members": [
+                            {
+                              "type": "SYMBOL",
+                              "name": "_BLANK_LINE"
+                            },
+                            {
+                              "type": "PATTERN",
+                              "value": "\\n"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BLANK"
+                        }
+                      ]
                     },
                     {
                       "type": "SYMBOL",
@@ -1852,7 +1866,7 @@
           "name": "content",
           "content": {
             "type": "SYMBOL",
-            "name": "list_paragraph"
+            "name": "paragraph"
           }
         }
       ]

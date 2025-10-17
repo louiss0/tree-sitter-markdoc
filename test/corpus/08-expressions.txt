@@ -49,7 +49,7 @@ Items {{ [1, 2, 3] }} end.
     (text)
     (inline_expression
       (expression
-        (array_literal
+        (array
           (expression
             (number))
           (expression
@@ -71,7 +71,7 @@ Tags {{ ["one", "two"] }} done.
     (text)
     (inline_expression
       (expression
-        (array_literal
+        (array
           (expression
             (string))
           (expression
@@ -91,7 +91,7 @@ Data {{ {key: "value"} }} text.
     (text)
     (inline_expression
       (expression
-        (object_literal
+        (object
           (pair
             (identifier)
             (expression
@@ -111,7 +111,7 @@ Config {{ {name: "test", count: 5} }} end.
     (text)
     (inline_expression
       (expression
-        (object_literal
+        (object
           (pair
             (identifier)
             (expression

@@ -155,7 +155,7 @@ module.exports = grammar({
       seq(
         $.tag_open,
         repeat(seq(
-          repeat1(/\n/),  // Allow one or more newlines (blank line support)
+          optional(choice($._BLANK_LINE, /\n/)),
           $._block
         )),
         $.tag_close
@@ -381,7 +381,7 @@ module.exports = grammar({
     // A list item with content (nested lists disabled for now)
     list_item: $ => seq(
       field('marker', $.list_marker),
-      field('content', $.list_paragraph)
+      field('content', $.paragraph)
     ),
 
     list_marker: $ => token(prec(2, choice(

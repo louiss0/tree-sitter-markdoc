@@ -529,7 +529,7 @@
         "required": true,
         "types": [
           {
-            "type": "list_paragraph",
+            "type": "paragraph",
             "named": true
           }
         ]
@@ -544,49 +544,6 @@
           }
         ]
       }
-    }
-  },
-  {
-    "type": "list_paragraph",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "emphasis",
-          "named": true
-        },
-        {
-          "type": "html_inline",
-          "named": true
-        },
-        {
-          "type": "image",
-          "named": true
-        },
-        {
-          "type": "inline_code",
-          "named": true
-        },
-        {
-          "type": "inline_expression",
-          "named": true
-        },
-        {
-          "type": "link",
-          "named": true
-        },
-        {
-          "type": "strong",
-          "named": true
-        },
-        {
-          "type": "text",
-          "named": true
-        }
-      ]
     }
   },
   {
