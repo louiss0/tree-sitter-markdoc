@@ -10,44 +10,70 @@
 module.exports = grammar({
   name: "markdoc",
 
+  externals: $ => [
+    $._code_content,
+    $._NEWLINE,
+    $._BLANK_LINE
+  ],
+
   extras: $ => [
-    /[ \t\r]/
+    /[ \t\r]/  // Horizontal whitespace including space
   ],
 
   conflicts: $ => [
     [$.source_file],
-    [$.attribute, $.expression]
+    [$.list_item],
+    [$.attribute, $.expression],
+    [$.code_fence_close],
+    [$.paragraph, $._inline_content],
+    [$.paragraph],
+    [$.attribute, $._primary_expression],
+    [$.markdoc_tag, $.paragraph],
+    [$.attribute_value, $._primary_expression],
+    [$.tag_open, $.tag_close],
+    [$.binary_expression]
   ],
 
   rules: {
     source_file: $ => prec.right(seq(
       repeat(/\n/),
       optional(seq(
-        $._block,
-        repeat(seq(
-          repeat1(/\n/),
+        choice(
+          $.frontmatter,
           $._block
+        ),
+        repeat(seq(
+          choice(
+            $._BLANK_LINE,  // Scanner emits for blank lines or block boundaries
+            /\n/             // Fallback for single newlines between non-paragraph blocks
+          ),
+          choice(
+            $.frontmatter,
+            $._block
+          )
         ))
       )),
       repeat(/\n/)
     )),
 
     _block: $ => choice(
-      $.frontmatter,
-      $.heading,
+      $.comment_block,  // Must come before markdoc_tag to match {% comment %}
+      $.markdoc_tag,
       $.fenced_code_block,
-      prec(1, $.markdoc_tag),
+      $.heading,
+      $.thematic_break,
+      $.blockquote,
+      $.html_block,
       $.list,
       $.html_comment,
-      $.html_block,
       $.paragraph
     ),
 
     frontmatter: $ => seq(
-      token(prec(2, '---')),
+      token(prec(10, '---')),
       /\n/,
       alias($.yaml_content, $.yaml),
-      token(prec(2, '---'))
+      token(prec(10, '---'))
     ),
 
     yaml_content: $ => repeat1(
@@ -66,6 +92,19 @@ module.exports = grammar({
     heading_marker: $ => token(prec(1, /#{1,6}[ \t]+/)),
 
     heading_text: $ => /[^\n]+/,
+
+    // Thematic break (horizontal rule) - must be at least 3 chars
+    thematic_break: $ => token(prec(1, choice(
+      /\*[ \t]*\*[ \t]*\*[ \t*]*/,
+      /-[ \t]*-[ \t]*-[ \t-]*/,
+      /_[ \t]*_[ \t]*_[ \t_]*/
+    ))),
+
+    // Blockquote
+    blockquote: $ => prec.right(seq(
+      token(prec(2, seq('>', optional(/[ \t]+/)))),
+      optional($._block)
+    )),
 
     fenced_code_block: $ => seq(
       field('open', $.code_fence_open),
@@ -90,87 +129,146 @@ module.exports = grammar({
       ))
     ),
 
-    code: $ => repeat1(/[^\n]+\n/),
+    code: $ => $._code_content,
 
     code_fence_close: $ => seq(
+      optional(/[ \t]*/),
       choice(
         token(prec(3, '```')),
         token(prec(3, '~~~'))
-      )
+      ),
+      optional(/\n/)
     ),
 
-    markdoc_tag: $ => choice(
+    // Markdoc comment block: {% comment %}...{% /comment %}
+    comment_block: $ => seq(
+      token(prec(10, seq('{%', /[ \t]*/, 'comment', /[ \t]*/, '%}'))),
+      repeat(choice(
+        /[^{\n]+/,
+        /\n/,
+        /\{/
+      )),
+      token(prec(10, seq('{%', /[ \t]*/, '\/', /[ \t]*/, 'comment', /[ \t]*/, '%}')))
+    ),
+
+    markdoc_tag: $ => prec.dynamic(10, choice(
       seq(
         $.tag_open,
-        repeat($._block),
+        repeat(seq(
+          repeat1(/\n/),  // Allow one or more newlines (blank line support)
+          $._block
+        )),
         $.tag_close
       ),
       $.tag_self_close
-    ),
+    )),
 
     tag_open: $ => prec.right(seq(
-      '{%',
-      /[ \t]*/,
+      token(prec(6, seq('{%', /[ \t]*/))),
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
       repeat(seq(
         /[ \t]+/,
         $.attribute
       )),
-      /[ \t]*/,
-      '%}',
+      token(prec(6, seq(/[ \t]*/, '%}'))),
       optional(/\n/)
     )),
 
     tag_close: $ => prec.right(seq(
-      '{%',
-      /[ \t]*/,
-      '/',
+      repeat(/\n/),
+      token(prec(6, seq('{%', /[ \t]*/))),
+      optional(token('/')),  // Allow optional slash for alternative syntax
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
-      /[ \t]*/,
-      '%}',
+      token(prec(6, seq(/[ \t]*/, '%}'))),
       optional(/\n/)
     )),
 
     tag_self_close: $ => prec.right(seq(
-      '{%',
-      /[ \t]*/,
+      token(prec(6, seq('{%', /[ \t]*/))),
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
       repeat(seq(
         /[ \t]+/,
         $.attribute
       )),
-      /[ \t]*/,
-      '/%}',
+      token(prec(6, seq(/[ \t]*/, '/%}'))),
       optional(/\n/)
     )),
 
     attribute: $ => seq(
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.attribute_name),
+      /[ \t]*/,
       '=',
-      field('attribute_value', choice(
-        $.string,
-        $.expression
-      ))
+      /[ \t]*/,
+      $.attribute_value
     ),
 
-    expression: $ => choice(
+    attribute_value: $ => choice(
+      $.string,
+      $.expression
+    ),
+
+    // Top-level expressions have highest precedence to contain their
+    // own operations and prevent ambiguity with attribute_value
+    expression: $ => prec.left(choice(
+      $.arrow_function,
+      $.binary_expression,
+      $.unary_expression,
       $.call_expression,
       $.member_expression,
       $.array_access,
-      $.array_literal,
-      $.object_literal,
+      $._primary_expression
+    )),
+
+    // Atomic expressions
+    _primary_expression: $ => choice(
+      $.variable,
       $.identifier,
+      $.string,
       $.number,
-      $.string
+      $.array,
+      $.object,
+      $.boolean,
+      $.null
     ),
 
-    call_expression: $ => prec.left(3, seq(
-      choice(
-        $.member_expression,
-        $.array_access,
-        $.identifier
-      ),
-      $.arguments
+    // Boolean literals
+    boolean: $ => choice('true', 'false'),
+
+    // Null literal
+    null: $ => 'null',
+
+    // Variable prefixed with $
+    variable: $ => seq('$', $.identifier),
+
+    // Arrow function: () => expr or (params) => expr
+    arrow_function: $ => seq(
+      '(',
+      optional(seq(
+        $.identifier,
+        repeat(seq(',', /[ \t]*/, $.identifier))
+      )),
+      ')',
+      /[ \t]*/,
+      '=>',
+      /[ \t]*/,
+      $.expression
+    ),
+
+    // Binary operators (in order of precedence)
+    // Use token(prec()) for operators to give them priority over conflicting markdown tokens
+    binary_expression: $ => choice(
+      prec.left(1, seq($.expression, token(prec(5, '||')), $.expression)),
+      prec.left(2, seq($.expression, token(prec(5, '&&')), $.expression)),
+      prec.left(3, seq($.expression, token(prec(5, choice('==', '!='))), $.expression)),
+      prec.left(4, seq($.expression, token(prec(5, choice('<', '>', '<=', '>='))), $.expression)),
+      prec.left(5, seq($.expression, token(prec(5, choice('+', '-'))), $.expression)),
+      prec.left(6, seq($.expression, token(prec(5, choice('*', '/', '%'))), $.expression))
+    ),
+
+    // Unary operators
+    unary_expression: $ => prec.right(7, seq(
+      choice('!', '-', '+'),
+      $.expression
     )),
 
     arguments: $ => seq(
@@ -182,22 +280,39 @@ module.exports = grammar({
       ')'
     ),
 
-    member_expression: $ => prec.left(2, seq(
+    // Ordered by precedence - call > member > array access 
+    call_expression: $ => prec.left(4, seq(
       choice(
-        $.array_access,
+        $.member_expression,
         $.identifier
       ),
-      repeat1(seq('.', $.identifier))
+      $.arguments
     )),
 
-    array_access: $ => prec.left(2, seq(
-      $.identifier,
+    member_expression: $ => prec.right(3, seq(
+      field('object', choice(
+        $.member_expression,
+        $.array_access,
+        $._primary_expression
+      )),
+      '.',
+      field('property', $.identifier)
+    )),
+
+    array_access: $ => prec.right(2, seq(
+      field('array', choice(
+        $.member_expression,
+        $._primary_expression
+      )),
       '[',
-      $.expression,
+      field('index', $.expression),
       ']'
     )),
 
-    array_literal: $ => seq(
+    // Alias for backward compatibility with tests
+    subscript_expression: $ => $.array_access,
+
+    array: $ => seq(
       '[',
       optional(seq(
         $.expression,
@@ -207,7 +322,7 @@ module.exports = grammar({
       ']'
     ),
 
-    object_literal: $ => seq(
+    object: $ => seq(
       '{',
       optional(seq(
         $.pair,
@@ -226,41 +341,48 @@ module.exports = grammar({
 
     identifier: $ => /[a-zA-Z_][a-zA-Z0-9_]*/,
 
-    string: $ => seq(
-      '"',
-      repeat(choice(
-        /[^"\\\n]/,
-        seq('\\', /./)
-      )),
-      '"'
+    string: $ => choice(
+      seq(
+        '"',
+        repeat(choice(
+          /[^"\\\n]/,
+          seq('\\', /./)
+        )),
+        '"'
+      ),
+      seq(
+        "'",
+        repeat(choice(
+          /[^'\\\n]/,
+          seq('\\', /./)
+        )),
+        "'"
+      )
     ),
 
     number: $ => /-?[0-9]+(\.[0-9]+)?/,
 
     inline_expression: $ => seq(
       '{{',
-      /[ \t]*/,
-      $.expression,
-      /[ \t]*/,
+      repeat(/[ \t]/),
+      field('content', $.expression),
+      repeat(/[ \t]/),
       '}}'
     ),
 
-    list: $ => prec.right(repeat1($.list_item)),
-
-    list_item: $ => prec.right(seq(
-      field('marker', $.list_marker),
-      field('content', seq(
-        $.paragraph,
-        optional(seq(
-          /\n/,
-          repeat(seq(
-            /[ \t]{2,}/,
-            choice($.list, $.paragraph),
-            optional(/\n/)
-          ))
-        ))
-      ))
+    // Lists: one or more list items separated by a single newline
+    // A blank line between items terminates the list (separate list)
+    list: $ => prec.right(seq(
+      $.list_item,
+      repeat(seq(/\n/, $.list_item)),
+      optional(/\n/)  // Optional trailing newline after last item
     )),
+
+    // A list item with content (nested lists disabled for now)
+    list_item: $ => seq(
+      field('marker', $.list_marker),
+      field('content', $.list_paragraph)
+    ),
 
     list_marker: $ => token(prec(2, choice(
       /[-*+][ \t]+/,
@@ -318,16 +440,25 @@ module.exports = grammar({
       )))
     ),
 
-    paragraph: $ => prec.left(repeat1(choice(
-      $.inline_expression,
-      $.strong,
-      $.emphasis,
-      $.inline_code,
-      $.link,
-      $.image,
-      $.html_inline,
-      $.text
-    ))),
+    // Paragraph: consecutive lines of content (separated by single newlines, not double)
+    paragraph: $ => prec.left(1, seq(
+      $._inline_first,
+      repeat($._inline_content),
+      repeat(seq(
+        $._NEWLINE,  // Use ONLY scanner token for context-aware line continuation
+        seq($._inline_first, repeat($._inline_content))
+      ))
+    )),
+
+    // List paragraph: same as paragraph but semantically distinct for list items
+    list_paragraph: $ => prec.left(1, seq(
+      $._inline_first,
+      repeat($._inline_content),
+      repeat(seq(
+        $._NEWLINE,
+        seq($._inline_first, repeat($._inline_content))
+      ))
+    )),
 
     emphasis: $ => prec.left(1, choice(
       seq('*', token(prec(1, /[^*\n]+/)), '*'),
@@ -355,8 +486,7 @@ module.exports = grammar({
     ),
 
     image: $ => seq(
-      '!',
-      '[',
+      token('!['),
       alias(token(prec(1, /[^\]\n]+/)), $.image_alt),
       ']',
       '(',
@@ -364,6 +494,27 @@ module.exports = grammar({
       ')'
     ),
 
-    text: $ => token(prec(-1, /[^\n{*_`!\[<]+/)),
+    // First inline element in a paragraph/line
+    _inline_first: $ => choice(
+      $.inline_expression,
+      $.text,
+      $.html_inline,
+      $.link,
+      $.emphasis,
+      $.strong,
+      $.inline_code
+    ),
+
+    // Inline content after first element
+    _inline_content: $ => choice(
+      $._inline_first,
+      $.image,
+      alias($.standalone_punct, $.text)
+    ),
+
+    text: $ => token(/[^\n{<`*_\[\]!]+/),
+    
+    // Fallback for standalone punctuation that doesn't start special syntax
+    standalone_punct: $ => '!',
   }
 });
