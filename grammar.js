@@ -336,15 +336,19 @@ module.exports = grammar({
       '}}'
     ),
 
-    // Lists: one or more list items separated by newlines
-    // Nested lists are automatically handled by INDENT/DEDENT tokens from scanner
+    // Lists: one or more list items
+    // Items can be separated by optional newlines (handled by extras)
+    // Nested lists use INDENT/DEDENT tokens from scanner
     list: $ => prec.right(seq(
       $.list_item,
       repeat(choice(
-        // Try nested list first (higher precedence)
+        // Nested list with indentation
         prec(2, seq($._INDENT, $.list, $._DEDENT)),
-        // Continuation at same indent level (lower precedence)
-        prec(1, $.list_item)
+        // Another item at same level (newlines handled by extras)
+        prec(1, seq(
+          optional($._NEWLINE),
+          $.list_item
+        ))
       ))
     )),
 

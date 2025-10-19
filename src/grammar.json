@@ -1534,8 +1534,25 @@
                   "type": "PREC",
                   "value": 1,
                   "content": {
-                    "type": "SYMBOL",
-                    "name": "list_item"
+                    "type": "SEQ",
+                    "members": [
+                      {
+                        "type": "CHOICE",
+                        "members": [
+                          {
+                            "type": "SYMBOL",
+                            "name": "_NEWLINE"
+                          },
+                          {
+                            "type": "BLANK"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "list_item"
+                      }
+                    ]
                   }
                 }
               ]

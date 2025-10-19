@@ -12,15 +12,15 @@ Simple unordered list
   (list
     (list_item
       (list_marker)
-      (paragraph
+      (list_paragraph
         (text)))
     (list_item
       (list_marker)
-      (paragraph
+      (list_paragraph
         (text)))
     (list_item
       (list_marker)
-      (paragraph
+      (list_paragraph
         (text)))))
 
 =======================================
@@ -38,8 +38,14 @@ Simple ordered list
     (list_item
       (list_marker)
       (list_paragraph
-        (text)
-        (text)
+        (text)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))
+    (list_item
+      (list_marker)
+      (list_paragraph
         (text)))))
 
 =======================================
@@ -56,15 +62,15 @@ Mixed unordered markers
   (list
     (list_item
       (list_marker)
-      (paragraph
+      (list_paragraph
         (text)))
     (list_item
       (list_marker)
-      (paragraph
+      (list_paragraph
         (text)))
     (list_item
       (list_marker)
-      (paragraph
+      (list_paragraph
         (text)))))
 
 =======================================
@@ -107,11 +113,11 @@ List after heading
   (list
     (list_item
       (list_marker)
-      (paragraph
+      (list_paragraph
         (text)))
     (list_item
       (list_marker)
-      (paragraph
+      (list_paragraph
         (text)))))
 
 =======================================
@@ -129,11 +135,11 @@ Regular paragraph text.
   (list
     (list_item
       (list_marker)
-      (paragraph
+      (list_paragraph
         (text)))
     (list_item
       (list_marker)
-      (paragraph
+      (list_paragraph
         (text))))
   (paragraph
     (text)))
