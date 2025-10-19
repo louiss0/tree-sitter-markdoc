@@ -413,8 +413,16 @@
                   "value": "{%"
                 },
                 {
+                  "type": "PATTERN",
+                  "value": "[ \\t]*"
+                },
+                {
                   "type": "STRING",
                   "value": "comment"
+                },
+                {
+                  "type": "PATTERN",
+                  "value": "[ \\t]*"
                 },
                 {
                   "type": "STRING",
@@ -453,12 +461,24 @@
                   "value": "{%"
                 },
                 {
+                  "type": "PATTERN",
+                  "value": "[ \\t]*"
+                },
+                {
                   "type": "STRING",
                   "value": "/"
                 },
                 {
+                  "type": "PATTERN",
+                  "value": "[ \\t]*"
+                },
+                {
                   "type": "STRING",
                   "value": "comment"
+                },
+                {
+                  "type": "PATTERN",
+                  "value": "[ \\t]*"
                 },
                 {
                   "type": "STRING",
@@ -1658,11 +1678,11 @@
           "members": [
             {
               "type": "PATTERN",
-              "value": "[-*+]"
+              "value": "[-*+][ \\t]+"
             },
             {
               "type": "PATTERN",
-              "value": "[0-9]+\\."
+              "value": "[0-9]+\\.[ \\t]+"
             }
           ]
         }

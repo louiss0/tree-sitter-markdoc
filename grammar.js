@@ -127,12 +127,12 @@ module.exports = grammar({
 
     // Markdoc comment block: {% comment %}...{% /comment %}
     comment_block: $ => seq(
-      token(prec(10, seq('{%', 'comment', '%}'))),
+      token(prec(10, seq('{%', /[ \t]*/, 'comment', /[ \t]*/, '%}'))),
       repeat(choice(
         /[^{\n]+/,
         /\{/
       )),
-      token(prec(10, seq('{%', '\/', 'comment', '%}')))
+      token(prec(10, seq('{%', /[ \t]*/, '/', /[ \t]*/, 'comment', /[ \t]*/, '%}')))
     ),
 
     markdoc_tag: $ => prec.dynamic(10, choice(
@@ -369,8 +369,8 @@ module.exports = grammar({
     ),
 
     list_marker: $ => token(prec(2, choice(
-      /[-*+]/,
-      /[0-9]+\./
+      /[-*+][ \t]+/,
+      /[0-9]+\.[ \t]+/
     ))),
 
     html_comment: $ => token(seq(
