@@ -1,3 +1,3 @@
-{% tag %}
-Content here
-{% tag %}
+{% section %}
+Paragraph content
+{% /section %}

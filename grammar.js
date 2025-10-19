@@ -138,7 +138,15 @@ module.exports = grammar({
     markdoc_tag: $ => prec.dynamic(10, choice(
       seq(
         $.tag_open,
-        repeat($._block),
+        optional(seq(
+          optional($._NEWLINE),  // Optional newline after opening tag
+          $._block,
+          repeat(seq(
+            optional($._BLANK_LINE),
+            $._block
+          ))
+        )),
+        optional($._NEWLINE),  // Optional newline before closing tag
         $.tag_close
       ),
       $.tag_self_close
