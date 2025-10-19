@@ -8,6 +8,10 @@
         "required": true,
         "types": [
           {
+            "type": "array_access",
+            "named": true
+          },
+          {
             "type": "array_literal",
             "named": true
           },
@@ -649,6 +653,10 @@
         "multiple": false,
         "required": true,
         "types": [
+          {
+            "type": "array_access",
+            "named": true
+          },
           {
             "type": "array_literal",
             "named": true

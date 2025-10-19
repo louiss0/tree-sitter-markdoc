@@ -1,1 +1,1 @@
-Hello {{ name }}
+{{ user.profile.name }}

@@ -1243,6 +1243,10 @@
                 },
                 {
                   "type": "SYMBOL",
+                  "name": "array_access"
+                },
+                {
+                  "type": "SYMBOL",
                   "name": "_primary_expression"
                 }
               ]
@@ -1278,6 +1282,10 @@
                 {
                   "type": "SYMBOL",
                   "name": "member_expression"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "array_access"
                 },
                 {
                   "type": "SYMBOL",

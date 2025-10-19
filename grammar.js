@@ -270,6 +270,7 @@ module.exports = grammar({
     member_expression: $ => prec.right(3, seq(
       field('object', choice(
         $.member_expression,
+        $.array_access,
         $._primary_expression
       )),
       '.',
@@ -279,6 +280,7 @@ module.exports = grammar({
     array_access: $ => prec.right(2, seq(
       field('array', choice(
         $.member_expression,
+        $.array_access,
         $._primary_expression
       )),
       '[',
