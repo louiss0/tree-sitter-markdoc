@@ -81,20 +81,20 @@ module.exports = grammar({
       field('heading_text', optional($.heading_text))
     )),
 
-    heading_marker: $ => token(prec(1, /#{1,6}/)),
+    heading_marker: $ => token(prec(3, /#{1,6}/)),
 
     heading_text: $ => /[^\n]+/,
 
     // Thematic break (horizontal rule) - must be at least 3 chars
     thematic_break: $ => token(prec(1, choice(
-      /\*[ \t]*\*[ \t]*\*[ \t*]*/,
-      /-[ \t]*-[ \t]*-[ \t-]*/,
-      /_[ \t]*_[ \t]*_[ \t_]*/
+      /\*\s*\*\s*\*[\s*]*/,
+      /-\s*-\s*-[\s-]*/,
+      /_\s*_\s*_[\s_]*/
     ))),
 
     // Blockquote
     blockquote: $ => prec.right(seq(
-      token(prec(2, seq('>', optional(/[ \t]+/)))),
+      token(prec(2, '>')),
       optional($._block)
     )),
 

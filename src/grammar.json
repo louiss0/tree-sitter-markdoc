@@ -187,7 +187,7 @@
       "type": "TOKEN",
       "content": {
         "type": "PREC",
-        "value": 1,
+        "value": 3,
         "content": {
           "type": "PATTERN",
           "value": "#{1,6}"
@@ -208,15 +208,15 @@
           "members": [
             {
               "type": "PATTERN",
-              "value": "\\*[ \\t]*\\*[ \\t]*\\*[ \\t*]*"
+              "value": "\\*\\s*\\*\\s*\\*[\\s*]*"
             },
             {
               "type": "PATTERN",
-              "value": "-[ \\t]*-[ \\t]*-[ \\t-]*"
+              "value": "-\\s*-\\s*-[\\s-]*"
             },
             {
               "type": "PATTERN",
-              "value": "_[ \\t]*_[ \\t]*_[ \\t_]*"
+              "value": "_\\s*_\\s*_[\\s_]*"
             }
           ]
         }
@@ -234,25 +234,8 @@
               "type": "PREC",
               "value": 2,
               "content": {
-                "type": "SEQ",
-                "members": [
-                  {
-                    "type": "STRING",
-                    "value": ">"
-                  },
-                  {
-                    "type": "CHOICE",
-                    "members": [
-                      {
-                        "type": "PATTERN",
-                        "value": "[ \\t]+"
-                      },
-                      {
-                        "type": "BLANK"
-                      }
-                    ]
-                  }
-                ]
+                "type": "STRING",
+                "value": ">"
               }
             }
           },
