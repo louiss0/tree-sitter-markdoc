@@ -20,16 +20,18 @@ Complex member access expressions
     (inline_expression
       (expression
         (member_expression
-          (subscript_expression
+          (array_access
             (identifier)
-            (number))
+            (expression
+              (number)))
           (identifier))))
     (inline_expression
       (expression
         (member_expression
-          (subscript_expression
+          (array_access
             (identifier)
-            (string))
+            (expression
+              (string)))
           (identifier))))))
 
 =============================================================================
