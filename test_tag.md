@@ -1,1 +1,3 @@
-{% image /%}
+{% section %}
+Paragraph content
+{% /section %}

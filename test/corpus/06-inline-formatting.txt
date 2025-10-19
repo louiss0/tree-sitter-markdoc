@@ -151,16 +151,16 @@ Inline formatting in list
   (list
     (list_item
       (list_marker)
-      (paragraph
+      (list_paragraph
         (text)
         (emphasis)))
     (list_item
       (list_marker)
-      (paragraph
+      (list_paragraph
         (text)
         (strong)))
     (list_item
       (list_marker)
-      (paragraph
+      (list_paragraph
         (text)
         (inline_code)))))

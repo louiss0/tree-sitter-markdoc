@@ -1,0 +1,17 @@
+  08-paragraphs-and-lists:
+     98. ✗ [31mBasic paragraphs[0m
+
+1 failure:
+
+correct / [32mexpected[0m / [31munexpected[0m
+
+  1. Basic paragraphs:
+
+    (source_file
+      (paragraph
+        (text)
+[31m        (text)
+[0m        (text))
+      (paragraph
+        (text)))
+

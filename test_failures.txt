@@ -1,0 +1,959 @@
+﻿  01-document-frontmatter:
+      1. Γ£ô [32mEmpty document[0m
+      2. Γ£ô [32mFrontmatter only[0m
+      3. Γ£ô [32mDocument without frontmatter[0m
+      4. Γ£ô [32mFrontmatter and body[0m
+  02-headings-paragraphs:
+      5. Γ£ô [32mATX heading level 1[0m
+      6. Γ£ô [32mATX heading level 2[0m
+      7. Γ£ô [32mATX heading level 3[0m
+      8. Γ£ô [32mATX heading levels 4-6[0m
+      9. Γ£ô [32mHeading with trailing space[0m
+     10. Γ£ô [32mHeading without space after marker (invalid)[0m
+     11. Γ£ô [32mSimple paragraph[0m
+     12. Γ£ù [31mParagraph with multiple lines[0m
+     13. Γ£ù [31mTwo paragraphs separated by blank line[0m
+     14. Γ£ô [32mHeading followed by paragraph[0m
+     15. Γ£ô [32mMixed headings and paragraphs[0m
+     16. Γ£ô [32mHeading with frontmatter[0m
+  03-fenced-code:
+     17. Γ£ô [32mBacktick fence without info string[0m
+     18. Γ£ô [32mBacktick fence with language[0m
+     19. Γ£ô [32mBacktick fence with language and attributes[0m
+     20. Γ£ô [32mTilde fence without info string[0m
+     21. Γ£ô [32mTilde fence with language[0m
+     22. Γ£ô [32mTilde fence with language and attributes[0m
+     23. Γ£ô [32mMulti-line code content[0m
+     24. Γ£ô [32mEmpty code block[0m
+     25. Γ£ô [32mCode block with heading after[0m
+     26. Γ£ô [32mCode block with paragraph after[0m
+     27. Γ£ô [32mMixed backticks and content[0m
+     28. Γ£ô [32mCode block with frontmatter[0m
+  04-markdoc-tags:
+     29. Γ£ù [31mSelf-closing tag[0m
+     30. Γ£ù [31mBlock tag without content[0m
+     31. Γ£ù [31mBlock tag with paragraph content[0m
+     32. Γ£ù [31mBlock tag with multiple paragraphs[0m
+     33. Γ£ù [31mNested block tags[0m
+     34. Γ£ù [31mTag with string attribute[0m
+     35. Γ£ù [31mTag with multiple attributes[0m
+     36. Γ£ù [31mSelf-closing tag with attributes[0m
+     37. Γ£ô [32mSimple inline expression[0m
+     38. Γ£ù [31mInline expression with property access[0m
+     39. Γ£ù [31mMultiple inline expressions in paragraph[0m
+     40. Γ£ù [31mTag with heading inside[0m
+     41. Γ£ù [31mTag with code block inside[0m
+     42. Γ£ù [31mMixed content with tags and expressions[0m
+     43. Γ£ù [31mTag with frontmatter[0m
+  05-html-tags-and-comments:
+     44. Γ£ù [31mHTML block tag[0m
+     45. Γ£ù [31mHTML self-closing tag[0m
+     46. Γ£ô [32mHTML comment[0m
+     47. Γ£ô [32mMulti-line HTML comment[0m
+     48. Γ£ù [31mMarkdoc comment block[0m
+     49. Γ£ù [31mMixed HTML and Markdoc content[0m
+  05-lists:
+     50. Γ£ô [32mSimple unordered list[0m
+     51. Γ£ô [32mSimple ordered list[0m
+     52. Γ£ô [32mMixed unordered markers[0m
+     53. Γ£ô [32mList with blank line separation[0m
+     54. Γ£ô [32mList after heading[0m
+     55. Γ£ô [32mList before paragraph[0m
+     56. Γ£ù [31mNested unordered list (simple)[0m
+     57. Γ£ù [31mNested ordered list[0m
+  06-expressions-and-attributes:
+     58. Γ£ù [31mComplex member access expressions[0m
+     59. Γ£ù [31mFunction call expressions[0m
+     60. Γ£ù [31mObject and array expressions[0m
+     61. Γ£ù [31mBinary and unary expressions[0m
+     62. Γ£ù [31mTag with complex attribute expressions[0m
+  06-inline-formatting:
+     63. Γ£ô [32mEmphasis with asterisks[0m
+     64. Γ£ô [32mEmphasis with underscores[0m
+     65. Γ£ô [32mStrong with double asterisks[0m
+     66. Γ£ô [32mStrong with double underscores[0m
+     67. Γ£ô [32mMixed emphasis and strong[0m
+     68. Γ£ô [32mInline code[0m
+     69. Γ£ô [32mLink with text and URL[0m
+     70. Γ£ô [32mImage with alt text[0m
+     71. Γ£ô [32mMultiple inline elements[0m
+     72. Γ£ô [32mInline formatting in list[0m
+  07-html:
+     73. Γ£ô [32mHTML block - simple div[0m
+     74. Γ£ô [32mHTML block with attributes[0m
+     75. Γ£ô [32mSelf-closing HTML tag[0m
+     76. Γ£ô [32mHTML comment block[0m
+     77. Γ£ô [32mInline HTML in paragraph[0m
+     78. Γ£ô [32mMultiple inline HTML elements[0m
+     79. Γ£ô [32mHTML block before paragraph[0m
+     80. Γ£ô [32mHTML block after heading[0m
+     81. Γ£ô [32mInline HTML with self-closing tag[0m
+  07-tag-closing-and-whitespace:
+     82. Γ£ù [31mAlternative tag closing syntax (without slash)[0m
+     83. Γ£ù [31mTag with extra whitespace[0m
+     84. Γ£ù [31mNested list indentation[0m
+     85. Γ£ù [31mMixed list and tag indentation[0m
+     86. Γ£ù [31mTag with blank lines in content[0m
+     87. Γ£ù [31mIndented code block in tag[0m
+  08-expressions:
+     88. Γ£ù [31mSimple member expression[0m
+     89. Γ£ù [31mNested member expression[0m
+     90. Γ£ô [32mArray literal with numbers[0m
+     91. Γ£ô [32mArray literal with strings[0m
+     92. Γ£ô [32mObject literal simple[0m
+     93. Γ£ô [32mObject literal multiple pairs[0m
+     94. Γ£ù [31mCall expression simple[0m
+     95. Γ£ù [31mCall expression with arguments[0m
+     96. Γ£ù [31mMember call expression[0m
+     97. Γ£ù [31mNested expressions[0m
+  08-paragraphs-and-lists:
+     98. Γ£ù [31mBasic paragraphs[0m
+     99. Γ£ù [31mList with paragraphs[0m
+    100. Γ£ù [31mMixed blocks and lists[0m
+
+42 failures:
+
+correct / [32mexpected[0m / [31munexpected[0m
+
+  1. Paragraph with multiple lines:
+
+    (source_file
+      (paragraph
+[31m        (text))
+[0m[31m      (paragraph
+[0m[31m        (text))
+[0m[31m      (paragraph
+[0m[32m        (text)
+[0m[32m        (text)
+[0m        (text)))
+
+
+  2. Two paragraphs separated by blank line:
+
+    (source_file
+      (paragraph
+[31m        (text))
+[0m[31m      (paragraph
+[0m[32m        (text)
+[0m        (text))
+      (paragraph
+        (text)))
+
+
+  3. Self-closing tag:
+
+    (source_file
+      (markdoc_tag
+[31m        (tag_self_close)))[0m
+[32m        (tag_self_close
+[0m[32m          (tag_name))))[0m
+
+
+  4. Block tag without content:
+
+    (source_file
+      (markdoc_tag
+[31m        (tag_open)
+[0m[31m        (tag_close)))[0m
+[32m        (tag_open
+[0m[32m          (tag_name))
+[0m[32m        (tag_close
+[0m[32m          (tag_name))))[0m
+
+
+  5. Block tag with paragraph content:
+
+    (source_file
+[31m      (ERROR
+[0m[31m        (tag_open)
+[0m[31m        (text)))[0m
+[32m      (markdoc_tag
+[0m[32m        (tag_open
+[0m[32m          (tag_name))
+[0m[32m        (paragraph
+[0m[32m          (text))
+[0m[32m        (tag_close
+[0m[32m          (tag_name))))[0m
+
+
+  6. Block tag with multiple paragraphs:
+
+    (source_file
+[31m      (ERROR
+[0m[31m        (tag_open)
+[0m[31m        (text)))[0m
+[32m      (markdoc_tag
+[0m[32m        (tag_open
+[0m[32m          (tag_name))
+[0m[32m        (paragraph
+[0m[32m          (text))
+[0m[32m        (paragraph
+[0m[32m          (text))
+[0m[32m        (tag_close
+[0m[32m          (tag_name))))[0m
+
+
+  7. Nested block tags:
+
+    (source_file
+[31m      (ERROR
+[0m[31m        (tag_open)
+[0m[31m        (tag_open)
+[0m[31m        (text)))[0m
+[32m      (markdoc_tag
+[0m[32m        (tag_open
+[0m[32m          (tag_name))
+[0m[32m        (markdoc_tag
+[0m[32m          (tag_open
+[0m[32m            (tag_name))
+[0m[32m          (paragraph
+[0m[32m            (text))
+[0m[32m          (tag_close
+[0m[32m            (tag_name)))
+[0m[32m        (tag_close
+[0m[32m          (tag_name))))[0m
+
+
+  8. Tag with string attribute:
+
+    (source_file
+      (markdoc_tag
+        (tag_open
+[32m          (tag_name)
+[0m          (attribute
+            (attribute_name)
+[31m            (string)))
+[0m[31m        (tag_close)))[0m
+[32m            (attribute_value
+[0m[32m              (string))))
+[0m[32m        (tag_close
+[0m[32m          (tag_name))))[0m
+
+
+  9. Tag with multiple attributes:
+
+    (source_file
+[31m      (ERROR
+[0m[32m      (markdoc_tag
+[0m        (tag_open
+[32m          (tag_name)
+[0m          (attribute
+            (attribute_name)
+[31m            (string))
+[0m[32m            (attribute_value
+[0m[32m              (string)))
+[0m          (attribute
+            (attribute_name)
+[31m            (string)))
+[0m[31m        (text)))[0m
+[32m            (attribute_value
+[0m[32m              (string))))
+[0m[32m        (paragraph
+[0m[32m          (text))
+[0m[32m        (tag_close
+[0m[32m          (tag_name))))[0m
+
+
+  10. Self-closing tag with attributes:
+
+    (source_file
+      (markdoc_tag
+        (tag_self_close
+[32m          (tag_name)
+[0m          (attribute
+            (attribute_name)
+[31m            (string))
+[0m[32m            (attribute_value
+[0m[32m              (string)))
+[0m          (attribute
+            (attribute_name)
+[31m            (string)))))[0m
+[32m            (attribute_value
+[0m[32m              (string))))))[0m
+
+
+  11. Inline expression with property access:
+
+    (source_file
+      (paragraph
+[31m        (text))
+[0m[31m      (ERROR
+[0m[31m        (expression
+[0m[31m          (identifier))))[0m
+[32m        (text)
+[0m[32m        (inline_expression
+[0m[32m          (expression
+[0m[32m            (member_expression
+[0m[32m              (identifier)
+[0m[32m              (identifier))))))[0m
+
+
+  12. Multiple inline expressions in paragraph:
+
+    (source_file
+      (paragraph
+        (inline_expression
+          (expression
+            (identifier)))
+        (text)
+        (inline_expression
+          (expression
+[31m            (identifier))))
+[0m[31m      (ERROR))[0m
+[32m            (identifier)))
+[0m[32m        (text)))[0m
+
+
+  13. Tag with heading inside:
+
+    (source_file
+[31m      (ERROR
+[0m[31m        (tag_open)
+[0m[32m      (markdoc_tag
+[0m[32m        (tag_open
+[0m[32m          (tag_name))
+[0m        (heading
+          (heading_marker)
+[31m          (heading_text))))[0m
+[32m          (heading_text))
+[0m[32m        (paragraph
+[0m[32m          (text))
+[0m[32m        (tag_close
+[0m[32m          (tag_name))))[0m
+
+
+  14. Tag with code block inside:
+
+    (source_file
+      (markdoc_tag
+[31m        (tag_open)
+[0m[32m        (tag_open
+[0m[32m          (tag_name))
+[0m        (fenced_code_block
+          (code_fence_open
+            (info_string
+              (language)))
+          (code)
+          (code_fence_close))
+[31m        (tag_close)))[0m
+[32m        (tag_close
+[0m[32m          (tag_name))))[0m
+
+
+  15. Mixed content with tags and expressions:
+
+    (source_file
+      (heading
+        (heading_marker)
+        (heading_text))
+[31m      (ERROR
+[0m[31m        (tag_open)
+[0m[32m      (markdoc_tag
+[0m[32m        (tag_open
+[0m[32m          (tag_name))
+[0m        (paragraph
+[31m          (text))
+[0m[32m          (text)
+[0m[32m          (inline_expression
+[0m[32m            (expression
+[0m[32m              (identifier))))
+[0m[32m        (tag_close
+[0m[32m          (tag_name)))
+[0m[32m      (paragraph
+[0m[32m        (text)
+[0m        (inline_expression
+          (expression
+[31m            (identifier)))))[0m
+[32m            (identifier)))
+[0m[32m        (text)))[0m
+
+
+  16. Tag with frontmatter:
+
+    (source_file
+      (frontmatter
+        (yaml))
+[31m      (ERROR
+[0m[31m        (tag_open)
+[0m[31m        (text)))[0m
+[32m      (markdoc_tag
+[0m[32m        (tag_open
+[0m[32m          (tag_name))
+[0m[32m        (paragraph
+[0m[32m          (text))
+[0m[32m        (tag_close
+[0m[32m          (tag_name))))[0m
+
+
+  17. HTML block tag:
+
+    (source_file
+[31m      (html_block))[0m
+[32m      (html_block
+[0m[32m        (html_attr
+[0m[32m          (attribute_name)
+[0m[32m          (attribute_value
+[0m[32m            (string)))
+[0m[32m        (html_content
+[0m[32m          (text))))[0m
+
+
+  18. HTML self-closing tag:
+
+    (source_file
+[31m      (html_block))[0m
+[32m      (paragraph
+[0m[32m        (html_inline
+[0m[32m          (html_attr
+[0m[32m            (attribute_name)
+[0m[32m            (attribute_value
+[0m[32m              (string)))
+[0m[32m          (html_attr
+[0m[32m            (attribute_name)
+[0m[32m            (attribute_value
+[0m[32m              (string))))))[0m
+
+
+  19. Markdoc comment block:
+
+    (source_file
+[31m      (ERROR
+[0m[31m        (tag_open)
+[0m[31m        (text)
+[0m[31m        (text)))[0m
+[32m      (comment_block))[0m
+
+
+  20. Mixed HTML and Markdoc content:
+
+    (source_file
+[31m      (html_block))[0m
+[32m      (html_block
+[0m[32m        (html_attr
+[0m[32m          (attribute_name)
+[0m[32m          (attribute_value
+[0m[32m            (string)))
+[0m[32m        (html_content
+[0m[32m          (markdoc_tag
+[0m[32m            (tag_open
+[0m[32m              (tag_name))
+[0m[32m            (html_block
+[0m[32m              (html_content
+[0m[32m                (text)))
+[0m[32m            (tag_close
+[0m[32m              (tag_name))))))[0m
+
+
+  21. Nested unordered list (simple):
+
+    (source_file
+      (list
+        (list_item
+          (list_marker)
+          (paragraph
+[31m            (text)
+[0m[31m            (text)
+[0m[31m            (text)))))[0m
+[32m            (text))
+[0m[32m          (list
+[0m[32m            (list_item
+[0m[32m              (list_marker)
+[0m[32m              (paragraph
+[0m[32m                (text)))
+[0m[32m            (list_item
+[0m[32m              (list_marker)
+[0m[32m              (paragraph
+[0m[32m                (text)))))))[0m
+
+
+  22. Nested ordered list:
+
+    (source_file
+      (list
+        (list_item
+          (list_marker)
+          (paragraph
+[31m            (text)
+[0m[31m            (text)
+[0m[31m            (text)))))[0m
+[32m            (text))
+[0m[32m          (list
+[0m[32m            (list_item
+[0m[32m              (list_marker)
+[0m[32m              (paragraph
+[0m[32m                (text)))
+[0m[32m            (list_item
+[0m[32m              (list_marker)
+[0m[32m              (paragraph
+[0m[32m                (text)))))))[0m
+
+
+  23. Complex member access expressions:
+
+    (source_file
+[31m      (ERROR
+[0m[31m        (expression
+[0m[31m          (identifier))))[0m
+[32m      (paragraph
+[0m[32m        (inline_expression
+[0m[32m          (expression
+[0m[32m            (member_expression
+[0m[32m              (member_expression
+[0m[32m                (identifier)
+[0m[32m                (identifier))
+[0m[32m              (identifier))))
+[0m[32m        (inline_expression
+[0m[32m          (expression
+[0m[32m            (member_expression
+[0m[32m              (subscript_expression
+[0m[32m                (identifier)
+[0m[32m                (number))
+[0m[32m              (identifier))))
+[0m[32m        (inline_expression
+[0m[32m          (expression
+[0m[32m            (member_expression
+[0m[32m              (subscript_expression
+[0m[32m                (identifier)
+[0m[32m                (string))
+[0m[32m              (identifier))))))[0m
+
+
+  24. Function call expressions:
+
+    (source_file
+[31m      (ERROR
+[0m[31m        (expression
+[0m[31m          (identifier))))[0m
+[32m      (paragraph
+[0m[32m        (inline_expression
+[0m[32m          (expression
+[0m[32m            (call_expression
+[0m[32m              (identifier)
+[0m[32m              (expression
+[0m[32m                (identifier)))))
+[0m[32m        (inline_expression
+[0m[32m          (expression
+[0m[32m            (call_expression
+[0m[32m              (identifier)
+[0m[32m              (expression
+[0m[32m                (number))
+[0m[32m              (expression
+[0m[32m                (number))
+[0m[32m              (expression
+[0m[32m                (number)))))
+[0m[32m        (inline_expression
+[0m[32m          (expression
+[0m[32m            (call_expression
+[0m[32m              (identifier)
+[0m[32m              (expression
+[0m[32m                (member_expression
+[0m[32m                  (identifier)
+[0m[32m                  (identifier)))
+[0m[32m              (expression
+[0m[32m                (subscript_expression
+[0m[32m                  (identifier)
+[0m[32m                  (string))))))))[0m
+
+
+  25. Object and array expressions:
+
+    (source_file
+[31m      (ERROR))[0m
+[32m      (paragraph
+[0m[32m        (inline_expression
+[0m[32m          (expression
+[0m[32m            (object
+[0m[32m              (pair
+[0m[32m                (identifier)
+[0m[32m                (expression
+[0m[32m                  (member_expression
+[0m[32m                    (identifier)
+[0m[32m                    (identifier))))
+[0m[32m              (pair
+[0m[32m                (identifier)
+[0m[32m                (expression
+[0m[32m                  (number))))))
+[0m[32m        (inline_expression
+[0m[32m          (expression
+[0m[32m            (array
+[0m[32m              (expression
+[0m[32m                (string))
+[0m[32m              (expression
+[0m[32m                (number))
+[0m[32m              (expression
+[0m[32m                (member_expression
+[0m[32m                  (member_expression
+[0m[32m                    (identifier)
+[0m[32m                    (identifier))
+[0m[32m                  (number))))))))[0m
+
+
+  26. Binary and unary expressions:
+
+    (source_file
+[31m      (ERROR
+[0m[31m        (expression
+[0m[31m          (identifier))))[0m
+[32m      (paragraph
+[0m[32m        (inline_expression
+[0m[32m          (expression
+[0m[32m            (binary_expression
+[0m[32m              (expression
+[0m[32m                (identifier))
+[0m[32m              (expression
+[0m[32m                (number)))))
+[0m[32m        (inline_expression
+[0m[32m          (expression
+[0m[32m            (binary_expression
+[0m[32m              (unary_expression
+[0m[32m                (expression
+[0m[32m                  (identifier)))
+[0m[32m              (binary_expression
+[0m[32m                (expression
+[0m[32m                  (identifier))
+[0m[32m                (expression
+[0m[32m                  (number))))))
+[0m[32m        (inline_expression
+[0m[32m          (expression
+[0m[32m            (unary_expression
+[0m[32m              (expression
+[0m[32m                (identifier)))))))[0m
+
+
+  27. Tag with complex attribute expressions:
+
+    (source_file
+[31m      (ERROR))[0m
+[32m      (markdoc_tag
+[0m[32m        (tag_open
+[0m[32m          (tag_name)
+[0m[32m          (attribute
+[0m[32m            (attribute_name)
+[0m[32m            (attribute_value
+[0m[32m              (expression
+[0m[32m                (array
+[0m[32m                  (expression
+[0m[32m                    (number))
+[0m[32m                  (expression
+[0m[32m                    (number))
+[0m[32m                  (expression
+[0m[32m                    (number))))))
+[0m[32m          (attribute
+[0m[32m            (attribute_name)
+[0m[32m            (attribute_value
+[0m[32m              (expression
+[0m[32m                (object
+[0m[32m                  (pair
+[0m[32m                    (identifier)
+[0m[32m                    (expression
+[0m[32m                      (boolean)))
+[0m[32m                  (pair
+[0m[32m                    (identifier)
+[0m[32m                    (expression
+[0m[32m                      (member_expression
+[0m[32m                        (identifier)
+[0m[32m                        (identifier))))))))
+[0m[32m          (attribute
+[0m[32m            (attribute_name)
+[0m[32m            (attribute_value
+[0m[32m              (expression
+[0m[32m                (arrow_function
+[0m[32m                  (expression
+[0m[32m                    (call_expression
+[0m[32m                      (identifier)
+[0m[32m                      (expression
+[0m[32m                        (identifier)))))))))
+[0m[32m        (paragraph
+[0m[32m          (text))
+[0m[32m        (tag_close
+[0m[32m          (tag_name))))[0m
+
+
+  28. Alternative tag closing syntax (without slash):
+
+    (source_file
+[31m      (ERROR
+[0m[31m        (tag_open)
+[0m[31m        (text)))[0m
+[32m      (markdoc_tag
+[0m[32m        (tag_open
+[0m[32m          (tag_name))
+[0m[32m        (paragraph
+[0m[32m          (text))
+[0m[32m        (tag_close
+[0m[32m          (tag_name))))[0m
+
+
+  29. Tag with extra whitespace:
+
+    (source_file
+[31m      (ERROR
+[0m[31m        (tag_open)
+[0m[31m        (text)))[0m
+[32m      (markdoc_tag
+[0m[32m        (tag_open
+[0m[32m          (tag_name))
+[0m[32m        (paragraph
+[0m[32m          (text))
+[0m[32m        (tag_close
+[0m[32m          (tag_name))))[0m
+
+
+  30. Nested list indentation:
+
+    (source_file
+      (list
+        (list_item
+[31m          (list_marker)
+[0m          (paragraph
+[31m            (text)
+[0m[31m            (text)
+[0m[31m            (text)
+[0m[31m            (text)
+[0m[31m            (text)
+[0m[31m            (text)))))[0m
+[32m            (text))
+[0m[32m          (list
+[0m[32m            (list_item
+[0m[32m              (paragraph
+[0m[32m                (text))
+[0m[32m              (list
+[0m[32m                (list_item
+[0m[32m                  (paragraph
+[0m[32m                    (text))
+[0m[32m                  (paragraph
+[0m[32m                    (text)))))
+[0m[32m            (list_item
+[0m[32m              (paragraph
+[0m[32m                (text))
+[0m[32m              (paragraph
+[0m[32m                (text)))))))[0m
+
+
+  31. Mixed list and tag indentation:
+
+    (source_file
+      (list
+        (list_item
+[31m          (list_marker)
+[0m          (paragraph
+[31m            (text))))
+[0m[31m      (ERROR))[0m
+[32m            (text))
+[0m[32m          (markdoc_tag
+[0m[32m            (tag_open
+[0m[32m              (tag_name))
+[0m[32m            (list
+[0m[32m              (list_item
+[0m[32m                (paragraph
+[0m[32m                  (text))
+[0m[32m                (list
+[0m[32m                  (list_item
+[0m[32m                    (paragraph
+[0m[32m                      (text))))))
+[0m[32m            (tag_close
+[0m[32m              (tag_name)))
+[0m[32m          (list
+[0m[32m            (list_item
+[0m[32m              (paragraph
+[0m[32m                (text)))))))[0m
+
+
+  32. Tag with blank lines in content:
+
+    (source_file
+[31m      (ERROR
+[0m[31m        (tag_open)))[0m
+[32m      (markdoc_tag
+[0m[32m        (tag_open
+[0m[32m          (tag_name))
+[0m[32m        (paragraph
+[0m[32m          (text))
+[0m[32m        (paragraph
+[0m[32m          (text))
+[0m[32m        (tag_close
+[0m[32m          (tag_name))))[0m
+
+
+  33. Indented code block in tag:
+
+    (source_file
+[31m      (ERROR
+[0m[31m        (tag_open)
+[0m[31m        (text)
+[0m[31m        (text)
+[0m[31m        (text)))[0m
+[32m      (markdoc_tag
+[0m[32m        (tag_open
+[0m[32m          (tag_name))
+[0m[32m        (code_block
+[0m[32m          (code))
+[0m[32m        (tag_close
+[0m[32m          (tag_name))))[0m
+
+
+  34. Simple member expression:
+
+    (source_file
+      (paragraph
+[31m        (text))
+[0m[31m      (ERROR
+[0m[31m        (expression
+[0m[31m          (identifier))))[0m
+[32m        (text)
+[0m[32m        (inline_expression
+[0m[32m          (expression
+[0m[32m            (member_expression
+[0m[32m              (identifier)
+[0m[32m              (identifier))))
+[0m[32m        (text)))[0m
+
+
+  35. Nested member expression:
+
+    (source_file
+      (paragraph
+[31m        (text))
+[0m[31m      (ERROR
+[0m[31m        (expression
+[0m[31m          (identifier))))[0m
+[32m        (text)
+[0m[32m        (inline_expression
+[0m[32m          (expression
+[0m[32m            (member_expression
+[0m[32m              (member_expression
+[0m[32m                (identifier)
+[0m[32m                (identifier))
+[0m[32m              (identifier))))
+[0m[32m        (text)))[0m
+
+
+  36. Call expression simple:
+
+    (source_file
+      (paragraph
+[31m        (text))
+[0m[31m      (ERROR
+[0m[31m        (expression
+[0m[31m          (identifier))))[0m
+[32m        (text)
+[0m[32m        (inline_expression
+[0m[32m          (expression
+[0m[32m            (call_expression
+[0m[32m              (identifier)
+[0m[32m              (arguments))))
+[0m[32m        (text)))[0m
+
+
+  37. Call expression with arguments:
+
+    (source_file
+      (paragraph
+[31m        (text))
+[0m[31m      (ERROR
+[0m[31m        (expression
+[0m[31m          (identifier))))[0m
+[32m        (text)
+[0m[32m        (inline_expression
+[0m[32m          (expression
+[0m[32m            (call_expression
+[0m[32m              (identifier)
+[0m[32m              (arguments
+[0m[32m                (expression
+[0m[32m                  (number))
+[0m[32m                (expression
+[0m[32m                  (number))))))
+[0m[32m        (text)))[0m
+
+
+  38. Member call expression:
+
+    (source_file
+      (paragraph
+[31m        (text))
+[0m[31m      (ERROR
+[0m[31m        (expression
+[0m[31m          (identifier))))[0m
+[32m        (text)
+[0m[32m        (inline_expression
+[0m[32m          (expression
+[0m[32m            (call_expression
+[0m[32m              (member_expression
+[0m[32m                (identifier)
+[0m[32m                (identifier))
+[0m[32m              (arguments))))
+[0m[32m        (text)))[0m
+
+
+  39. Nested expressions:
+
+    (source_file
+      (paragraph
+[31m        (text))
+[0m[31m      (ERROR
+[0m[31m        (expression
+[0m[31m          (identifier))))[0m
+[32m        (text)
+[0m[32m        (inline_expression
+[0m[32m          (expression
+[0m[32m            (call_expression
+[0m[32m              (member_expression
+[0m[32m                (identifier)
+[0m[32m                (identifier))
+[0m[32m              (arguments
+[0m[32m                (expression
+[0m[32m                  (array_access
+[0m[32m                    (identifier)
+[0m[32m                    (expression
+[0m[32m                      (number))))))))
+[0m[32m        (text)))[0m
+
+
+  40. Basic paragraphs:
+
+    (source_file
+      (paragraph
+[31m        (text))
+[0m[31m      (paragraph
+[0m[32m        (text)
+[0m        (text))
+      (paragraph
+        (text)))
+
+
+  41. List with paragraphs:
+
+    (source_file
+      (list
+        (list_item
+          (list_marker)
+[31m          (paragraph
+[0m[32m          (list_paragraph
+[0m            (text)))
+        (list_item
+          (list_marker)
+[31m          (paragraph
+[0m[32m          (list_paragraph
+[0m            (text)
+            (text)))))
+
+
+  42. Mixed blocks and lists:
+
+    (source_file
+      (paragraph
+        (text))
+      (list
+        (list_item
+          (list_marker)
+[31m          (paragraph
+[0m[32m          (list_paragraph
+[0m            (text)))
+        (list_item
+          (list_marker)
+[31m          (paragraph
+[0m[32m          (list_paragraph
+[0m            (text))))
+      (paragraph
+        (text)))
+

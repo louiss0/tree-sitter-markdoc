@@ -1,0 +1,98 @@
+=============================================================================
+Alternative tag closing syntax (without slash)
+=============================================================================
+
+{% tag %}
+Content here
+{% tag %}
+
+-----------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_open
+      (tag_name))
+    (paragraph
+      (text))
+    (tag_close
+      (tag_name))))
+
+=============================================================================
+Tag with extra whitespace
+=============================================================================
+
+{%   spacey   %}
+Text with space
+{%   /spacey   %}
+
+-----------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_open
+      (tag_name))
+    (paragraph
+      (text))
+    (tag_close
+      (tag_name))))
+
+=============================================================================
+Nested list indentation
+=============================================================================
+
+- First level
+  - Second level
+    - Third level
+      Content at level 3
+  - Back to level 2
+    Content at level 2
+
+-----------------------------------------------------------------------------
+
+(source_file
+  (list
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)
+        (text)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)
+        (text)))))
+
+
+=============================================================================
+Tag with blank lines in content
+=============================================================================
+
+{% section %}
+
+First paragraph with space above
+
+Second paragraph with blank line between
+
+{% /section %}
+
+-----------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_open
+      (tag_name))
+    (paragraph
+      (text))
+    (paragraph
+      (text))
+    (tag_close
+      (tag_name))))
+

@@ -1,0 +1,67 @@
+===================
+Basic paragraphs
+===================
+
+Hello world
+This is part of the first paragraph
+
+This is a second paragraph
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (text))
+  (paragraph
+    (text)))
+
+===================
+List with paragraphs
+===================
+
+- List item 1 with text
+- List item 2
+  with continuation line
+
+---
+
+(source_file
+  (list
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)
+        (text)))))
+
+===================
+Mixed blocks and lists
+===================
+
+Some text
+
+- List item
+- Another item
+
+More text after list
+
+---
+
+(source_file
+  (paragraph
+    (text))
+  (list
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text))))
+  (paragraph
+    (text)))
