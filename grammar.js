@@ -18,6 +18,10 @@ module.exports = grammar({
     $._DEDENT
   ],
 
+  extras: $ => [
+    /[ \t\n\r]/
+  ],
+
   conflicts: $ => [
     [$.source_file],
     [$.list_item],
@@ -32,26 +36,21 @@ module.exports = grammar({
   ],
 
   rules: {
-    source_file: $ => prec.right(seq(
-      repeat(/\n/),
-      optional(seq(
+    source_file: $ => prec.right(optional(seq(
+      choice(
+        $.frontmatter,
+        $._block
+      ),
+      repeat(seq(
+        choice(
+          $._BLANK_LINE
+        ),
         choice(
           $.frontmatter,
           $._block
-        ),
-        repeat(seq(
-          choice(
-            $._BLANK_LINE,  // Scanner emits for blank lines or block boundaries
-            /\n/             // Fallback for single newlines between non-paragraph blocks
-          ),
-          choice(
-            $.frontmatter,
-            $._block
-          )
-        ))
-      )),
-      repeat(/\n/)
-    )),
+        )
+      ))
+    ))),
 
     _block: $ => choice(
       $.comment_block,  // Must come before markdoc_tag to match {% comment %}
@@ -68,16 +67,12 @@ module.exports = grammar({
 
     frontmatter: $ => seq(
       token(prec(10, '---')),
-      /\n/,
       alias($.yaml_content, $.yaml),
       token(prec(10, '---'))
     ),
 
     yaml_content: $ => repeat1(
-      choice(
-        /[^\n-][^\n]*\n/,
-        /\n/
-      )
+      /[^-][^\n]*/ 
     ),
 
 
@@ -86,7 +81,7 @@ module.exports = grammar({
       field('heading_text', optional($.heading_text))
     )),
 
-    heading_marker: $ => token(prec(1, /#{1,6}[ \t]+/)),
+    heading_marker: $ => token(prec(1, /#{1,6}/)),
 
     heading_text: $ => /[^\n]+/,
 
@@ -114,90 +109,64 @@ module.exports = grammar({
         token(prec(3, '```')),
         token(prec(3, '~~~'))
       ),
-      optional($.info_string),
-      /\n/
+      optional($.info_string)
     ),
 
     info_string: $ => seq(
       alias(/[a-zA-Z0-9_+-]+/, $.language),
-      optional(seq(
-        /[ \t]+/,
-        alias(/\{[^}\n]*\}/, $.attributes)
-      ))
+      optional(alias(/\{[^}\n]*\}/, $.attributes))
     ),
 
     code: $ => $._code_content,
 
     code_fence_close: $ => choice(
-      seq(
-        token(prec(3, '```')),
-        /[ \t]*\n?/
-      ),
-      seq(
-        token(prec(3, '~~~')),
-        /[ \t]*\n?/
-      )
+      token(prec(3, '```')),
+      token(prec(3, '~~~'))
     ),
 
     // Markdoc comment block: {% comment %}...{% /comment %}
     comment_block: $ => seq(
-      token(prec(10, seq('{%', /[ \t]*/, 'comment', /[ \t]*/, '%}'))),
+      token(prec(10, seq('{%', 'comment', '%}'))),
       repeat(choice(
         /[^{\n]+/,
-        /\n/,
         /\{/
       )),
-      token(prec(10, seq('{%', /[ \t]*/, '\/', /[ \t]*/, 'comment', /[ \t]*/, '%}')))
+      token(prec(10, seq('{%', '\/', 'comment', '%}')))
     ),
 
     markdoc_tag: $ => prec.dynamic(10, choice(
       seq(
         $.tag_open,
-        repeat(seq(
-          repeat(/\n/),
-          $._block
-        )),
+        repeat($._block),
         $.tag_close
       ),
       $.tag_self_close
     )),
 
     tag_open: $ => prec.right(seq(
-      token(prec(6, seq('{%', /[ \t]*/))),
+      token(prec(6, '{%')),
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
-      repeat(seq(
-        /[ \t]+/,
-        $.attribute
-      )),
-      token(prec(6, seq(/[ \t]*/, '%}'))),
-      optional(/\n/)
+      repeat($.attribute),
+      token(prec(6, '%}'))
     )),
 
     tag_close: $ => prec.right(seq(
-      repeat(/\n/),
-      token(prec(6, seq('{%', /[ \t]*/))),
-      optional(token('/')),  // Allow optional slash for alternative syntax
+      token(prec(6, '{%')),
+      optional(token('/')),
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
-      token(prec(6, seq(/[ \t]*/, '%}'))),
-      optional(/\n/)
+      token(prec(6, '%}'))
     )),
 
     tag_self_close: $ => prec.right(seq(
-      token(prec(6, seq('{%', /[ \t]*/))),
+      token(prec(6, '{%')),
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
-      repeat(seq(
-        /[ \t]+/,
-        $.attribute
-      )),
-      token(prec(6, seq(/[ \t]*/, '/%}'))),
-      optional(/\n/)
+      repeat($.attribute),
+      token(prec(6, '/%}'))
     )),
 
     attribute: $ => seq(
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.attribute_name),
-      /[ \t]*/,
       '=',
-      /[ \t]*/,
       $.attribute_value
     ),
 
@@ -248,16 +217,12 @@ module.exports = grammar({
     // Arrow function: () => expr or (params) => expr
     arrow_function: $ => seq(
       '(',
-      /[ \t]*/,
       optional(seq(
         $.identifier,
-        repeat(seq(/[ \t]*/, ',', /[ \t]*/, $.identifier))
+        repeat(seq(',', $.identifier))
       )),
-      /[ \t]*/,
       ')',
-      /[ \t]*/,
       '=>',
-      /[ \t]*/,
       $.expression
     ),
 
@@ -265,18 +230,17 @@ module.exports = grammar({
     // Use token(prec()) for operators to give them priority over conflicting markdown tokens
     // Add spaces around operators for proper parsing
     binary_expression: $ => choice(
-      prec.left(1, seq($.expression, /[ \t]*/, token(prec(5, '||')), /[ \t]*/, $.expression)),
-      prec.left(2, seq($.expression, /[ \t]*/, token(prec(5, '&&')), /[ \t]*/, $.expression)),
-      prec.left(3, seq($.expression, /[ \t]*/, token(prec(5, choice('==', '!='))), /[ \t]*/, $.expression)),
-      prec.left(4, seq($.expression, /[ \t]*/, token(prec(5, choice('<', '>', '<=', '>='))), /[ \t]*/, $.expression)),
-      prec.left(5, seq($.expression, /[ \t]*/, token(prec(5, choice('+', '-'))), /[ \t]*/, $.expression)),
-      prec.left(6, seq($.expression, /[ \t]*/, token(prec(5, choice('*', '/', '%'))), /[ \t]*/, $.expression))
+      prec.left(1, seq($.expression, token(prec(5, '||')), $.expression)),
+      prec.left(2, seq($.expression, token(prec(5, '&&')), $.expression)),
+      prec.left(3, seq($.expression, token(prec(5, choice('==', '!='))), $.expression)),
+      prec.left(4, seq($.expression, token(prec(5, choice('<', '>', '<=', '>='))), $.expression)),
+      prec.left(5, seq($.expression, token(prec(5, choice('+', '-'))), $.expression)),
+      prec.left(6, seq($.expression, token(prec(5, choice('*', '/', '%'))), $.expression))
     ),
 
     // Unary operators
     unary_expression: $ => prec.right(7, seq(
       choice('!', '-', '+'),
-      /[ \t]*/,
       $.expression
     )),
 
@@ -286,14 +250,11 @@ module.exports = grammar({
         $.member_expression,
         $.identifier
       ),
-      /[ \t]*/,
       '(',
-      /[ \t]*/,
       optional(seq(
         $.expression,
-        repeat(seq(/[ \t]*/, ',', /[ \t]*/, $.expression))
+        repeat(seq(',', $.expression))
       )),
-      /[ \t]*/,
       ')'
     )),
 
@@ -302,9 +263,7 @@ module.exports = grammar({
         $.member_expression,
         $._primary_expression
       )),
-      /[ \t]*/,
       '.',
-      /[ \t]*/,
       field('property', $.identifier)
     )),
 
@@ -313,11 +272,8 @@ module.exports = grammar({
         $.member_expression,
         $._primary_expression
       )),
-      /[ \t]*/,
       '[',
-      /[ \t]*/,
       field('index', $.expression),
-      /[ \t]*/,
       ']'
     )),
 
@@ -326,34 +282,27 @@ module.exports = grammar({
 
     array_literal: $ => seq(
       '[',
-      /[ \t]*/,
       optional(seq(
         $.expression,
-        repeat(seq(/[ \t]*/, ',', /[ \t]*/, $.expression)),
-        /[ \t]*/,
-        optional(',')  // trailing comma
+        repeat(seq(',', $.expression)),
+        optional(',')
       )),
-      /[ \t]*/,
       ']'
     ),
 
     object_literal: $ => seq(
       '{',
-      /[ \t]*/,
       optional(seq(
         $.pair,
-        repeat(seq(/[ \t]*/, ',', /[ \t]*/, $.pair)),
-        /[ \t]*/,
-        optional(',')  // trailing comma
+        repeat(seq(',', $.pair)),
+        optional(',')
       )),
-      /[ \t]*/,
       '}'
     ),
 
     pair: $ => seq(
       $.identifier,
       ':',
-      /[ \t]*/,
       $.expression
     ),
 
@@ -382,9 +331,7 @@ module.exports = grammar({
 
     inline_expression: $ => seq(
       '{{',
-      repeat(/[ \t]/),
       field('content', $.expression),
-      repeat(/[ \t]/),
       '}}'
     ),
 
@@ -394,11 +341,10 @@ module.exports = grammar({
       $.list_item,
       repeat(choice(
         // Try nested list first (higher precedence)
-        prec(2, seq(/\n/, $._INDENT, $.list, $._DEDENT)),
+        prec(2, seq($._INDENT, $.list, $._DEDENT)),
         // Continuation at same indent level (lower precedence)
-        prec(1, seq(/\n/, $.list_item))
-      )),
-      optional(/\n/)
+        prec(1, $.list_item)
+      ))
     )),
 
     // A list item: marker + paragraph content
@@ -408,8 +354,8 @@ module.exports = grammar({
     ),
 
     list_marker: $ => token(prec(2, choice(
-      /[-*+][ \t]+/,
-      /[0-9]+\.[ \t]+/
+      /[-*+]/,
+      /[0-9]+\./
     ))),
 
     html_comment: $ => token(seq(
@@ -466,26 +412,20 @@ module.exports = grammar({
     // Paragraph: consecutive lines of content (separated by single newlines, not double)
     paragraph: $ => prec.left(1, seq(
       $._inline_first,
+      repeat($._inline_content),
       repeat(seq(
-        /[ \t]*/,
-        $._inline_content
-      )),
-      repeat(seq(
-        $._NEWLINE,  // Use ONLY scanner token for context-aware line continuation
-        seq($._inline_first, repeat(seq(/[ \t]*/, $._inline_content)))
+        $._NEWLINE,
+        seq($._inline_first, repeat($._inline_content))
       ))
     )),
 
     // List paragraph: same as paragraph but semantically distinct for list items
     list_paragraph: $ => prec.left(1, seq(
       $._inline_first,
-      repeat(seq(
-        /[ \t]*/,
-        $._inline_content
-      )),
+      repeat($._inline_content),
       repeat(seq(
         $._NEWLINE,
-        seq($._inline_first, repeat(seq(/[ \t]*/, $._inline_content)))
+        seq($._inline_first, repeat($._inline_content))
       ))
     )),
 
@@ -541,7 +481,7 @@ module.exports = grammar({
       alias($.standalone_punct, $.text)
     ),
 
-    text: $ => token(/[^\n{<`*_\[\]!\-#+> \t]+/),
+    text: $ => token(/[^\n{<`*_\[\]!\-#+>]+/),
     
     // Fallback for standalone punctuation that doesn't start special syntax
     standalone_punct: $ => '!',
