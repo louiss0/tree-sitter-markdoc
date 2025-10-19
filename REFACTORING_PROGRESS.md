@@ -28,25 +28,29 @@ Successfully refactored the parser from 72% to 93% test pass rate (99/106 tests 
 ### 5. Tag Improvements
 - Allow optional newlines inside markdoc tags
 
-## Remaining Failures (7 tests)
+## Remaining Failures (6 tests)
 
-### Tag-related (5 tests)
+### All Tag-related
 1. Test #40: Tag with heading inside
-2. Test #42: Mixed content with tags and expressions
-3. Test #85: Mixed list and tag indentation
-4. Test #86: Tag with blank lines in content
-5. Test #87: Indented code block in tag
+2. Test #42: Mixed content with tags and expressions  
+3. Test #62: Tag with complex attribute expressions
+4. Test #85: Mixed list and tag indentation
+5. Test #86: Tag with blank lines in content
+6. Test #87: Indented code block in tag
 
-### Expression-related (2 tests)
-1. Test #58: Complex member access expressions
-2. Test #62: Tag with complex attribute expressions
+All remaining failures involve Markdoc tags not properly parsing nested content. Tags need architectural improvements to support:
+- Headings inside tags
+- Code blocks inside tags
+- Lists with proper indentation inside tags
+- Blank lines within tag content
+- Complex expressions in tag attributes
 
 ## Test Pass Rate History
 
 - Initial: 72/106 (68%)
 - After list fixes: 83/106 (78%)
 - After scanner rewrite: 97/106 (92%)
-- Current: 99/106 (93%)
+- Current: 100/106 (94%)
 
 ## Next Steps
 
