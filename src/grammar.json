@@ -336,45 +336,35 @@
       ]
     },
     "info_string": {
-      "type": "PREC_RIGHT",
-      "value": 2,
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "ALIAS",
-            "content": {
-              "type": "IMMEDIATE_TOKEN",
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "PATTERN",
+            "value": "[a-zA-Z0-9_+-]+"
+          },
+          "named": true,
+          "value": "language"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "ALIAS",
               "content": {
                 "type": "PATTERN",
-                "value": "[a-zA-Z0-9_+-]+"
-              }
-            },
-            "named": true,
-            "value": "language"
-          },
-          {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "ALIAS",
-                "content": {
-                  "type": "IMMEDIATE_TOKEN",
-                  "content": {
-                    "type": "PATTERN",
-                    "value": "\\{[^}\\n]*\\}"
-                  }
-                },
-                "named": true,
-                "value": "attributes"
+                "value": "\\{[^}\\n]*\\}"
               },
-              {
-                "type": "BLANK"
-              }
-            ]
-          }
-        ]
-      }
+              "named": true,
+              "value": "attributes"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        }
+      ]
     },
     "code": {
       "type": "SYMBOL",
