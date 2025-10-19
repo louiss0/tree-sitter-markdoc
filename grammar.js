@@ -18,10 +18,6 @@ module.exports = grammar({
     $._DEDENT
   ],
 
-  extras: $ => [
-    /[ \t]/
-  ],
-
   conflicts: $ => [
     [$.source_file],
     [$.list_item],
@@ -251,10 +247,12 @@ module.exports = grammar({
     // Arrow function: () => expr or (params) => expr
     arrow_function: $ => seq(
       '(',
+      /[ \t]*/,
       optional(seq(
         $.identifier,
-        repeat(seq(',', /[ \t]*/, $.identifier))
+        repeat(seq(/[ \t]*/, ',', /[ \t]*/, $.identifier))
       )),
+      /[ \t]*/,
       ')',
       /[ \t]*/,
       '=>',
@@ -264,18 +262,20 @@ module.exports = grammar({
 
     // Binary operators (in order of precedence)
     // Use token(prec()) for operators to give them priority over conflicting markdown tokens
+    // Add spaces around operators for proper parsing
     binary_expression: $ => choice(
-      prec.left(1, seq($.expression, token(prec(5, '||')), $.expression)),
-      prec.left(2, seq($.expression, token(prec(5, '&&')), $.expression)),
-      prec.left(3, seq($.expression, token(prec(5, choice('==', '!='))), $.expression)),
-      prec.left(4, seq($.expression, token(prec(5, choice('<', '>', '<=', '>='))), $.expression)),
-      prec.left(5, seq($.expression, token(prec(5, choice('+', '-'))), $.expression)),
-      prec.left(6, seq($.expression, token(prec(5, choice('*', '/', '%'))), $.expression))
+      prec.left(1, seq($.expression, /[ \t]*/, token(prec(5, '||')), /[ \t]*/, $.expression)),
+      prec.left(2, seq($.expression, /[ \t]*/, token(prec(5, '&&')), /[ \t]*/, $.expression)),
+      prec.left(3, seq($.expression, /[ \t]*/, token(prec(5, choice('==', '!='))), /[ \t]*/, $.expression)),
+      prec.left(4, seq($.expression, /[ \t]*/, token(prec(5, choice('<', '>', '<=', '>='))), /[ \t]*/, $.expression)),
+      prec.left(5, seq($.expression, /[ \t]*/, token(prec(5, choice('+', '-'))), /[ \t]*/, $.expression)),
+      prec.left(6, seq($.expression, /[ \t]*/, token(prec(5, choice('*', '/', '%'))), /[ \t]*/, $.expression))
     ),
 
     // Unary operators
     unary_expression: $ => prec.right(7, seq(
       choice('!', '-', '+'),
+      /[ \t]*/,
       $.expression
     )),
 
@@ -285,11 +285,14 @@ module.exports = grammar({
         $.member_expression,
         $.identifier
       ),
+      /[ \t]*/,
       '(',
+      /[ \t]*/,
       optional(seq(
         $.expression,
-        repeat(seq(',', /[ \t]*/, $.expression))
+        repeat(seq(/[ \t]*/, ',', /[ \t]*/, $.expression))
       )),
+      /[ \t]*/,
       ')'
     )),
 
@@ -298,7 +301,9 @@ module.exports = grammar({
         $.member_expression,
         $._primary_expression
       )),
+      /[ \t]*/,
       '.',
+      /[ \t]*/,
       field('property', $.identifier)
     )),
 
@@ -307,8 +312,11 @@ module.exports = grammar({
         $.member_expression,
         $._primary_expression
       )),
+      /[ \t]*/,
       '[',
+      /[ \t]*/,
       field('index', $.expression),
+      /[ \t]*/,
       ']'
     )),
 
@@ -317,21 +325,27 @@ module.exports = grammar({
 
     array_literal: $ => seq(
       '[',
+      /[ \t]*/,
       optional(seq(
         $.expression,
-        repeat(seq(',', /[ \t]*/, $.expression)),
+        repeat(seq(/[ \t]*/, ',', /[ \t]*/, $.expression)),
+        /[ \t]*/,
         optional(',')  // trailing comma
       )),
+      /[ \t]*/,
       ']'
     ),
 
     object_literal: $ => seq(
       '{',
+      /[ \t]*/,
       optional(seq(
         $.pair,
-        repeat(seq(',', /[ \t]*/, $.pair)),
+        repeat(seq(/[ \t]*/, ',', /[ \t]*/, $.pair)),
+        /[ \t]*/,
         optional(',')  // trailing comma
       )),
+      /[ \t]*/,
       '}'
     ),
 
@@ -373,23 +387,23 @@ module.exports = grammar({
       '}}'
     ),
 
-    // Lists: one or more list items separated by a single newline
-    // Nested lists are triggered by INDENT tokens
+    // Lists: one or more list items separated by newlines
+    // Nested lists are automatically handled by INDENT/DEDENT tokens from scanner
     list: $ => prec.right(seq(
       $.list_item,
-      repeat(seq(/\n/, $.list_item)),
-      optional(/\n/)  // Optional trailing newline after last item
+      repeat(choice(
+        // Try nested list first (higher precedence)
+        prec(2, seq(/\n/, $._INDENT, $.list, $._DEDENT)),
+        // Continuation at same indent level (lower precedence)
+        prec(1, seq(/\n/, $.list_item))
+      )),
+      optional(/\n/)
     )),
 
-    // A list item with optional nested content
+    // A list item: marker + paragraph content
     list_item: $ => seq(
       field('marker', $.list_marker),
-      field('content', $.paragraph),
-      optional(seq(
-        $._INDENT,
-        $.list,
-        $._DEDENT
-      ))
+      field('content', $.paragraph)
     ),
 
     list_marker: $ => token(prec(2, choice(
@@ -451,20 +465,26 @@ module.exports = grammar({
     // Paragraph: consecutive lines of content (separated by single newlines, not double)
     paragraph: $ => prec.left(1, seq(
       $._inline_first,
-      repeat($._inline_content),
+      repeat(seq(
+        /[ \t]*/,
+        $._inline_content
+      )),
       repeat(seq(
         $._NEWLINE,  // Use ONLY scanner token for context-aware line continuation
-        seq($._inline_first, repeat($._inline_content))
+        seq($._inline_first, repeat(seq(/[ \t]*/, $._inline_content)))
       ))
     )),
 
     // List paragraph: same as paragraph but semantically distinct for list items
     list_paragraph: $ => prec.left(1, seq(
       $._inline_first,
-      repeat($._inline_content),
+      repeat(seq(
+        /[ \t]*/,
+        $._inline_content
+      )),
       repeat(seq(
         $._NEWLINE,
-        seq($._inline_first, repeat($._inline_content))
+        seq($._inline_first, repeat(seq(/[ \t]*/, $._inline_content)))
       ))
     )),
 
@@ -520,7 +540,7 @@ module.exports = grammar({
       alias($.standalone_punct, $.text)
     ),
 
-    text: $ => token(/[^\n{<`*_\[\]!]+/),
+    text: $ => token(/[^\n{<`*_\[\]!\-#+> \t]+/),
     
     // Fallback for standalone punctuation that doesn't start special syntax
     standalone_punct: $ => '!',

@@ -499,6 +499,10 @@
       "required": true,
       "types": [
         {
+          "type": "list",
+          "named": true
+        },
+        {
           "type": "list_item",
           "named": true
         }
@@ -529,16 +533,6 @@
           }
         ]
       }
-    },
-    "children": {
-      "multiple": false,
-      "required": false,
-      "types": [
-        {
-          "type": "list",
-          "named": true
-        }
-      ]
     }
   },
   {
