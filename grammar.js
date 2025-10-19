@@ -82,7 +82,7 @@ module.exports = grammar({
       field('heading_text', optional($.heading_text))
     )),
 
-    heading_marker: $ => token(prec(3, /#{1,6}/)),
+    heading_marker: $ => token(prec(3, /#{1,6}[ \t]/)),  // Require space/tab after #
 
     heading_text: $ => /[^\n]+/,
 
