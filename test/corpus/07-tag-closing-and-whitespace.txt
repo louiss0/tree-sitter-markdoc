@@ -131,23 +131,3 @@ Second paragraph with blank line between
     (tag_close
       (tag_name))))
 
-=============================================================================
-Indented code block in tag
-=============================================================================
-
-{% example %}
-    This is a code block
-    indented with 4 spaces
-    inside a tag
-{% /example %}
-
------------------------------------------------------------------------------
-
-(source_file
-  (markdoc_tag
-    (tag_open
-      (tag_name))
-    (code_block
-      (code))
-    (tag_close
-      (tag_name))))

@@ -476,6 +476,25 @@
     }
   },
   {
+    "type": "inline_tag",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "tag_name",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "link",
     "named": true,
     "fields": {},
@@ -565,6 +584,10 @@
         },
         {
           "type": "inline_expression",
+          "named": true
+        },
+        {
+          "type": "inline_tag",
           "named": true
         },
         {
@@ -767,6 +790,10 @@
         },
         {
           "type": "inline_expression",
+          "named": true
+        },
+        {
+          "type": "inline_tag",
           "named": true
         },
         {

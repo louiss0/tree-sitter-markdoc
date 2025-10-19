@@ -31,6 +31,7 @@ module.exports = grammar({
     [$.list_paragraph],
     [$.attribute, $._primary_expression],
     [$.markdoc_tag, $.paragraph],
+    [$.markdoc_tag],
     [$.attribute_value, $._primary_expression],
     [$.tag_open, $.tag_close],
     [$.binary_expression]
@@ -135,21 +136,29 @@ module.exports = grammar({
       token(prec(10, seq('{%', /[ \t]*/, '/', /[ \t]*/, 'comment', /[ \t]*/, '%}')))
     ),
 
+    // Block-level Markdoc tag ({% tag %}...{% /tag %} or {% tag /%})
     markdoc_tag: $ => prec.dynamic(10, choice(
+      // Self-closing tag
+      $.tag_self_close,
+      // Full tag with content
       seq(
         $.tag_open,
-        optional(seq(
-          optional($._NEWLINE),  // Optional newline after opening tag
-          $._block,
-          repeat(seq(
-            optional($._BLANK_LINE),
-            $._block
-          ))
-        )),
-        optional($._NEWLINE),  // Optional newline before closing tag
-        $.tag_close
-      ),
-      $.tag_self_close
+        choice(
+          // Empty tag
+          seq(optional($._NEWLINE), $.tag_close),
+          // Tag with content
+          seq(
+            repeat(choice($._NEWLINE, $._BLANK_LINE)),
+            $._block,
+            repeat(choice(
+              seq($._BLANK_LINE, $._block),
+              seq($._NEWLINE, $._block)
+            )),
+            repeat(choice($._NEWLINE, $._BLANK_LINE)),
+            $.tag_close
+          )
+        )
+      )
     )),
 
     tag_open: $ => prec.right(seq(
@@ -166,11 +175,20 @@ module.exports = grammar({
       token(prec(6, '%}'))
     )),
 
+    // Self-closing tag used at block level ({% tag /%})
     tag_self_close: $ => prec.right(seq(
       token(prec(6, '{%')),
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
       repeat($.attribute),
       token(prec(6, '/%}'))
+    )),
+
+    // Inline self-closing tag for use in paragraphs/lists
+    inline_tag: $ => prec(1, seq(
+      token('{%'),
+      alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
+      repeat($.attribute),
+      token('/%}')
     )),
 
     attribute: $ => seq(
@@ -481,6 +499,7 @@ module.exports = grammar({
     // First inline element in a paragraph/line
     _inline_first: $ => choice(
       $.inline_expression,
+      $.inline_tag,
       $.text,
       $.html_inline,
       $.link,

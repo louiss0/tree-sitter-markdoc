@@ -178,7 +178,7 @@ Content
         (attribute_name)
         (attribute_value
           (expression
-            (array
+            (array_literal
               (expression
                 (number))
               (expression
@@ -189,7 +189,7 @@ Content
         (attribute_name)
         (attribute_value
           (expression
-            (object
+            (object_literal
               (pair
                 (identifier)
                 (expression
