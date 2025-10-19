@@ -118,6 +118,28 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
     lexer->mark_end(lexer);
     bool has_content = false;
     
+    // Skip the newline after the opening fence
+    if (lexer->lookahead == '\n') {
+      lexer->advance(lexer, false);
+      lexer->mark_end(lexer);
+    }
+    
+    // Check if the very next thing is a closing fence (empty block)
+    if (lexer->lookahead == '`' || lexer->lookahead == '~') {
+      char fence_char = lexer->lookahead;
+      int count = 0;
+      while (lexer->lookahead == fence_char && count < 5) {
+        count++;
+        lexer->advance(lexer, false);
+      }
+      if (count >= 3) {
+        // Empty code block, don't emit CODE_CONTENT
+        return false;
+      }
+      // Not a fence, reset (will re-parse below)
+      lexer->mark_end(lexer);
+    }
+    
     // Consume content until we find ``` or ~~~ at start of line
     bool at_line_start = true;
     while (lexer->lookahead != 0) {
