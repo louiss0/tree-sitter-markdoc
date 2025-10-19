@@ -40,6 +40,10 @@
             "named": true
           },
           {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
             "type": "string",
             "named": true
           },
@@ -136,16 +140,85 @@
   {
     "type": "binary_expression",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "expression",
-          "named": true
-        }
-      ]
+    "fields": {
+      "left": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      },
+      "operator": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "binary_add",
+            "named": true
+          },
+          {
+            "type": "binary_and",
+            "named": true
+          },
+          {
+            "type": "binary_divide",
+            "named": true
+          },
+          {
+            "type": "binary_equal",
+            "named": true
+          },
+          {
+            "type": "binary_greater_equal",
+            "named": true
+          },
+          {
+            "type": "binary_greater_than",
+            "named": true
+          },
+          {
+            "type": "binary_less_equal",
+            "named": true
+          },
+          {
+            "type": "binary_less_than",
+            "named": true
+          },
+          {
+            "type": "binary_modulo",
+            "named": true
+          },
+          {
+            "type": "binary_multiply",
+            "named": true
+          },
+          {
+            "type": "binary_not_equal",
+            "named": true
+          },
+          {
+            "type": "binary_or",
+            "named": true
+          },
+          {
+            "type": "binary_subtract",
+            "named": true
+          }
+        ]
+      },
+      "right": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -312,6 +385,10 @@
         },
         {
           "type": "object_literal",
+          "named": true
+        },
+        {
+          "type": "parenthesized_expression",
           "named": true
         },
         {
@@ -709,6 +786,10 @@
             "named": true
           },
           {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
             "type": "string",
             "named": true
           },
@@ -806,6 +887,21 @@
         },
         {
           "type": "text",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "parenthesized_expression",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "expression",
           "named": true
         }
       ]
@@ -938,17 +1034,41 @@
   {
     "type": "unary_expression",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "expression",
-          "named": true
-        }
-      ]
+    "fields": {
+      "argument": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      },
+      "operator": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "unary_minus",
+            "named": true
+          },
+          {
+            "type": "unary_not",
+            "named": true
+          },
+          {
+            "type": "unary_plus",
+            "named": true
+          }
+        ]
+      }
     }
+  },
+  {
+    "type": "unary_not",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "variable",
@@ -991,10 +1111,6 @@
     "named": false
   },
   {
-    "type": "&&",
-    "named": false
-  },
-  {
     "type": "'",
     "named": false
   },
@@ -1015,15 +1131,7 @@
     "named": false
   },
   {
-    "type": "+",
-    "named": false
-  },
-  {
     "type": ",",
-    "named": false
-  },
-  {
-    "type": "-",
     "named": false
   },
   {
@@ -1095,6 +1203,58 @@
     "named": true
   },
   {
+    "type": "binary_add",
+    "named": true
+  },
+  {
+    "type": "binary_and",
+    "named": true
+  },
+  {
+    "type": "binary_divide",
+    "named": true
+  },
+  {
+    "type": "binary_equal",
+    "named": true
+  },
+  {
+    "type": "binary_greater_equal",
+    "named": true
+  },
+  {
+    "type": "binary_greater_than",
+    "named": true
+  },
+  {
+    "type": "binary_less_equal",
+    "named": true
+  },
+  {
+    "type": "binary_less_than",
+    "named": true
+  },
+  {
+    "type": "binary_modulo",
+    "named": true
+  },
+  {
+    "type": "binary_multiply",
+    "named": true
+  },
+  {
+    "type": "binary_not_equal",
+    "named": true
+  },
+  {
+    "type": "binary_or",
+    "named": true
+  },
+  {
+    "type": "binary_subtract",
+    "named": true
+  },
+  {
     "type": "false",
     "named": false
   },
@@ -1159,6 +1319,14 @@
     "named": false
   },
   {
+    "type": "unary_minus",
+    "named": true
+  },
+  {
+    "type": "unary_plus",
+    "named": true
+  },
+  {
     "type": "{",
     "named": false
   },
@@ -1168,10 +1336,6 @@
   },
   {
     "type": "{{",
-    "named": false
-  },
-  {
-    "type": "||",
     "named": false
   },
   {

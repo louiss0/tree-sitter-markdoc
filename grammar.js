@@ -223,7 +223,15 @@ module.exports = grammar({
       $.array_literal,
       $.object_literal,
       $.boolean,
-      $.null
+      $.null,
+      $.parenthesized_expression
+    ),
+
+    // Parenthesized expressions for grouping
+    parenthesized_expression: $ => seq(
+      '(',
+      $.expression,
+      ')'
     ),
 
     // Boolean literals
@@ -242,7 +250,7 @@ module.exports = grammar({
     variable: $ => seq('$', $.identifier),
 
     // Arrow function: () => expr or (params) => expr
-    arrow_function: $ => seq(
+    arrow_function: $ => prec(10, seq(
       '(',
       optional(seq(
         $.identifier,
@@ -251,25 +259,58 @@ module.exports = grammar({
       ')',
       '=>',
       $.expression
-    ),
+    )),
+
+    // Operator tokens (named for highlighting)
+    // Arithmetic operators
+    binary_add: $ => token(prec(5, '+')),
+    binary_subtract: $ => token(prec(5, '-')),
+    binary_multiply: $ => token(prec(5, '*')),
+    binary_divide: $ => token(prec(5, '/')),
+    binary_modulo: $ => token(prec(5, '%')),
+    
+    // Comparison operators
+    binary_equal: $ => token(prec(5, '==')),
+    binary_not_equal: $ => token(prec(5, '!=')),
+    binary_less_than: $ => token(prec(5, '<')),
+    binary_greater_than: $ => token(prec(5, '>')),
+    binary_less_equal: $ => token(prec(5, '<=')),
+    binary_greater_equal: $ => token(prec(5, '>=')),
+    
+    // Logical operators
+    binary_and: $ => token(prec(5, '&&')),
+    binary_or: $ => token(prec(5, '||')),
+    
+    // Unary operators
+    unary_not: $ => '!',
+    unary_minus: $ => '-',
+    unary_plus: $ => '+',
 
     // Binary operators (in order of precedence)
     // Use token(prec()) for operators to give them priority over conflicting markdown tokens
     // Add spaces around operators for proper parsing
     binary_expression: $ => choice(
-      prec.left(1, seq($.expression, token(prec(5, '||')), $.expression)),
-      prec.left(2, seq($.expression, token(prec(5, '&&')), $.expression)),
-      prec.left(3, seq($.expression, token(prec(5, choice('==', '!='))), $.expression)),
-      prec.left(4, seq($.expression, token(prec(5, choice('<', '>', '<=', '>='))), $.expression)),
-      prec.left(5, seq($.expression, token(prec(5, choice('+', '-'))), $.expression)),
-      prec.left(6, seq($.expression, token(prec(5, choice('*', '/', '%'))), $.expression))
+      prec.left(1, seq(field('left', $.expression), field('operator', $.binary_or), field('right', $.expression))),
+      prec.left(2, seq(field('left', $.expression), field('operator', $.binary_and), field('right', $.expression))),
+      prec.left(3, seq(field('left', $.expression), field('operator', $.binary_equal), field('right', $.expression))),
+      prec.left(3, seq(field('left', $.expression), field('operator', $.binary_not_equal), field('right', $.expression))),
+      prec.left(4, seq(field('left', $.expression), field('operator', $.binary_less_than), field('right', $.expression))),
+      prec.left(4, seq(field('left', $.expression), field('operator', $.binary_greater_than), field('right', $.expression))),
+      prec.left(4, seq(field('left', $.expression), field('operator', $.binary_less_equal), field('right', $.expression))),
+      prec.left(4, seq(field('left', $.expression), field('operator', $.binary_greater_equal), field('right', $.expression))),
+      prec.left(5, seq(field('left', $.expression), field('operator', $.binary_add), field('right', $.expression))),
+      prec.left(5, seq(field('left', $.expression), field('operator', $.binary_subtract), field('right', $.expression))),
+      prec.left(6, seq(field('left', $.expression), field('operator', $.binary_multiply), field('right', $.expression))),
+      prec.left(6, seq(field('left', $.expression), field('operator', $.binary_divide), field('right', $.expression))),
+      prec.left(6, seq(field('left', $.expression), field('operator', $.binary_modulo), field('right', $.expression)))
     ),
 
     // Unary operators
-    unary_expression: $ => prec.right(7, seq(
-      choice('!', '-', '+'),
-      $.expression
-    )),
+    unary_expression: $ => choice(
+      prec.right(7, seq(field('operator', $.unary_not), field('argument', $.expression))),
+      prec.right(7, seq(field('operator', $.unary_minus), field('argument', $.expression))),
+      prec.right(7, seq(field('operator', $.unary_plus), field('argument', $.expression)))
+    ),
 
     // Ordered by precedence - call > member > array access 
     call_expression: $ => prec.left(4, seq(
