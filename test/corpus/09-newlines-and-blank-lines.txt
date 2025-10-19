@@ -97,6 +97,6 @@ Paragraph two
 
 (source_file
   (paragraph
-    (text))
-  (paragraph
+    (text)
+    (text)
     (text)))

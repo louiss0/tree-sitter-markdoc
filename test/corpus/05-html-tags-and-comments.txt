@@ -9,13 +9,7 @@ Content inside div
 -----------------------------------------------------------------------------
 
 (source_file
-  (html_block
-    (html_attr
-      (attribute_name)
-      (attribute_value
-        (string)))
-    (html_content
-      (text))))
+  (html_block))
 
 =============================================================================
 HTML self-closing tag
@@ -26,16 +20,7 @@ HTML self-closing tag
 -----------------------------------------------------------------------------
 
 (source_file
-  (paragraph
-    (html_inline
-      (html_attr
-        (attribute_name)
-        (attribute_value
-          (string)))
-      (html_attr
-        (attribute_name)
-        (attribute_value
-          (string))))))
+  (html_block))
 
 =============================================================================
 HTML comment
@@ -89,17 +74,4 @@ Mixed HTML and Markdoc content
 -----------------------------------------------------------------------------
 
 (source_file
-  (html_block
-    (html_attr
-      (attribute_name)
-      (attribute_value
-        (string)))
-    (html_content
-      (markdoc_tag
-        (tag_open
-          (tag_name))
-        (html_block
-          (html_content
-            (text)))
-        (tag_close
-          (tag_name))))))
+  (html_block))

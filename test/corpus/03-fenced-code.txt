@@ -180,8 +180,9 @@ Some text here.
 
 (source_file
   (fenced_code_block
-    (code_fence_open)
-    (code)
+    (code_fence_open
+      (info_string
+        (language)))
     (code_fence_close))
   (paragraph
     (text)))

@@ -69,9 +69,10 @@ Function call expressions
               (identifier)
               (identifier)))
           (expression
-            (subscript_expression
+            (array_access
               (identifier)
-              (string))))))))
+              (expression
+                (string)))))))))
 
 =============================================================================
 Object and array expressions
@@ -86,7 +87,7 @@ Object and array expressions
   (paragraph
     (inline_expression
       (expression
-        (object
+        (object_literal
           (pair
             (identifier)
             (expression
@@ -99,17 +100,18 @@ Object and array expressions
               (number))))))
     (inline_expression
       (expression
-        (array
+        (array_literal
           (expression
             (string))
           (expression
             (number))
           (expression
-            (member_expression
+            (array_access
               (member_expression
                 (identifier)
                 (identifier))
-              (number))))))))
+              (expression
+                (number)))))))))
 
 =============================================================================
 Binary and unary expressions
@@ -133,14 +135,16 @@ Binary and unary expressions
     (inline_expression
       (expression
         (binary_expression
-          (unary_expression
-            (expression
-              (identifier)))
-          (binary_expression
-            (expression
-              (identifier))
-            (expression
-              (number))))))
+          (expression
+            (unary_expression
+              (expression
+                (identifier))))
+          (expression
+            (binary_expression
+              (expression
+                (identifier))
+              (expression
+                (number)))))))
     (inline_expression
       (expression
         (unary_expression

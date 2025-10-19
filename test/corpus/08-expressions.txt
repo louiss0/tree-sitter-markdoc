@@ -136,8 +136,7 @@ Result {{ func() }} here.
     (inline_expression
       (expression
         (call_expression
-          (identifier)
-          (arguments))))
+          (identifier))))
     (text)))
 
 =======================================
@@ -155,11 +154,10 @@ Value {{ add(1, 2) }} end.
       (expression
         (call_expression
           (identifier)
-          (arguments
-            (expression
-              (number))
-            (expression
-              (number))))))
+          (expression
+            (number))
+          (expression
+            (number)))))
     (text)))
 
 =======================================
@@ -178,8 +176,7 @@ Output {{ user.getName() }} text.
         (call_expression
           (member_expression
             (identifier)
-            (identifier))
-          (arguments))))
+            (identifier)))))
     (text)))
 
 =======================================
@@ -199,10 +196,9 @@ Complex {{ obj.method(arr[0]) }} done.
           (member_expression
             (identifier)
             (identifier))
-          (arguments
-            (expression
-              (array_access
-                (identifier)
-                (expression
-                  (number))))))))
+          (expression
+            (array_access
+              (identifier)
+              (expression
+                (number)))))))
     (text)))

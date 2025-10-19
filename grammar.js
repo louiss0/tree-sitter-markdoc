@@ -28,6 +28,7 @@ module.exports = grammar({
     [$.attribute, $.expression],
     [$.paragraph, $._inline_content],
     [$.paragraph],
+    [$.list_paragraph],
     [$.attribute, $._primary_expression],
     [$.markdoc_tag, $.paragraph],
     [$.attribute_value, $._primary_expression],
@@ -347,10 +348,10 @@ module.exports = grammar({
       ))
     )),
 
-    // A list item: marker + paragraph content
+    // A list item: marker + list_paragraph content
     list_item: $ => seq(
       field('marker', $.list_marker),
-      field('content', $.paragraph)
+      field('content', $.list_paragraph)
     ),
 
     list_marker: $ => token(prec(2, choice(

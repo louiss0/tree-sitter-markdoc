@@ -13,7 +13,7 @@ This is a second paragraph
   (paragraph
     (text)
     (text))
-  (paragraph 
+  (paragraph
     (text)))
 
 ===================

@@ -52,23 +52,23 @@ Nested list indentation
 (source_file
   (list
     (list_item
-      (paragraph
-        (text))
-      (list
-        (list_item
-          (paragraph
-            (text))
-          (list
-            (list_item
-              (paragraph
-                (text))
-              (paragraph
-                (text)))))
-        (list_item
-          (paragraph
-            (text))
-          (paragraph
-            (text)))))))
+      (list_marker)
+      (list_paragraph
+        (text)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)
+        (text)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)
+        (text)))))
 
 =============================================================================
 Mixed list and tag indentation

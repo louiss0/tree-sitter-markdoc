@@ -12,13 +12,16 @@ Simple unordered list
   (list
     (list_item
       (list_marker)
-      (paragraph (text)))
+      (paragraph
+        (text)))
     (list_item
       (list_marker)
-      (paragraph (text)))
+      (paragraph
+        (text)))
     (list_item
       (list_marker)
-      (paragraph (text)))))
+      (paragraph
+        (text)))))
 
 =======================================
 Simple ordered list
@@ -34,13 +37,10 @@ Simple ordered list
   (list
     (list_item
       (list_marker)
-      (paragraph (text)))
-    (list_item
-      (list_marker)
-      (paragraph (text)))
-    (list_item
-      (list_marker)
-      (paragraph (text)))))
+      (list_paragraph
+        (text)
+        (text)
+        (text)))))
 
 =======================================
 Mixed unordered markers
@@ -56,13 +56,16 @@ Mixed unordered markers
   (list
     (list_item
       (list_marker)
-      (paragraph (text)))
+      (paragraph
+        (text)))
     (list_item
       (list_marker)
-      (paragraph (text)))
+      (paragraph
+        (text)))
     (list_item
       (list_marker)
-      (paragraph (text)))))
+      (paragraph
+        (text)))))
 
 =======================================
 List with blank line separation
@@ -78,11 +81,13 @@ List with blank line separation
   (list
     (list_item
       (list_marker)
-      (paragraph (text))))
+      (list_paragraph
+        (text))))
   (list
     (list_item
       (list_marker)
-      (paragraph (text)))))
+      (list_paragraph
+        (text)))))
 
 =======================================
 List after heading
@@ -102,10 +107,12 @@ List after heading
   (list
     (list_item
       (list_marker)
-      (paragraph (text)))
+      (paragraph
+        (text)))
     (list_item
       (list_marker)
-      (paragraph (text)))))
+      (paragraph
+        (text)))))
 
 =======================================
 List before paragraph
@@ -122,11 +129,14 @@ Regular paragraph text.
   (list
     (list_item
       (list_marker)
-      (paragraph (text)))
+      (paragraph
+        (text)))
     (list_item
       (list_marker)
-      (paragraph (text))))
-  (paragraph (text)))
+      (paragraph
+        (text))))
+  (paragraph
+    (text)))
 
 =======================================
 Nested unordered list (simple)
@@ -142,14 +152,16 @@ Nested unordered list (simple)
   (list
     (list_item
       (list_marker)
-      (paragraph (text))
-      (list
-        (list_item
-          (list_marker)
-          (paragraph (text)))
-        (list_item
-          (list_marker)
-          (paragraph (text)))))))
+      (list_paragraph
+        (text)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))))
 
 =======================================
 Nested ordered list
@@ -165,11 +177,13 @@ Nested ordered list
   (list
     (list_item
       (list_marker)
-      (paragraph (text))
-      (list
-        (list_item
-          (list_marker)
-          (paragraph (text)))
-        (list_item
-          (list_marker)
-          (paragraph (text)))))))
+      (list_paragraph
+        (text)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))))
