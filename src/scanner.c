@@ -13,18 +13,12 @@ enum TokenType {
 typedef struct {
   uint16_t indent_stack[64];
   uint8_t indent_len;
-  bool in_fence;
-  char fence_char;
-  uint8_t fence_len;
 } Scanner;
 
 void *tree_sitter_markdoc_external_scanner_create() {
   Scanner *scanner = (Scanner *)malloc(sizeof(Scanner));
   scanner->indent_len = 1;
   scanner->indent_stack[0] = 0;
-  scanner->in_fence = false;
-  scanner->fence_char = 0;
-  scanner->fence_len = 0;
   return scanner;
 }
 
@@ -35,10 +29,6 @@ void tree_sitter_markdoc_external_scanner_destroy(void *payload) {
 unsigned tree_sitter_markdoc_external_scanner_serialize(void *payload, char *buffer) {
   Scanner *s = (Scanner *)payload;
   unsigned i = 0;
-  unsigned char flags = s->in_fence ? 1 : 0;
-  buffer[i++] = flags;
-  buffer[i++] = s->fence_char;
-  buffer[i++] = s->fence_len;
   buffer[i++] = s->indent_len;
   for (uint8_t j = 0; j < s->indent_len && i + 1 < 255; j++) {
     uint16_t v = s->indent_stack[j];
@@ -52,17 +42,10 @@ void tree_sitter_markdoc_external_scanner_deserialize(void *payload, const char 
   Scanner *s = (Scanner *)payload;
   s->indent_len = 1;
   s->indent_stack[0] = 0;
-  s->in_fence = false;
-  s->fence_char = 0;
-  s->fence_len = 0;
   
-  if (length < 4) return;
+  if (length < 1) return;
   
   unsigned i = 0;
-  unsigned char flags = (unsigned char)buffer[i++];
-  s->in_fence = (flags & 1) != 0;
-  s->fence_char = buffer[i++];
-  s->fence_len = (uint8_t)buffer[i++];
   s->indent_len = (uint8_t)buffer[i++];
   if (s->indent_len == 0) s->indent_len = 1;
   
@@ -121,77 +104,68 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
     return false;
   }
   
-  // CODE_CONTENT: handle fenced code blocks
+  // CODE_CONTENT: consume everything until we see a code fence close pattern
+  // The grammar will handle detecting code_fence_open and code_fence_close
   if (valid_symbols[CODE_CONTENT]) {
-    if (!s->in_fence && lexer->get_column(lexer) == 0) {
-      // Check if we're starting a code fence
-      if (lexer->lookahead == '`' || lexer->lookahead == '~') {
+    // Only match CODE_CONTENT if we're at the start of a line or have already seen a newline
+    // This ensures the info_string on the fence-opening line can be parsed first
+    if (lexer->get_column(lexer) != 0 && lexer->lookahead != '\n') {
+      // We're in the middle of a line, probably on the fence-opening line with info_string
+      // Don't match CODE_CONTENT yet, let the grammar parse info_string first
+      return false;
+    }
+    
+    lexer->mark_end(lexer);
+    bool has_content = false;
+    
+    // Consume content until we find ``` or ~~~ at start of line
+    bool at_line_start = true;
+    while (lexer->lookahead != 0) {
+      // Check for fence close pattern at start of line
+      if (at_line_start && (lexer->lookahead == '`' || lexer->lookahead == '~')) {
+        // Peek ahead to see if this is a fence (3+ chars)
         char fence_char = lexer->lookahead;
-        unsigned count = 0;
+        int32_t next = lexer->lookahead;
+        int count = 0;
         
-        // Peek ahead to count fence characters
-        int32_t ch = lexer->lookahead;
-        while (ch == fence_char) {
+        // Save position
+        TSLexer saved_state = *lexer;
+        
+        // Count fence chars
+        while (next == fence_char && count < 5) {  // limit lookahead
           count++;
           lexer->advance(lexer, false);
-          ch = lexer->lookahead;
+          next = lexer->lookahead;
         }
         
         if (count >= 3) {
-          s->in_fence = true;
-          s->fence_char = fence_char;
-          s->fence_len = count;
-          return false;
+          // This looks like a closing fence, stop consuming content
+          *lexer = saved_state;  // restore position
+          break;
         }
+        
+        // Not a fence, restore and continue
+        *lexer = saved_state;
       }
+      
+      // Track line starts
+      if (lexer->lookahead == '\n') {
+        at_line_start = true;
+      } else if (lexer->lookahead != ' ' && lexer->lookahead != '\t') {
+        at_line_start = false;
+      }
+      
+      has_content = true;
+      lexer->advance(lexer, false);
+      lexer->mark_end(lexer);
     }
     
-    // Inside a fence: consume until closing fence
-    if (s->in_fence) {
-      lexer->mark_end(lexer);
-      bool has_content = false;
-      bool at_line_start = (lexer->get_column(lexer) == 0);
-      
-      while (lexer->lookahead != 0) {
-        // Check for closing fence at start of line
-        if (at_line_start) {
-          if (lexer->lookahead == s->fence_char) {
-            unsigned count = 0;
-            while (lexer->lookahead == s->fence_char) {
-              lexer->advance(lexer, false);
-              count++;
-              if (count >= s->fence_len) break;
-            }
-            if (count >= s->fence_len) {
-              // Found closing fence
-              s->in_fence = false;
-              s->fence_char = 0;
-              s->fence_len = 0;
-              break;
-            }
-            has_content = true;
-            at_line_start = false;
-            continue;
-          }
-        }
-        
-        // Track line starts
-        if (lexer->lookahead == '\n') {
-          at_line_start = true;
-        } else if (lexer->lookahead != ' ' && lexer->lookahead != '\t') {
-          at_line_start = false;
-        }
-        
-        has_content = true;
-        lexer->advance(lexer, false);
-        lexer->mark_end(lexer);
-      }
-      
-      if (has_content) {
-        lexer->result_symbol = CODE_CONTENT;
-        return true;
-      }
+    if (has_content) {
+      lexer->result_symbol = CODE_CONTENT;
+      return true;
     }
+    
+    return false;
   }
   
   // NEWLINE and BLANK_LINE: handle line breaks
