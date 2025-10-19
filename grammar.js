@@ -496,7 +496,7 @@ module.exports = grammar({
       alias($.standalone_punct, $.text)
     ),
 
-    text: $ => token(/[^\n{<`*_\[\]!\-#+>]+/),
+    text: $ => token(/[^\n{<`*_\[\]!\->]+/),
     
     // Fallback for standalone punctuation that doesn't start special syntax
     standalone_punct: $ => '!',

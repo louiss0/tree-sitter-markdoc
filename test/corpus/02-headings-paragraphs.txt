@@ -84,8 +84,7 @@ This is a paragraph
 
 (source_file
   (paragraph
-    (text))
-  (paragraph
+    (text)
     (text)))
 
 ================================================================================

@@ -2300,7 +2300,7 @@
       "type": "TOKEN",
       "content": {
         "type": "PATTERN",
-        "value": "[^\\n{<`*_\\[\\]!\\-#+>]+"
+        "value": "[^\\n{<`*_\\[\\]!\\->]+"
       }
     },
     "standalone_punct": {
