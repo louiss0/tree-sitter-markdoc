@@ -113,10 +113,12 @@ module.exports = grammar({
       optional($.info_string)
     ),
 
-    info_string: $ => seq(
-      alias(/[a-zA-Z0-9_+-]+/, $.language),
-      optional(alias(/\{[^}\n]*\}/, $.attributes))
-    ),
+    // Info string: language and optional attributes
+    // token.immediate ensures no whitespace/newline before matching
+    info_string: $ => prec.right(2, seq(
+      alias(token.immediate(/[a-zA-Z0-9_+-]+/), $.language),
+      optional(alias(token.immediate(/\{[^}\n]*\}/), $.attributes))
+    )),
 
     code: $ => $._code_content,
 
