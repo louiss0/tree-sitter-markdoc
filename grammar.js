@@ -22,7 +22,6 @@ module.exports = grammar({
     [$.source_file],
     [$.list_item],
     [$.attribute, $.expression],
-    [$.code_fence_close],
     [$.paragraph, $._inline_content],
     [$.paragraph],
     [$.attribute, $._primary_expression],
@@ -129,13 +128,15 @@ module.exports = grammar({
 
     code: $ => $._code_content,
 
-    code_fence_close: $ => seq(
-      optional(/[ \t]*/),
-      choice(
+    code_fence_close: $ => choice(
+      seq(
         token(prec(3, '```')),
-        token(prec(3, '~~~'))
+        /[ \t]*\n?/
       ),
-      optional(/\n/)
+      seq(
+        token(prec(3, '~~~')),
+        /[ \t]*\n?/
+      )
     ),
 
     // Markdoc comment block: {% comment %}...{% /comment %}

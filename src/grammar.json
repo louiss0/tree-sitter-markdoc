@@ -437,22 +437,10 @@
       "name": "_code_content"
     },
     "code_fence_close": {
-      "type": "SEQ",
+      "type": "CHOICE",
       "members": [
         {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "PATTERN",
-              "value": "[ \\t]*"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
-        },
-        {
-          "type": "CHOICE",
+          "type": "SEQ",
           "members": [
             {
               "type": "TOKEN",
@@ -466,6 +454,15 @@
               }
             },
             {
+              "type": "PATTERN",
+              "value": "[ \\t]*\\n?"
+            }
+          ]
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
               "type": "TOKEN",
               "content": {
                 "type": "PREC",
@@ -475,18 +472,10 @@
                   "value": "~~~"
                 }
               }
-            }
-          ]
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "PATTERN",
-              "value": "\\n"
             },
             {
-              "type": "BLANK"
+              "type": "PATTERN",
+              "value": "[ \\t]*\\n?"
             }
           ]
         }
@@ -2710,9 +2699,6 @@
     [
       "attribute",
       "expression"
-    ],
-    [
-      "code_fence_close"
     ],
     [
       "paragraph",
