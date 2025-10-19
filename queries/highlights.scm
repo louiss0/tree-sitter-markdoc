@@ -1,43 +1,257 @@
-; Syntax highlighting queries for Markdoc
+; ============================================================================
+; Tree-sitter Syntax Highlighting Queries for Markdoc
+; ============================================================================
+; This file defines syntax highlighting patterns for the Markdoc language,
+; which extends Markdown with custom tags and expressions.
+;
+; Capture naming follows Tree-sitter conventions for cross-editor compatibility:
+; - Neovim (nvim-treesitter)
+; - Helix
+; - Zed
+; ============================================================================
 
-; Frontmatter (YAML)
+; ============================================================================
+; FRONTMATTER (YAML)
+; ============================================================================
+
 (frontmatter) @markup.raw.block
+(yaml) @markup.raw.block
 
-; Headings
+; ============================================================================
+; HEADINGS
+; ============================================================================
+
+; Heading markers (#, ##, ###, etc.)
 (heading_marker) @markup.heading.marker
+
+; Heading text content
 (heading_text) @markup.heading
 
-; Code blocks
+; ============================================================================
+; THEMATIC BREAKS (HORIZONTAL RULES)
+; ============================================================================
+
+(thematic_break) @punctuation.special
+
+; ============================================================================
+; BLOCKQUOTES
+; ============================================================================
+
+(blockquote ">" @markup.quote)
+
+; ============================================================================
+; CODE BLOCKS (FENCED)
+; ============================================================================
+
+; Code fence delimiters (``` or ~~~)
 (code_fence_open) @punctuation.bracket
 (code_fence_close) @punctuation.bracket
-(language) @property
+
+; Language identifier (e.g., javascript, python, go)
+(language) @label
+
+; Attributes in info string (e.g., {1-5})
+(info_string (attributes) @attribute)
+
+; Code content
 (code) @markup.raw.block
 
-; Markdoc tags
+; ============================================================================
+; LISTS
+; ============================================================================
+
+; List markers (-, *, +, 1., 2., etc.)
+(list_marker) @markup.list
+
+; ============================================================================
+; INLINE FORMATTING
+; ============================================================================
+
+; Emphasis (italic) - *text* or _text_
+(emphasis) @markup.italic
+
+; Strong (bold) - **text** or __text__
+(strong) @markup.bold
+
+; Inline code - `code`
+(inline_code) @markup.raw.inline
+
+; ============================================================================
+; LINKS AND IMAGES
+; ============================================================================
+
+; Link structure: [text](url)
+(link
+  "[" @punctuation.bracket
+  "]" @punctuation.bracket
+  "(" @punctuation.bracket
+  ")" @punctuation.bracket)
+
+(link_text) @markup.link.label
+(link_destination) @markup.link.url
+
+; Image structure: ![alt](url)
+(image
+  "![" @punctuation.bracket
+  "]" @punctuation.bracket
+  "(" @punctuation.bracket
+  ")" @punctuation.bracket)
+
+(image_alt) @markup.link.label
+(image_destination) @markup.link.url
+
+; ============================================================================
+; HTML
+; ============================================================================
+
+; HTML blocks (block-level tags)
+(html_block) @markup.raw.block
+
+; HTML inline (inline tags)
+(html_inline) @markup.raw.inline
+
+; HTML comments <!-- comment -->
+(html_comment) @comment
+
+; ============================================================================
+; MARKDOC TAGS
+; ============================================================================
+
+; Tag delimiters: {% and %} and /%}
 ("{%" @punctuation.bracket)
 ("%}" @punctuation.bracket)
 ("/%}" @punctuation.bracket)
+
+; Tag names (e.g., callout, table, partial)
 (tag_name) @tag
-("/" @punctuation.delimiter) ; For closing tags
 
-; Tag attributes
+; Closing tag slash
+("/" @punctuation.delimiter)
+
+; Comment blocks: {% comment %}...{% /comment %}
+(comment_block) @comment
+
+; ============================================================================
+; TAG ATTRIBUTES
+; ============================================================================
+
+; Attribute name (e.g., type, id, class)
 (attribute_name) @attribute
-("=" @operator)
 
-; Inline expressions
+; Assignment operator
+(attribute ("=" @operator))
+
+; ============================================================================
+; INLINE EXPRESSIONS {{ ... }}
+; ============================================================================
+
+; Expression delimiters
 (inline_expression
   "{{" @punctuation.bracket
   "}}" @punctuation.bracket)
 
-; Expressions and values
+; ============================================================================
+; EXPRESSIONS AND OPERATORS
+; ============================================================================
+
+; Variables with $ prefix
+(variable "$" @punctuation.special)
+(variable (identifier) @variable)
+
+; Identifiers (function names, object keys, etc.)
 (identifier) @variable
-(member_expression) @variable.member
-(number) @number
+
+; Member expressions: object.property
+(member_expression
+  "." @punctuation.delimiter
+  property: (identifier) @property)
+
+; Array access: array[index]
+(array_access
+  "[" @punctuation.bracket
+  "]" @punctuation.bracket)
+
+; Function calls: func() or obj.method()
+; Highlight identifier as function in direct calls
+(call_expression
+  (identifier) @function)
+
+; Highlight property as function in member expression calls
+(call_expression
+  (member_expression
+    property: (identifier) @function))
+
+; Arrow functions: () => expr
+(arrow_function
+  "(" @punctuation.bracket
+  ")" @punctuation.bracket
+  "=>" @keyword.operator)
+
+; Arrow function parameters
+(arrow_function (identifier) @variable.parameter)
+
+; ============================================================================
+; OPERATORS
+; ============================================================================
+
+; NOTE: Binary and unary operators (==, !=, +, -, etc.) are anonymous tokens
+; in the grammar and cannot be highlighted with queries. They would need to be
+; named nodes in grammar.js to be highlightable.
+
+; ============================================================================
+; LITERALS
+; ============================================================================
+
+; Strings: "string" or 'string'
 (string) @string
-("." @punctuation.delimiter) ; Member access
 
-; Attributes
-(attributes) @attribute
+; Numbers: 42, 3.14, -10
+(number) @number
 
-; Paragraph text
-(text) @text
+; Booleans: true, false
+(boolean) @boolean
+
+; Null
+(null) @constant.builtin
+
+; ============================================================================
+; DATA STRUCTURES
+; ============================================================================
+
+; Array literals: [1, 2, 3]
+(array_literal
+  "[" @punctuation.bracket
+  "]" @punctuation.bracket)
+
+; Object literals: { key: value }
+(object_literal
+  "{" @punctuation.bracket
+  "}" @punctuation.bracket)
+
+; Object pairs - key: value
+; First child is the key (identifier)
+(pair
+  (identifier) @property
+  ":" @punctuation.delimiter)
+
+; Commas in arrays and objects
+(array_literal "," @punctuation.delimiter)
+(object_literal "," @punctuation.delimiter)
+(call_expression "," @punctuation.delimiter)
+
+; ============================================================================
+; TEXT CONTENT
+; ============================================================================
+
+; Plain text in paragraphs and lists
+(text) @none
+(list_paragraph (text) @none)
+
+; ============================================================================
+; PARENTHESES AND BRACKETS (GENERIC)
+; ============================================================================
+
+; Function call parentheses
+(call_expression
+  "(" @punctuation.bracket
+  ")" @punctuation.bracket)
