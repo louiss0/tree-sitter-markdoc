@@ -194,9 +194,29 @@
 ; OPERATORS
 ; ============================================================================
 
-; NOTE: Binary and unary operators (==, !=, +, -, etc.) are anonymous tokens
-; in the grammar and cannot be highlighted with queries. They would need to be
-; named nodes in grammar.js to be highlightable.
+; Binary arithmetic operators
+(binary_add) @operator
+(binary_subtract) @operator
+(binary_multiply) @operator
+(binary_divide) @operator
+(binary_modulo) @operator
+
+; Binary comparison operators
+(binary_equal) @operator
+(binary_not_equal) @operator
+(binary_less_than) @operator
+(binary_greater_than) @operator
+(binary_less_equal) @operator
+(binary_greater_equal) @operator
+
+; Binary logical operators
+(binary_and) @operator
+(binary_or) @operator
+
+; Unary operators
+(unary_not) @operator
+(unary_minus) @operator
+(unary_plus) @operator
 
 ; ============================================================================
 ; LITERALS
