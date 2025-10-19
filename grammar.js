@@ -13,11 +13,13 @@ module.exports = grammar({
   externals: $ => [
     $._code_content,
     $._NEWLINE,
-    $._BLANK_LINE
+    $._BLANK_LINE,
+    $._INDENT,
+    $._DEDENT
   ],
 
   extras: $ => [
-    /[ \t\r]/  // Horizontal whitespace including space
+    /[ \t]/
   ],
 
   conflicts: $ => [
@@ -372,17 +374,22 @@ module.exports = grammar({
     ),
 
     // Lists: one or more list items separated by a single newline
-    // A blank line between items terminates the list (separate list)
+    // Nested lists are triggered by INDENT tokens
     list: $ => prec.right(seq(
       $.list_item,
       repeat(seq(/\n/, $.list_item)),
       optional(/\n/)  // Optional trailing newline after last item
     )),
 
-    // A list item with content (nested lists disabled for now)
+    // A list item with optional nested content
     list_item: $ => seq(
       field('marker', $.list_marker),
-      field('content', $.paragraph)
+      field('content', $.paragraph),
+      optional(seq(
+        $._INDENT,
+        $.list,
+        $._DEDENT
+      ))
     ),
 
     list_marker: $ => token(prec(2, choice(
