@@ -1,1 +1,0 @@
-Here is an image: ![Logo](logo.png)

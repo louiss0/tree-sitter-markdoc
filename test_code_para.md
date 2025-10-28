@@ -1,5 +1,0 @@
-```
-code
-```
-
-Some text here.
