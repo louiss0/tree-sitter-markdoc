@@ -12,7 +12,9 @@
         "markdoc"
       ],
       "injection-regex": "^markdoc$",
-      "class-name": "TreeSitterMarkdoc"
+      "class-name": "TreeSitterMarkdoc",
+      "highlights": "queries/highlights.scm",
+      "injections": "queries/injections.scm"
     }
   ],
   "metadata": {

@@ -63,6 +63,14 @@
 ; List markers (-, *, +, 1., 2., etc.)
 (list_marker) @markup.list
 
+; List item annotations: {% type %} after list content
+(list_item_annotation
+  "{%" @punctuation.bracket
+  "%}" @punctuation.bracket)
+
+; Annotation type name (e.g., important, warning, note)
+(annotation_type) @tag.attribute
+
 ; ============================================================================
 ; INLINE FORMATTING
 ; ============================================================================

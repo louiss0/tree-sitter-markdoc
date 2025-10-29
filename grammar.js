@@ -22,40 +22,48 @@ module.exports = grammar({
     /[ \t\n\r]/
   ],
 
-  conflicts: $ => [
-    [$.source_file],
-    [$.list_item],
-    [$.attribute, $.expression],
-    [$.paragraph, $._inline_content],
-    [$.paragraph],
-    [$.list_paragraph],
-    [$.attribute, $._primary_expression],
-    [$.markdoc_tag, $.paragraph],
-    [$.markdoc_tag],
-    [$.attribute_value, $._primary_expression],
-    [$.tag_open, $.tag_close],
-    [$.binary_expression]
-  ],
+    conflicts: $ => [
+      [$.source_file],
+      [$.list_item],
+      [$.attribute, $.expression],
+      [$.paragraph, $._inline_content],
+      [$.paragraph],
+      [$.list_paragraph],
+      [$.attribute, $._primary_expression],
+      [$.markdoc_tag, $.paragraph],
+      [$.markdoc_tag],
+      [$.attribute_value, $._primary_expression],
+      [$.tag_open, $.tag_close],
+      [$.binary_expression],
+      [$.markdown_table],
+      [$.markdoc_table],
+      [$.markdoc_table_cell_content],
+      [$.markdoc_table_cell_annotation],
+      [$.markdoc_table_open, $.markdoc_table_close]
+    ],
 
   rules: {
     source_file: $ => prec.right(optional(seq(
-      choice(
-        $.frontmatter,
-        $._block
-      ),
-      repeat(seq(
-        choice(
-          $._BLANK_LINE
-        ),
-        choice(
-          $.frontmatter,
+      // Frontmatter ONLY at document start, before any content
+      optional($.frontmatter),
+      repeat(choice($._NEWLINE, $._BLANK_LINE)),
+      // Body content: no frontmatter allowed after this point
+      optional(seq(
+        $._block,
+        repeat(seq(
+          repeat1(choice(
+            $._BLANK_LINE,
+            $._NEWLINE
+          )),
           $._block
-        )
+        ))
       ))
     ))),
 
     _block: $ => choice(
       $.comment_block,  // Must come before markdoc_tag to match {% comment %}
+      $.markdown_table, // Must come before markdoc_tag to match pipe-delimited tables
+      $.markdoc_table,  // Must come before markdoc_tag to match list-based tables
       $.markdoc_tag,
       $.fenced_code_block,
       $.heading,
@@ -67,14 +75,14 @@ module.exports = grammar({
       $.paragraph
     ),
 
+    // Frontmatter: metadata block at document start ONLY
+    // Since it only appears before body content, no ambiguity with internal --- separators
     frontmatter: $ => seq(
       token(prec(10, '---')),
-      alias($.yaml_content, $.yaml),
+      repeat(
+        /[^\n]+/  // any non-newline content
+      ),
       token(prec(10, '---'))
-    ),
-
-    yaml_content: $ => repeat1(
-      /[^-][^\n]*/ 
     ),
 
 
@@ -136,6 +144,109 @@ module.exports = grammar({
       token(prec(10, seq('{%', /[ \t]*/, '/', /[ \t]*/, 'comment', /[ \t]*/, '%}')))
     ),
 
+    // Markdown table: pipe-delimited table with separator row
+    // | Header 1 | Header 2 |
+    // |----------|----------|
+    // | Cell 1   | Cell 2   |
+    markdown_table: $ => prec.dynamic(11, seq(
+      $.markdown_table_header,
+      $.markdown_table_separator,
+      repeat1($.markdown_table_row)
+    )),
+
+    markdown_table_header: $ => seq(
+      token('|'),
+      $.markdown_table_cell,
+      repeat(seq(token('|'), $.markdown_table_cell)),
+      token('|')
+    ),
+
+    markdown_table_separator: $ => seq(
+      token('|'),
+      $.markdown_table_sep_cell,
+      repeat(seq(token('|'), $.markdown_table_sep_cell)),
+      token('|')
+    ),
+
+    markdown_table_row: $ => seq(
+      token('|'),
+      $.markdown_table_cell,
+      repeat(seq(token('|'), $.markdown_table_cell)),
+      token('|')
+    ),
+
+    markdown_table_cell: $ => /[^|\n]+/,
+
+    markdown_table_sep_cell: $ => /-+/,
+
+    // Markdoc table tag: {% table %}...{% /table %} with row structure using list markers
+    // Uses standard block content - separators work within list blocks
+    markdoc_table: $ => prec.dynamic(12, seq(
+      $.markdoc_table_open,
+      repeat($._block),
+      $.markdoc_table_close
+    )),
+
+    markdoc_table_open: $ => seq(
+      token(prec(6, '{%')),
+      alias(token('table'), $.tag_name),
+      repeat($.attribute),
+      token(prec(6, '%}'))
+    ),
+
+    markdoc_table_close: $ => seq(
+      token(prec(6, '{%')),
+      optional(token('/')),
+      alias(token('table'), $.tag_name),
+      token(prec(6, '%}'))
+    ),
+
+    // A row consists of list items (cells)
+    markdoc_table_row_items: $ => prec.right(seq(
+      $.markdoc_table_cell,
+      repeat(prec.right(seq(
+        optional($._NEWLINE),
+        $.markdoc_table_cell
+      )))
+    )),
+
+    // A markdoc table cell: list marker + cell content
+    markdoc_table_cell: $ => seq(
+      field('marker', $.list_marker),
+      field('content', $.markdoc_table_cell_content)
+    ),
+
+    // Markdoc table cell content - simplified to handle complex content
+    markdoc_table_cell_content: $ => prec.left(1, seq(
+      $.markdoc_table_cell_item,
+      repeat($.markdoc_table_cell_item)
+    )),
+
+    // A markdoc table cell item can be text, tags, code blocks, or other content
+    markdoc_table_cell_item: $ => choice(
+      $.inline_expression,
+      $.inline_tag,
+      $.markdoc_table_cell_annotation,
+      $.fenced_code_block,
+      $.text,
+      $.html_inline,
+      $.link,
+      $.emphasis,
+      $.strong,
+      $.inline_code,
+      $.image,
+      alias($.standalone_punct, $.text)
+    ),
+
+    // Cell annotation: {% colspan=2 %}
+    markdoc_table_cell_annotation: $ => seq(
+      token('{%'),
+      alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.annotation_name),
+      '=',
+      alias(/[0-9]+/, $.annotation_value),
+      token('%}')
+    ),
+
     // Block-level Markdoc tag ({% tag %}...{% /tag %} or {% tag /%})
     markdoc_tag: $ => prec.dynamic(10, choice(
       // Self-closing tag
@@ -164,6 +275,8 @@ module.exports = grammar({
     tag_open: $ => prec.right(seq(
       token(prec(6, '{%')),
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
+      optional($.id_shorthand),
+      repeat($.class_shorthand),
       repeat($.attribute),
       token(prec(6, '%}'))
     )),
@@ -179,6 +292,8 @@ module.exports = grammar({
     tag_self_close: $ => prec.right(seq(
       token(prec(6, '{%')),
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
+      optional($.id_shorthand),
+      repeat($.class_shorthand),
       repeat($.attribute),
       token(prec(6, '/%}'))
     )),
@@ -187,6 +302,8 @@ module.exports = grammar({
     inline_tag: $ => prec(1, seq(
       token('{%'),
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
+      optional($.id_shorthand),
+      repeat($.class_shorthand),
       repeat($.attribute),
       token('/%}')
     )),
@@ -196,6 +313,16 @@ module.exports = grammar({
       '=',
       $.attribute_value
     ),
+
+    id_shorthand: $ => prec.right(seq(
+      token('#'),
+      alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.shorthand_id)
+    )),
+
+    class_shorthand: $ => prec.right(seq(
+      token('.'),
+      alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.shorthand_class)
+    )),
 
     attribute_value: $ => choice(
       $.string,
@@ -421,16 +548,25 @@ module.exports = grammar({
       ))
     )),
 
-    // A list item: marker + list_paragraph content
+    // A list item: marker + list_paragraph content + optional annotation
     list_item: $ => seq(
       field('marker', $.list_marker),
-      field('content', $.list_paragraph)
+      field('content', $.list_paragraph),
+      optional($.list_item_annotation)
     ),
 
     list_marker: $ => token(prec(2, choice(
       /[-*+][ \t]+/,
       /[0-9]+\.[ \t]+/
     ))),
+
+    // List item annotation: {% type %} or {% type attr="value" %}
+    list_item_annotation: $ => seq(
+      token(prec(6, '{%')),
+      field('type', alias(token(/[a-zA-Z_][a-zA-Z0-9_-]*/), $.annotation_type)),
+      repeat($.attribute),
+      token(prec(6, '%}'))
+    ),
 
     html_comment: $ => token(seq(
       '<!--',
