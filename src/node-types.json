@@ -254,6 +254,10 @@
           "named": true
         },
         {
+          "type": "if_tag",
+          "named": true
+        },
+        {
           "type": "list",
           "named": true
         },
@@ -352,6 +356,22 @@
     "type": "comment_block",
     "named": true,
     "fields": {}
+  },
+  {
+    "type": "else_tag",
+    "named": true,
+    "fields": {
+      "condition": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      }
+    }
   },
   {
     "type": "emphasis",
@@ -524,6 +544,102 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "if_tag",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "blockquote",
+          "named": true
+        },
+        {
+          "type": "comment_block",
+          "named": true
+        },
+        {
+          "type": "else_tag",
+          "named": true
+        },
+        {
+          "type": "fenced_code_block",
+          "named": true
+        },
+        {
+          "type": "heading",
+          "named": true
+        },
+        {
+          "type": "html_block",
+          "named": true
+        },
+        {
+          "type": "html_comment",
+          "named": true
+        },
+        {
+          "type": "if_tag",
+          "named": true
+        },
+        {
+          "type": "if_tag_close",
+          "named": true
+        },
+        {
+          "type": "if_tag_open",
+          "named": true
+        },
+        {
+          "type": "list",
+          "named": true
+        },
+        {
+          "type": "markdoc_table",
+          "named": true
+        },
+        {
+          "type": "markdoc_tag",
+          "named": true
+        },
+        {
+          "type": "markdown_table",
+          "named": true
+        },
+        {
+          "type": "paragraph",
+          "named": true
+        },
+        {
+          "type": "thematic_break",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "if_tag_close",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "if_tag_open",
+    "named": true,
+    "fields": {
+      "condition": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -792,6 +908,10 @@
           "named": true
         },
         {
+          "type": "if_tag",
+          "named": true
+        },
+        {
           "type": "list",
           "named": true
         },
@@ -890,6 +1010,10 @@
         },
         {
           "type": "html_comment",
+          "named": true
+        },
+        {
+          "type": "if_tag",
           "named": true
         },
         {
@@ -1196,6 +1320,10 @@
         },
         {
           "type": "html_comment",
+          "named": true
+        },
+        {
+          "type": "if_tag",
           "named": true
         },
         {
@@ -1536,6 +1664,10 @@
     "named": true
   },
   {
+    "type": "else",
+    "named": false
+  },
+  {
     "type": "false",
     "named": false
   },
@@ -1550,6 +1682,10 @@
   {
     "type": "identifier",
     "named": true
+  },
+  {
+    "type": "if",
+    "named": false
   },
   {
     "type": "image_alt",

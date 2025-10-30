@@ -39,7 +39,8 @@ module.exports = grammar({
       [$.markdoc_table],
       [$.markdoc_table_cell_content],
       [$.markdoc_table_cell_annotation],
-      [$.markdoc_table_open, $.markdoc_table_close]
+      [$.markdoc_table_open, $.markdoc_table_close],
+      [$.if_tag]
     ],
 
   rules: {
@@ -64,6 +65,7 @@ module.exports = grammar({
       $.comment_block,  // Must come before markdoc_tag to match {% comment %}
       $.markdown_table, // Must come before markdoc_tag to match pipe-delimited tables
       $.markdoc_table,  // Must come before markdoc_tag to match list-based tables
+      $.if_tag,        // Must come before markdoc_tag to handle if/else structures
       $.markdoc_tag,
       $.fenced_code_block,
       $.heading,
@@ -307,6 +309,53 @@ module.exports = grammar({
       repeat($.attribute),
       token('/%}')
     )),
+
+    // If conditional tag: {% if condition %}...{% else %}...{% /if %}
+    if_tag: $ => prec.dynamic(11, seq(
+      $.if_tag_open,
+      repeat(choice($._NEWLINE, $._BLANK_LINE)),
+      $._block,
+      repeat(choice(
+        seq($._BLANK_LINE, $._block),
+        seq($._NEWLINE, $._block)
+      )),
+      repeat(seq(
+        repeat(choice($._NEWLINE, $._BLANK_LINE)),
+        $.else_tag,
+        repeat(choice($._NEWLINE, $._BLANK_LINE)),
+        $._block,
+        repeat(choice(
+          seq($._BLANK_LINE, $._block),
+          seq($._NEWLINE, $._block)
+        ))
+      )),
+      repeat(choice($._NEWLINE, $._BLANK_LINE)),
+      $.if_tag_close
+    )),
+
+    // Opening if tag: {% if condition %}
+    if_tag_open: $ => seq(
+      token(prec(6, '{%')),
+      token('if'),
+      field('condition', $.expression),
+      token(prec(6, '%}'))
+    ),
+
+    // Else tag (with optional condition): {% else %} or {% else condition /%}
+    else_tag: $ => seq(
+      token(prec(6, '{%')),
+      token('else'),
+      optional(field('condition', $.expression)),
+      token(prec(6, '/%}'))
+    ),
+
+    // Closing if tag: {% /if %}
+    if_tag_close: $ => seq(
+      token(prec(6, '{%')),
+      optional(token('/')),
+      token('if'),
+      token(prec(6, '%}'))
+    ),
 
     attribute: $ => seq(
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.attribute_name),

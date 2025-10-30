@@ -109,6 +109,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "if_tag"
+        },
+        {
+          "type": "SYMBOL",
           "name": "markdoc_tag"
         },
         {
@@ -1353,6 +1357,316 @@
           }
         ]
       }
+    },
+    "if_tag": {
+      "type": "PREC_DYNAMIC",
+      "value": 11,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "if_tag_open"
+          },
+          {
+            "type": "REPEAT",
+            "content": {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "_NEWLINE"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "_BLANK_LINE"
+                }
+              ]
+            }
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_block"
+          },
+          {
+            "type": "REPEAT",
+            "content": {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "_BLANK_LINE"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "_block"
+                    }
+                  ]
+                },
+                {
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "_NEWLINE"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "_block"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "type": "REPEAT",
+            "content": {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "REPEAT",
+                  "content": {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "_NEWLINE"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "_BLANK_LINE"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "else_tag"
+                },
+                {
+                  "type": "REPEAT",
+                  "content": {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "_NEWLINE"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "_BLANK_LINE"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "_block"
+                },
+                {
+                  "type": "REPEAT",
+                  "content": {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SEQ",
+                        "members": [
+                          {
+                            "type": "SYMBOL",
+                            "name": "_BLANK_LINE"
+                          },
+                          {
+                            "type": "SYMBOL",
+                            "name": "_block"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "SEQ",
+                        "members": [
+                          {
+                            "type": "SYMBOL",
+                            "name": "_NEWLINE"
+                          },
+                          {
+                            "type": "SYMBOL",
+                            "name": "_block"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "REPEAT",
+            "content": {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "_NEWLINE"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "_BLANK_LINE"
+                }
+              ]
+            }
+          },
+          {
+            "type": "SYMBOL",
+            "name": "if_tag_close"
+          }
+        ]
+      }
+    },
+    "if_tag_open": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "TOKEN",
+          "content": {
+            "type": "PREC",
+            "value": 6,
+            "content": {
+              "type": "STRING",
+              "value": "{%"
+            }
+          }
+        },
+        {
+          "type": "TOKEN",
+          "content": {
+            "type": "STRING",
+            "value": "if"
+          }
+        },
+        {
+          "type": "FIELD",
+          "name": "condition",
+          "content": {
+            "type": "SYMBOL",
+            "name": "expression"
+          }
+        },
+        {
+          "type": "TOKEN",
+          "content": {
+            "type": "PREC",
+            "value": 6,
+            "content": {
+              "type": "STRING",
+              "value": "%}"
+            }
+          }
+        }
+      ]
+    },
+    "else_tag": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "TOKEN",
+          "content": {
+            "type": "PREC",
+            "value": 6,
+            "content": {
+              "type": "STRING",
+              "value": "{%"
+            }
+          }
+        },
+        {
+          "type": "TOKEN",
+          "content": {
+            "type": "STRING",
+            "value": "else"
+          }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "condition",
+              "content": {
+                "type": "SYMBOL",
+                "name": "expression"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "TOKEN",
+          "content": {
+            "type": "PREC",
+            "value": 6,
+            "content": {
+              "type": "STRING",
+              "value": "/%}"
+            }
+          }
+        }
+      ]
+    },
+    "if_tag_close": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "TOKEN",
+          "content": {
+            "type": "PREC",
+            "value": 6,
+            "content": {
+              "type": "STRING",
+              "value": "{%"
+            }
+          }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "TOKEN",
+              "content": {
+                "type": "STRING",
+                "value": "/"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "TOKEN",
+          "content": {
+            "type": "STRING",
+            "value": "if"
+          }
+        },
+        {
+          "type": "TOKEN",
+          "content": {
+            "type": "PREC",
+            "value": 6,
+            "content": {
+              "type": "STRING",
+              "value": "%}"
+            }
+          }
+        }
+      ]
     },
     "attribute": {
       "type": "SEQ",
@@ -3555,6 +3869,9 @@
     [
       "markdoc_table_open",
       "markdoc_table_close"
+    ],
+    [
+      "if_tag"
     ]
   ],
   "precedences": [],
