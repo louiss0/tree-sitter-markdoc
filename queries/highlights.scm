@@ -143,21 +143,13 @@
 ; ============================================================================
 
 ; If tag opening: {% if condition %}
-(if_tag_open
-  "{%" @keyword
-  "if" @keyword)
+(if_tag_open) @keyword.control
 
 ; If tag closing: {% /if %}
-(if_tag_close
-  "{%" @keyword
-  "/" @keyword
-  "if" @keyword)
+(if_tag_close) @keyword.control
 
 ; Else tag: {% else %} or {% else condition /%}
-(else_tag
-  "{%" @keyword
-  "else" @keyword
-  "/%}" @keyword)
+(else_tag) @keyword.control
 
 ; ============================================================================
 ; TAG ATTRIBUTES

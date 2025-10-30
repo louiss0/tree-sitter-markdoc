@@ -40,9 +40,9 @@ module.exports = grammar({
       [$.markdoc_table_cell_content],
       [$.markdoc_table_cell_annotation],
       [$.markdoc_table_open, $.markdoc_table_close],
-      [$.if_tag]
+      [$.if_tag],
+      [$._if_block]
     ],
-
   rules: {
     source_file: $ => prec.right(optional(seq(
       // Frontmatter ONLY at document start, before any content
@@ -182,10 +182,14 @@ module.exports = grammar({
     markdown_table_sep_cell: $ => /-+/,
 
     // Markdoc table tag: {% table %}...{% /table %} with row structure using list markers
-    // Uses standard block content - separators work within list blocks
+    // Structure: header cells, separator (---), row cells, separator, row cells, ...
     markdoc_table: $ => prec.dynamic(12, seq(
       $.markdoc_table_open,
-      repeat($._block),
+      $.markdoc_table_header,
+      repeat1(seq(
+        $.markdoc_table_separator,
+        $.markdoc_table_row
+      )),
       $.markdoc_table_close
     )),
 
@@ -203,14 +207,14 @@ module.exports = grammar({
       token(prec(6, '%}'))
     ),
 
-    // A row consists of list items (cells)
-    markdoc_table_row_items: $ => prec.right(seq(
-      $.markdoc_table_cell,
-      repeat(prec.right(seq(
-        optional($._NEWLINE),
-        $.markdoc_table_cell
-      )))
-    )),
+    // Table header: first set of cells before first ---
+    markdoc_table_header: $ => repeat1($.markdoc_table_cell),
+
+    // Table row separator: ---
+    markdoc_table_separator: $ => token(prec(10, '---')),
+
+    // Table row: set of cells after a separator, continues until next --- or close tag
+    markdoc_table_row: $ => repeat1($.markdoc_table_cell),
 
     // A markdoc table cell: list marker + cell content
     markdoc_table_cell: $ => seq(
@@ -314,24 +318,56 @@ module.exports = grammar({
     if_tag: $ => prec.dynamic(11, seq(
       $.if_tag_open,
       repeat(choice($._NEWLINE, $._BLANK_LINE)),
-      $._block,
+      $._if_block,
       repeat(choice(
-        seq($._BLANK_LINE, $._block),
-        seq($._NEWLINE, $._block)
+        seq($._BLANK_LINE, $._if_block),
+        seq($._NEWLINE, $._if_block)
       )),
       repeat(seq(
         repeat(choice($._NEWLINE, $._BLANK_LINE)),
         $.else_tag,
         repeat(choice($._NEWLINE, $._BLANK_LINE)),
-        $._block,
+        $._if_block,
         repeat(choice(
-          seq($._BLANK_LINE, $._block),
-          seq($._NEWLINE, $._block)
+          seq($._BLANK_LINE, $._if_block),
+          seq($._NEWLINE, $._if_block)
         ))
       )),
       repeat(choice($._NEWLINE, $._BLANK_LINE)),
       $.if_tag_close
     )),
+
+    // Blocks inside if_tags exclude standalone 'else' tags (which would be parsed as markdoc_tag)
+    _if_block: $ => choice(
+      $.comment_block,
+      $.markdown_table,
+      $.markdoc_table,
+      $.fenced_code_block,
+      $.heading,
+      $.thematic_break,
+      $.blockquote,
+      $.html_block,
+      $.list,
+      $.html_comment,
+      // Markdoc tags, but filtered to not match 'else' keyword
+      seq(
+        $.tag_open,
+        choice(
+          seq(optional($._NEWLINE), $.tag_close),
+          seq(
+            repeat(choice($._NEWLINE, $._BLANK_LINE)),
+            $._block,
+            repeat(choice(
+              seq($._BLANK_LINE, $._block),
+              seq($._NEWLINE, $._block)
+            )),
+            repeat(choice($._NEWLINE, $._BLANK_LINE)),
+            $.tag_close
+          )
+        )
+      ),
+      $.paragraph
+    ),
 
     // Opening if tag: {% if condition %}
     if_tag_open: $ => seq(
