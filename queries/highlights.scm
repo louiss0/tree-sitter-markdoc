@@ -121,6 +121,29 @@
 (html_comment) @comment
 
 ; ============================================================================
+; MARKDOC TABLES
+; ============================================================================
+
+; Table row separator: ---
+(markdoc_table_separator) @punctuation.special
+
+; Table-specific list markers (cells)
+(markdoc_table_header
+  (markdoc_table_cell
+    marker: (list_marker) @markup.list))
+(markdoc_table_row
+  (markdoc_table_cell
+    marker: (list_marker) @markup.list))
+
+; Table cell annotations: {% colspan=2 %}
+(markdoc_table_cell_annotation
+  "{%" @punctuation.bracket
+  (annotation_name) @attribute
+  "=" @operator
+  (annotation_value) @number
+  "%}" @punctuation.bracket)
+
+; ============================================================================
 ; MARKDOC TAGS
 ; ============================================================================
 
@@ -131,6 +154,10 @@
 
 ; Tag names (e.g., callout, table, partial)
 (tag_name) @tag
+
+; Table tag specifically (built-in)
+(markdoc_table_open (tag_name) @tag.builtin)
+(markdoc_table_close (tag_name) @tag.builtin)
 
 ; Closing tag slash
 ("/" @punctuation.delimiter)
