@@ -337,19 +337,15 @@ module.exports = grammar({
       $.if_tag_close
     )),
 
-    // Blocks inside if_tags exclude standalone 'else' tags (which would be parsed as markdoc_tag)
+    // Blocks inside if_tags - includes most block content
+    // We use a negative lookahead approach by not matching 'else' tags
     _if_block: $ => choice(
       $.comment_block,
       $.markdown_table,
       $.markdoc_table,
-      $.fenced_code_block,
-      $.heading,
-      $.thematic_break,
-      $.blockquote,
-      $.html_block,
-      $.list,
-      $.html_comment,
-      // Markdoc tags, but filtered to not match 'else' keyword
+      // Self-closing tags at block level (but not 'else' which is handled by else_tag)
+      $.tag_self_close,
+      // Full tags with content (but not 'else' which is handled by else_tag)
       seq(
         $.tag_open,
         choice(
@@ -366,6 +362,13 @@ module.exports = grammar({
           )
         )
       ),
+      $.fenced_code_block,
+      $.heading,
+      $.thematic_break,
+      $.blockquote,
+      $.html_block,
+      $.list,
+      $.html_comment,
       $.paragraph
     ),
 

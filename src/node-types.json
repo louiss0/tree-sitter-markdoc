@@ -623,6 +623,10 @@
           "named": true
         },
         {
+          "type": "tag_self_close",
+          "named": true
+        },
+        {
           "type": "thematic_break",
           "named": true
         }

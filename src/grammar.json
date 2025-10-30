@@ -1541,31 +1541,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "fenced_code_block"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "heading"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "thematic_break"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "blockquote"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "html_block"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "list"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "html_comment"
+          "name": "tag_self_close"
         },
         {
           "type": "SEQ",
@@ -1680,6 +1656,34 @@
               ]
             }
           ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "fenced_code_block"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "heading"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "thematic_break"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "blockquote"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "html_block"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "list"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "html_comment"
         },
         {
           "type": "SYMBOL",
