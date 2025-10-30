@@ -139,6 +139,27 @@
 (comment_block) @comment
 
 ; ============================================================================
+; CONDITIONAL TAGS (if/else)
+; ============================================================================
+
+; If tag opening: {% if condition %}
+(if_tag_open
+  "{%" @keyword
+  "if" @keyword)
+
+; If tag closing: {% /if %}
+(if_tag_close
+  "{%" @keyword
+  "/" @keyword
+  "if" @keyword)
+
+; Else tag: {% else %} or {% else condition /%}
+(else_tag
+  "{%" @keyword
+  "else" @keyword
+  "/%}" @keyword)
+
+; ============================================================================
 ; TAG ATTRIBUTES
 ; ============================================================================
 
