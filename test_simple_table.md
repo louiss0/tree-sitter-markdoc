@@ -1,5 +1,0 @@
-{% table %}
-* Header
----
-* Cell
-{% /table %}

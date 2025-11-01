@@ -1,3 +1,0 @@
-{% table %}
-* Cell
-{% /table %}
