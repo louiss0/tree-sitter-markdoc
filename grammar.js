@@ -480,14 +480,14 @@ module.exports = grammar({
 
     // First inline element in a paragraph/line
     _inline_first: $ => choice(
-      $.inline_expression,
-      $.text,
-      prec(2, alias($.standalone_punct, $.text)),
-      $.html_inline,
-      $.link,
+      prec(5, $.inline_expression),
+      prec(4, $.text),
+      prec(3, alias($.standalone_punct, $.text)),
+      prec(2, $.html_inline),
+      prec(2, $.link),
       prec(1, $.emphasis),
       prec(1, $.strong),
-      $.inline_code
+      prec(2, $.inline_code)
     ),
 
     // Inline content after first element
@@ -500,6 +500,6 @@ module.exports = grammar({
     text: $ => token(/[^\n{<`*_\[\]!\->]+/),
     
     // Fallback for standalone punctuation that doesn't start special syntax
-    standalone_punct: $ => choice('!', '-', '_', '*'),
+    standalone_punct: $ => token(choice('!', '-', '_', '*')),
   }
 });

@@ -904,11 +904,6 @@
     }
   },
   {
-    "type": "text",
-    "named": true,
-    "fields": {}
-  },
-  {
     "type": "unary_expression",
     "named": true,
     "fields": {},
@@ -1121,6 +1116,10 @@
   },
   {
     "type": "tag_name",
+    "named": true
+  },
+  {
+    "type": "text",
     "named": true
   },
   {

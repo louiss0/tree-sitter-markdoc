@@ -2245,16 +2245,24 @@
       "type": "CHOICE",
       "members": [
         {
-          "type": "SYMBOL",
-          "name": "inline_expression"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "text"
+          "type": "PREC",
+          "value": 5,
+          "content": {
+            "type": "SYMBOL",
+            "name": "inline_expression"
+          }
         },
         {
           "type": "PREC",
-          "value": 2,
+          "value": 4,
+          "content": {
+            "type": "SYMBOL",
+            "name": "text"
+          }
+        },
+        {
+          "type": "PREC",
+          "value": 3,
           "content": {
             "type": "ALIAS",
             "content": {
@@ -2266,12 +2274,20 @@
           }
         },
         {
-          "type": "SYMBOL",
-          "name": "html_inline"
+          "type": "PREC",
+          "value": 2,
+          "content": {
+            "type": "SYMBOL",
+            "name": "html_inline"
+          }
         },
         {
-          "type": "SYMBOL",
-          "name": "link"
+          "type": "PREC",
+          "value": 2,
+          "content": {
+            "type": "SYMBOL",
+            "name": "link"
+          }
         },
         {
           "type": "PREC",
@@ -2290,8 +2306,12 @@
           }
         },
         {
-          "type": "SYMBOL",
-          "name": "inline_code"
+          "type": "PREC",
+          "value": 2,
+          "content": {
+            "type": "SYMBOL",
+            "name": "inline_code"
+          }
         }
       ]
     },
@@ -2325,25 +2345,28 @@
       }
     },
     "standalone_punct": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "STRING",
-          "value": "!"
-        },
-        {
-          "type": "STRING",
-          "value": "-"
-        },
-        {
-          "type": "STRING",
-          "value": "_"
-        },
-        {
-          "type": "STRING",
-          "value": "*"
-        }
-      ]
+      "type": "TOKEN",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "!"
+          },
+          {
+            "type": "STRING",
+            "value": "-"
+          },
+          {
+            "type": "STRING",
+            "value": "_"
+          },
+          {
+            "type": "STRING",
+            "value": "*"
+          }
+        ]
+      }
     }
   },
   "extras": [

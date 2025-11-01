@@ -72,16 +72,16 @@
      61. ✓ [32mBinary and unary expressions[0m
      62. ✗ [31mTag with complex attribute expressions[0m
   06-inline-formatting:
-     63. ✓ [32mEmphasis with asterisks[0m
-     64. ✓ [32mEmphasis with underscores[0m
-     65. ✓ [32mStrong with double asterisks[0m
-     66. ✓ [32mStrong with double underscores[0m
-     67. ✓ [32mMixed emphasis and strong[0m
+     63. ✗ [31mEmphasis with asterisks[0m
+     64. ✗ [31mEmphasis with underscores[0m
+     65. ✗ [31mStrong with double asterisks[0m
+     66. ✗ [31mStrong with double underscores[0m
+     67. ✗ [31mMixed emphasis and strong[0m
      68. ✓ [32mInline code[0m
      69. ✓ [32mLink with text and URL[0m
      70. ✓ [32mImage with alt text[0m
-     71. ✓ [32mMultiple inline elements[0m
-     72. ✓ [32mInline formatting in list[0m
+     71. ✗ [31mMultiple inline elements[0m
+     72. ✗ [31mInline formatting in list[0m
   07-html:
      73. ✓ [32mHTML block - simple div[0m
      74. ✓ [32mHTML block with attributes[0m
@@ -127,10 +127,10 @@
     109. ✗ [31mAsterisks in paragraph[0m
     110. ✗ [31mLeading punctuation in paragraph[0m
     111. ✗ [31mEnd-of-word punctuation[0m
-    112. ✓ [32mEnd-of-line punctuation[0m
+    112. ✗ [31mEnd-of-line punctuation[0m
     113. ✓ [32mHyphen within a word[0m
 
-10 failures:
+18 failures:
 
 correct / [32mexpected[0m / [31munexpected[0m
 
@@ -261,7 +261,94 @@ correct / [32mexpected[0m / [31munexpected[0m
 [0m[32m          (tag_name))))[0m
 
 
-  4. Mixed list and tag indentation:
+  4. Emphasis with asterisks:
+
+    (source_file
+      (paragraph
+[32m        (text)
+[0m[32m        (emphasis)
+[0m        (text)))
+
+
+  5. Emphasis with underscores:
+
+    (source_file
+      (paragraph
+[32m        (text)
+[0m[32m        (emphasis)
+[0m        (text)))
+
+
+  6. Strong with double asterisks:
+
+    (source_file
+      (paragraph
+[32m        (text)
+[0m[32m        (strong)
+[0m        (text)))
+
+
+  7. Strong with double underscores:
+
+    (source_file
+      (paragraph
+[32m        (text)
+[0m[32m        (strong)
+[0m        (text)))
+
+
+  8. Mixed emphasis and strong:
+
+    (source_file
+      (paragraph
+[32m        (text)
+[0m[32m        (emphasis)
+[0m[32m        (text)
+[0m[32m        (strong)
+[0m        (text)))
+
+
+  9. Multiple inline elements:
+
+    (source_file
+      (paragraph
+        (text)
+[32m        (emphasis)
+[0m[32m        (text)
+[0m[32m        (strong)
+[0m[32m        (text)
+[0m        (inline_code)
+        (text)
+        (link
+          (link_text)
+          (link_destination))
+        (text)))
+
+
+  10. Inline formatting in list:
+
+    (source_file
+      (list
+        (list_item
+          (list_marker)
+          (list_paragraph
+[31m            (text)))
+[0m[32m            (text)
+[0m[32m            (emphasis)))
+[0m        (list_item
+          (list_marker)
+          (list_paragraph
+[31m            (text)))
+[0m[32m            (text)
+[0m[32m            (strong)))
+[0m        (list_item
+          (list_marker)
+          (list_paragraph
+            (text)
+            (inline_code)))))
+
+
+  11. Mixed list and tag indentation:
 
     (source_file
       (list
@@ -293,7 +380,7 @@ correct / [32mexpected[0m / [31munexpected[0m
 [0m[32m                (text)))))))[0m
 
 
-  5. Tag with blank lines in content:
+  12. Tag with blank lines in content:
 
     (source_file
 [31m      (ERROR
@@ -309,7 +396,7 @@ correct / [32mexpected[0m / [31munexpected[0m
 [0m[32m          (tag_name))))[0m
 
 
-  6. Indented code block in tag:
+  13. Indented code block in tag:
 
     (source_file
       (markdoc_tag
@@ -327,29 +414,25 @@ correct / [32mexpected[0m / [31munexpected[0m
           (tag_name))))
 
 
-  7. Underscores in paragraph:
+  14. Underscores in paragraph:
 
     (source_file
       (paragraph
-        (text)
-[31m        (text))
-[0m[31m      (ERROR))[0m
 [32m        (text)
-[0m[32m        (text)))[0m
+[0m[32m        (text)
+[0m        (text)))
 
 
-  8. Asterisks in paragraph:
+  15. Asterisks in paragraph:
 
     (source_file
       (paragraph
-        (text)
-[31m        (text))
-[0m[31m      (ERROR))[0m
 [32m        (text)
-[0m[32m        (text)))[0m
+[0m[32m        (text)
+[0m        (text)))
 
 
-  9. Leading punctuation in paragraph:
+  16. Leading punctuation in paragraph:
 
     (source_file
       (paragraph
@@ -358,13 +441,12 @@ correct / [32mexpected[0m / [31munexpected[0m
       (paragraph
 [32m        (text)
 [0m        (text))
-[31m      (ERROR))[0m
-[32m      (paragraph
-[0m[32m        (text)
-[0m[32m        (text)))[0m
+      (paragraph
+[32m        (text)
+[0m        (text)))
 
 
-  10. End-of-word punctuation:
+  17. End-of-word punctuation:
 
     (source_file
       (paragraph
@@ -372,12 +454,25 @@ correct / [32mexpected[0m / [31munexpected[0m
         (text)
         (text))
       (paragraph
+[32m        (text)
+[0m[32m        (text)
+[0m        (text))
+      (paragraph
+[32m        (text)
+[0m[32m        (text)
+[0m        (text)))
+
+
+  18. End-of-line punctuation:
+
+    (source_file
+      (paragraph
         (text)
+        (text))
+      (paragraph
 [32m        (text)
 [0m        (text))
-[31m      (ERROR))[0m
-[32m      (paragraph
-[0m[32m        (text)
-[0m[32m        (text)
-[0m[32m        (text)))[0m
+      (paragraph
+[32m        (text)
+[0m        (text)))
 
