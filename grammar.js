@@ -482,11 +482,11 @@ module.exports = grammar({
     _inline_first: $ => choice(
       $.inline_expression,
       $.text,
-      alias($.standalone_punct, $.text),
+      prec(2, alias($.standalone_punct, $.text)),
       $.html_inline,
       $.link,
-      $.emphasis,
-      $.strong,
+      prec(1, $.emphasis),
+      prec(1, $.strong),
       $.inline_code
     ),
 

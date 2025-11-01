@@ -2253,13 +2253,17 @@
           "name": "text"
         },
         {
-          "type": "ALIAS",
+          "type": "PREC",
+          "value": 2,
           "content": {
-            "type": "SYMBOL",
-            "name": "standalone_punct"
-          },
-          "named": true,
-          "value": "text"
+            "type": "ALIAS",
+            "content": {
+              "type": "SYMBOL",
+              "name": "standalone_punct"
+            },
+            "named": true,
+            "value": "text"
+          }
         },
         {
           "type": "SYMBOL",
@@ -2270,12 +2274,20 @@
           "name": "link"
         },
         {
-          "type": "SYMBOL",
-          "name": "emphasis"
+          "type": "PREC",
+          "value": 1,
+          "content": {
+            "type": "SYMBOL",
+            "name": "emphasis"
+          }
         },
         {
-          "type": "SYMBOL",
-          "name": "strong"
+          "type": "PREC",
+          "value": 1,
+          "content": {
+            "type": "SYMBOL",
+            "name": "strong"
+          }
         },
         {
           "type": "SYMBOL",
