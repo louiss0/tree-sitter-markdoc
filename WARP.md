@@ -6,9 +6,9 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 ## Tree Sitter Limitations
 
 Tree sitter doesn't allow lookahead's
-Every regex you use must be Rust compatable! 
-Don't use flag regex at all! 
-Don't use capture groups regex at all! 
+Every regex you use must be Rust compatable!
+Don't use flag regex at all!
+Don't use capture groups regex at all!
 Don't use two regexes that are the same or capture the same thing at all!
 
 
@@ -73,13 +73,11 @@ Don't use two regexes that are the same or capture the same thing at all!
 - Precedence and conflict resolution:
   - Attribute parsing vs. embedded expressions are disambiguated via precedence rules to ensure tags with attributes and inline expressions parse consistently.
 
-## Test Structure
+## Test Workflow
 
-- Tests are organized by feature in test/corpus/.
-- Current test pass rate: 55/80 (68.75%).
-- Known limitations:
-  - Multi-line paragraphs
-  - Complex nested lists
+- Remember to cleanup all test files that are generated during testing.
+- Run tests using `npm test` or `yarn test`.
+- Ensure all tests pass before committing changes.
 
 ## Git Workflow
 
