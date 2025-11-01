@@ -1,3 +1,0 @@
-- Item with *emphasis*
-- Item with **strong**
-- Item with `code`

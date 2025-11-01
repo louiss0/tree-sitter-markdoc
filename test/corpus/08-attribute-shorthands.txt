@@ -1,0 +1,207 @@
+================================================================================
+Self-closing tag with id shorthand
+================================================================================
+
+{% image #myimage /%}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_self_close
+      (tag_name)
+      (id_shorthand
+        (shorthand_id)))))
+
+================================================================================
+Self-closing tag with class shorthand
+================================================================================
+
+{% image .large /%}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_self_close
+      (tag_name)
+      (class_shorthand
+        (shorthand_class)))))
+
+================================================================================
+Self-closing tag with id and class shorthands
+================================================================================
+
+{% image #photo .thumbnail /%}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_self_close
+      (tag_name)
+      (id_shorthand
+        (shorthand_id))
+      (class_shorthand
+        (shorthand_class)))))
+
+================================================================================
+Block tag with id shorthand
+================================================================================
+
+{% section #content %}
+Hello world
+{% /section %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_open
+      (tag_name)
+      (id_shorthand
+        (shorthand_id)))
+    (paragraph
+      (text))
+    (tag_close
+      (tag_name))))
+
+================================================================================
+Block tag with class shorthand
+================================================================================
+
+{% div .container %}
+Content here
+{% /div %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_open
+      (tag_name)
+      (class_shorthand
+        (shorthand_class)))
+    (paragraph
+      (text))
+    (tag_close
+      (tag_name))))
+
+================================================================================
+Block tag with multiple class shorthands
+================================================================================
+
+{% div .container .highlight .active %}
+Content here
+{% /div %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_open
+      (tag_name)
+      (class_shorthand
+        (shorthand_class))
+      (class_shorthand
+        (shorthand_class))
+      (class_shorthand
+        (shorthand_class)))
+    (paragraph
+      (text))
+    (tag_close
+      (tag_name))))
+
+================================================================================
+Block tag with id, classes, and traditional attributes
+================================================================================
+
+{% div #wrapper .container title="My Section" %}
+Content here
+{% /div %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_open
+      (tag_name)
+      (id_shorthand
+        (shorthand_id))
+      (class_shorthand
+        (shorthand_class))
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (string))))
+    (paragraph
+      (text))
+    (tag_close
+      (tag_name))))
+
+================================================================================
+Inline tag with shorthands
+================================================================================
+
+Hello {% image .inline-icon /%} world
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (paragraph
+    (text)
+    (inline_tag
+      (tag_name)
+      (class_shorthand
+        (shorthand_class)))
+    (text)))
+
+================================================================================
+Multiple class shorthands with id
+================================================================================
+
+{% div #myid .first .second %}
+Content
+{% /div %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_open
+      (tag_name)
+      (id_shorthand
+        (shorthand_id))
+      (class_shorthand
+        (shorthand_class))
+      (class_shorthand
+        (shorthand_class)))
+    (paragraph
+      (text))
+    (tag_close
+      (tag_name))))
+
+================================================================================
+Shorthand with hyphenated identifiers
+================================================================================
+
+{% section #my-section .bg-dark .text-center %}
+Content
+{% /section %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_open
+      (tag_name)
+      (id_shorthand
+        (shorthand_id))
+      (class_shorthand
+        (shorthand_class))
+      (class_shorthand
+        (shorthand_class)))
+    (paragraph
+      (text))
+    (tag_close
+      (tag_name))))

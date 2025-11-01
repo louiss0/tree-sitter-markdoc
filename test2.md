@@ -1,1 +1,0 @@
-{{ !isDone && count < 10 }}

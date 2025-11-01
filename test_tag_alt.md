@@ -1,3 +1,0 @@
-{% tag %}
-Content here
-{% tag %}
