@@ -2253,6 +2253,15 @@
           "name": "text"
         },
         {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "standalone_punct"
+          },
+          "named": true,
+          "value": "text"
+        },
+        {
           "type": "SYMBOL",
           "name": "html_inline"
         },
@@ -2304,8 +2313,25 @@
       }
     },
     "standalone_punct": {
-      "type": "STRING",
-      "value": "!"
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "!"
+        },
+        {
+          "type": "STRING",
+          "value": "-"
+        },
+        {
+          "type": "STRING",
+          "value": "_"
+        },
+        {
+          "type": "STRING",
+          "value": "*"
+        }
+      ]
     }
   },
   "extras": [

@@ -482,6 +482,7 @@ module.exports = grammar({
     _inline_first: $ => choice(
       $.inline_expression,
       $.text,
+      alias($.standalone_punct, $.text),
       $.html_inline,
       $.link,
       $.emphasis,
@@ -499,6 +500,6 @@ module.exports = grammar({
     text: $ => token(/[^\n{<`*_\[\]!\->]+/),
     
     // Fallback for standalone punctuation that doesn't start special syntax
-    standalone_punct: $ => '!',
+    standalone_punct: $ => choice('!', '-', '_', '*'),
   }
 });
