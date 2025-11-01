@@ -1,24 +1,37 @@
 #include <tree_sitter/parser.h>
 #include <stdlib.h>
 #include <string.h>
+#include <wctype.h>
+#include <stdbool.h>
 
 enum TokenType {
   CODE_CONTENT,
   NEWLINE,
   BLANK_LINE,
   INDENT,
-  DEDENT
+  DEDENT,
+  EM_OPEN_STAR,
+  EM_CLOSE_STAR,
+  STRONG_OPEN_STAR,
+  STRONG_CLOSE_STAR,
+  EM_OPEN_UNDERSCORE,
+  EM_CLOSE_UNDERSCORE,
+  STRONG_OPEN_UNDERSCORE,
+  STRONG_CLOSE_UNDERSCORE,
+  RAW_DELIM
 };
 
 typedef struct {
   uint16_t indent_stack[64];
   uint8_t indent_len;
+  int32_t prev;  // previous non-newline char for flanking detection
 } Scanner;
 
 void *tree_sitter_markdoc_external_scanner_create() {
   Scanner *scanner = (Scanner *)malloc(sizeof(Scanner));
   scanner->indent_len = 1;
   scanner->indent_stack[0] = 0;
+  scanner->prev = 0;
   return scanner;
 }
 
@@ -35,6 +48,14 @@ unsigned tree_sitter_markdoc_external_scanner_serialize(void *payload, char *buf
     buffer[i++] = (char)(v & 0xFF);
     buffer[i++] = (char)((v >> 8) & 0xFF);
   }
+  // Serialize prev character (4 bytes, little-endian)
+  if (i + 4 < 255) {
+    int32_t p = s->prev;
+    buffer[i++] = (char)(p & 0xFF);
+    buffer[i++] = (char)((p >> 8) & 0xFF);
+    buffer[i++] = (char)((p >> 16) & 0xFF);
+    buffer[i++] = (char)((p >> 24) & 0xFF);
+  }
   return i;
 }
 
@@ -42,6 +63,7 @@ void tree_sitter_markdoc_external_scanner_deserialize(void *payload, const char 
   Scanner *s = (Scanner *)payload;
   s->indent_len = 1;
   s->indent_stack[0] = 0;
+  s->prev = 0;
   
   if (length < 1) return;
   
@@ -53,10 +75,32 @@ void tree_sitter_markdoc_external_scanner_deserialize(void *payload, const char 
     uint16_t v = (uint8_t)buffer[i++] | (((uint16_t)(uint8_t)buffer[i++]) << 8);
     s->indent_stack[j] = v;
   }
+  
+  // Deserialize prev character (4 bytes, little-endian)
+  if (i + 4 <= length) {
+    int32_t p = 0;
+    p |= (int32_t)(uint8_t)buffer[i++];
+    p |= (int32_t)(uint8_t)buffer[i++] << 8;
+    p |= (int32_t)(uint8_t)buffer[i++] << 16;
+    p |= (int32_t)(uint8_t)buffer[i++] << 24;
+    s->prev = p;
+  }
 }
 
 static inline bool is_newline(int32_t ch) {
   return ch == '\n' || ch == '\r';
+}
+
+static inline bool is_space_ch(int32_t c) {
+  return c == ' ' || c == '\t';
+}
+
+static inline bool is_punct_ch(int32_t c) {
+  return c && !iswalnum(c) && !is_space_ch(c) && !is_newline(c);
+}
+
+static inline bool is_word_ch(int32_t c) {
+  return iswalnum(c) || c == '_';
 }
 
 bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
@@ -248,5 +292,125 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
     return false;
   }
   
+  // EMPHASIS DELIMITERS: handle * and _ with CommonMark flanking rules
+  if (lexer->lookahead == '*' || lexer->lookahead == '_') {
+    // Check if any emphasis token is valid before scanning
+    if (!valid_symbols[EM_OPEN_STAR] && !valid_symbols[EM_CLOSE_STAR] &&
+        !valid_symbols[STRONG_OPEN_STAR] && !valid_symbols[STRONG_CLOSE_STAR] &&
+        !valid_symbols[EM_OPEN_UNDERSCORE] && !valid_symbols[EM_CLOSE_UNDERSCORE] &&
+        !valid_symbols[STRONG_OPEN_UNDERSCORE] && !valid_symbols[STRONG_CLOSE_UNDERSCORE] &&
+        !valid_symbols[RAW_DELIM]) {
+      if (!is_newline(lexer->lookahead) && lexer->lookahead != 0) {
+        s->prev = lexer->lookahead;
+      }
+      return false;
+    }
+
+    int32_t delim = lexer->lookahead;
+    int32_t prev = s->prev;
+    
+    // Peek ahead: consume first delim to see what's after
+    lexer->advance(lexer, false);
+    int32_t after_first = lexer->lookahead;
+    
+    // Determine if we have 1 or 2+ delimiters by checking if next is same
+    bool has_second = (after_first == delim);
+    
+    // If we have 2, peek one more to get the character after both
+    int32_t next_after_run = after_first;
+    if (has_second) {
+      lexer->advance(lexer, false);
+      next_after_run = lexer->lookahead;
+    }
+    
+    // Determine flanking
+    bool next_is_space = is_space_ch(next_after_run) || is_newline(next_after_run) || next_after_run == 0;
+    bool prev_is_space = is_space_ch(prev) || prev == 0 || is_newline(prev);
+    bool next_is_word = is_word_ch(next_after_run);
+    bool prev_is_word = is_word_ch(prev);
+    
+    bool left_flanking = next_is_word && (prev_is_space || is_punct_ch(prev));
+    bool right_flanking = prev_is_word && (next_is_space || is_punct_ch(next_after_run));
+    
+    // Single delim + space cannot open
+    bool is_single = !has_second;
+    if (is_single && next_is_space) {
+      left_flanking = false;
+    }
+    
+    // Mark end at current position (after consuming what we peeked)
+    lexer->mark_end(lexer);
+    
+    // Emit strong if we have 2+ and conditions allow
+    if (has_second) {
+      if (left_flanking && !right_flanking) {
+        if (delim == '*' && valid_symbols[STRONG_OPEN_STAR]) {
+          lexer->result_symbol = STRONG_OPEN_STAR;
+          s->prev = delim;
+          return true;
+        }
+        if (delim == '_' && valid_symbols[STRONG_OPEN_UNDERSCORE]) {
+          lexer->result_symbol = STRONG_OPEN_UNDERSCORE;
+          s->prev = delim;
+          return true;
+        }
+      }
+      if (right_flanking) {
+        if (delim == '*' && valid_symbols[STRONG_CLOSE_STAR]) {
+          lexer->result_symbol = STRONG_CLOSE_STAR;
+          s->prev = delim;
+          return true;
+        }
+        if (delim == '_' && valid_symbols[STRONG_CLOSE_UNDERSCORE]) {
+          lexer->result_symbol = STRONG_CLOSE_UNDERSCORE;
+          s->prev = delim;
+          return true;
+        }
+      }
+      // If strong didn't match, fall through to try emphasis
+    }
+    
+    // Emit emphasis (always 1 delimiter)
+    if (left_flanking && !right_flanking) {
+      if (delim == '*' && valid_symbols[EM_OPEN_STAR]) {
+        lexer->result_symbol = EM_OPEN_STAR;
+        s->prev = delim;
+        return true;
+      }
+      if (delim == '_' && valid_symbols[EM_OPEN_UNDERSCORE]) {
+        lexer->result_symbol = EM_OPEN_UNDERSCORE;
+        s->prev = delim;
+        return true;
+      }
+    }
+    if (right_flanking) {
+      if (delim == '*' && valid_symbols[EM_CLOSE_STAR]) {
+        lexer->result_symbol = EM_CLOSE_STAR;
+        s->prev = delim;
+        return true;
+      }
+      if (delim == '_' && valid_symbols[EM_CLOSE_UNDERSCORE]) {
+        lexer->result_symbol = EM_CLOSE_UNDERSCORE;
+        s->prev = delim;
+        return true;
+      }
+    }
+    
+    // Not markup - emit as raw
+    if (valid_symbols[RAW_DELIM]) {
+      lexer->result_symbol = RAW_DELIM;
+      s->prev = delim;
+      return true;
+    }
+    
+    s->prev = delim;
+    return false;
+  }
+
+  // Update prev for any other character
+  if (!is_newline(lexer->lookahead) && lexer->lookahead != 0) {
+    s->prev = lexer->lookahead;
+  }
+
   return false;
 }

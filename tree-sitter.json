@@ -8,6 +8,7 @@
       "scope": "source.markdoc",
       "file-types": [
         "mdoc",
+        "md",
         "markdoc"
       ],
       "injection-regex": "^markdoc$",

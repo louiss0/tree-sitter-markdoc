@@ -1,0 +1,535 @@
+=======================================
+Single asterisk followed by space (plain text, not emphasis opener)
+=======================================
+
+This is * a word.
+
+---
+
+(source_file
+  (paragraph
+    (text)))
+
+=======================================
+Single underscore followed by space (plain text, not emphasis opener)
+=======================================
+
+This is _ a word.
+
+---
+
+(source_file
+  (paragraph
+    (text)))
+
+=======================================
+Double asterisk followed by space (plain text, not strong opener)
+=======================================
+
+This is ** a word.
+
+---
+
+(source_file
+  (paragraph
+    (text)))
+
+=======================================
+Double underscore followed by space (plain text, not strong opener)
+=======================================
+
+This is __ a word.
+
+---
+
+(source_file
+  (paragraph
+    (text)))
+
+=======================================
+Proper emphasis with asterisks (no space)
+=======================================
+
+This is *word* emphasized.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (emphasis)
+    (text)))
+
+=======================================
+Proper emphasis with underscores (no space)
+=======================================
+
+This is _word_ emphasized.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (emphasis)
+    (text)))
+
+=======================================
+Proper strong with double asterisks (no space)
+=======================================
+
+This is **bold** text.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (strong)
+    (text)))
+
+=======================================
+Proper strong with double underscores (no space)
+=======================================
+
+This is __bold__ text.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (strong)
+    (text)))
+
+=======================================
+Emphasis with multiple words inside
+=======================================
+
+This *has multiple words* in emphasis.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (emphasis)
+    (text)))
+
+=======================================
+Strong with multiple words inside
+=======================================
+
+This **has multiple words** in strong.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (strong)
+    (text)))
+
+=======================================
+Mixed emphasis and strong in same line
+=======================================
+
+Text with *emphasis* and **strong** together.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (emphasis)
+    (text)
+    (strong)
+    (text)))
+
+=======================================
+Triple asterisk (strong + emphasis)
+=======================================
+
+This is ***bold and italic***.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (strong
+      (emphasis))
+    (text)))
+
+=======================================
+Triple underscore (strong + emphasis)
+=======================================
+
+This is ___bold and italic___.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (strong
+      (emphasis))
+    (text)))
+
+=======================================
+Dash in middle of text (plain text, not emphasis)
+=======================================
+
+This is a word-word compound.
+
+---
+
+(source_file
+  (paragraph
+    (text)))
+
+=======================================
+Dash followed by space (plain text, not list marker inside line)
+=======================================
+
+Some text - more text here.
+
+---
+
+(source_file
+  (paragraph
+    (text)))
+
+=======================================
+Dash at line start with space (list marker)
+=======================================
+
+- List item here
+
+---
+
+(source_file
+  (list
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))))
+
+=======================================
+Triple dash on own line (thematic break)
+=======================================
+
+---
+
+---
+
+(source_file
+  (thematic_break))
+
+=======================================
+Emphasis at start of line
+=======================================
+
+*emphasis* at the beginning.
+
+---
+
+(source_file
+  (paragraph
+    (emphasis)
+    (text)))
+
+=======================================
+Emphasis at end of line
+=======================================
+
+At the end *emphasis*
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (emphasis)))
+
+=======================================
+Unbalanced emphasis (opening only)
+=======================================
+
+This *has only opening.
+
+---
+
+(source_file
+  (paragraph
+    (text)))
+
+=======================================
+Unbalanced emphasis (closing only)
+=======================================
+
+This has only closing* here.
+
+---
+
+(source_file
+  (paragraph
+    (text)))
+
+=======================================
+Adjacent emphasis markers
+=======================================
+
+This is *em* **strong** *another em*.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (emphasis)
+    (text)
+    (strong)
+    (text)
+    (emphasis)
+    (text)))
+
+=======================================
+Emphasis with punctuation around it
+=======================================
+
+(*word*) and "*word*" here.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (emphasis)
+    (text)
+    (emphasis)
+    (text)))
+
+=======================================
+Multiple emphasis runs in single line
+=======================================
+
+*first* middle *second* end.
+
+---
+
+(source_file
+  (paragraph
+    (emphasis)
+    (text)
+    (emphasis)
+    (text)))
+
+=======================================
+Strong with emphasis nested inside
+=======================================
+
+This is **_bold and italic_** text.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (strong
+      (emphasis))
+    (text)))
+
+=======================================
+Emphasis with strong nested inside
+=======================================
+
+This is *emphasis with **nested strong***
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (emphasis)
+    (text)))
+
+=======================================
+List with emphasis
+=======================================
+
+- Item with *emphasis* here
+- Another with **strong**
+
+---
+
+(source_file
+  (list
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)
+        (emphasis)
+        (text)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)
+        (strong)))))
+
+=======================================
+Emphasis not separated by space is not emphasis
+=======================================
+
+abc*def*ghi
+
+---
+
+(source_file
+  (paragraph
+    (text)))
+
+=======================================
+Underscore not separated by space is not emphasis
+=======================================
+
+abc_def_ghi
+
+---
+
+(source_file
+  (paragraph
+    (text)))
+
+=======================================
+Multiple delimiters followed by space (all text)
+=======================================
+
+This *** has **multiple __ delimiters.
+
+---
+
+(source_file
+  (paragraph
+    (text)))
+
+=======================================
+Emphasis with numbers adjacent
+=======================================
+
+The value is *123* units.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (emphasis)
+    (text)))
+
+=======================================
+Emphasis spanning multiple words with punctuation
+=======================================
+
+This *includes, text, and: punctuation* inside.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (emphasis)
+    (text)))
+
+=======================================
+Inline expression with emphasis
+=======================================
+
+Value is {{*emphasized*}}
+
+---
+
+(source_file
+  (paragraph
+    (inline_expression
+      (emphasis))))
+
+=======================================
+No emphasis with line break between delimiters
+=======================================
+
+This *has
+a newline* so no emphasis.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (text)))
+
+=======================================
+Star surrounded by punctuation
+=======================================
+
+(* test *) with parens.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (emphasis)
+    (text)))
+
+=======================================
+Underscore with numbers on both sides
+=======================================
+
+Test_123_ end.
+
+---
+
+(source_file
+  (paragraph
+    (text)))
+
+=======================================
+Mixed star and underscore emphasis
+=======================================
+
+Use *star* and _underscore_ together.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (emphasis)
+    (text)
+    (emphasis)
+    (text)))
+
+=======================================
+Empty emphasis markers (no content)
+=======================================
+
+This ** and __ are empty.
+
+---
+
+(source_file
+  (paragraph
+    (text)))
+
+=======================================
+Triple delimiter followed by space (all text)
+=======================================
+
+This *** should be text.
+
+---
+
+(source_file
+  (paragraph
+    (text)))

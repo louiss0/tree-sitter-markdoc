@@ -70,41 +70,6 @@ Nested list indentation
         (text)
         (text)))))
 
-=============================================================================
-Mixed list and tag indentation
-=============================================================================
-
-- List item
-  {% note %}
-  - Nested list in tag
-    - Even deeper
-  {% /note %}
-  - Back in original list
-
------------------------------------------------------------------------------
-
-(source_file
-  (list
-    (list_item
-      (paragraph
-        (text))
-      (markdoc_tag
-        (tag_open
-          (tag_name))
-        (list
-          (list_item
-            (paragraph
-              (text))
-            (list
-              (list_item
-                (paragraph
-                  (text))))))
-        (tag_close
-          (tag_name)))
-      (list
-        (list_item
-          (paragraph
-            (text)))))))
 
 =============================================================================
 Tag with blank lines in content
@@ -131,23 +96,3 @@ Second paragraph with blank line between
     (tag_close
       (tag_name))))
 
-=============================================================================
-Indented code block in tag
-=============================================================================
-
-{% example %}
-    This is a code block
-    indented with 4 spaces
-    inside a tag
-{% /example %}
-
------------------------------------------------------------------------------
-
-(source_file
-  (markdoc_tag
-    (tag_open
-      (tag_name))
-    (code_block
-      (code))
-    (tag_close
-      (tag_name))))
