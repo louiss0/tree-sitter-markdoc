@@ -15,7 +15,16 @@ module.exports = grammar({
     $._NEWLINE,
     $._BLANK_LINE,
     $._INDENT,
-    $._DEDENT
+    $._DEDENT,
+    $._em_open_star,
+    $._em_close_star,
+    $._strong_open_star,
+    $._strong_close_star,
+    $._em_open_underscore,
+    $._em_close_underscore,
+    $._strong_open_underscore,
+    $._strong_close_underscore,
+    $._raw_delim
   ],
 
   extras: $ => [
@@ -503,15 +512,45 @@ module.exports = grammar({
       ))
     )),
 
-    emphasis: $ => prec.left(1, choice(
-      seq('*', token(prec(1, /[^*\n]+/)), '*'),
-      seq('_', token(prec(1, /[^_\n]+/)), '_')
-    )),
+    emphasis: $ => choice(
+      seq($._em_open_star, repeat1(choice(
+        $.text,
+        $.inline_code,
+        $.link,
+        $.image,
+        $.html_inline,
+        $.inline_expression
+      )), $._em_close_star),
+      seq($._em_open_underscore, repeat1(choice(
+        $.text,
+        $.inline_code,
+        $.link,
+        $.image,
+        $.html_inline,
+        $.inline_expression
+      )), $._em_close_underscore)
+    ),
 
-    strong: $ => prec.left(2, choice(
-      seq('**', token(prec(2, /[^*\n]+/)), '**'),
-      seq('__', token(prec(2, /[^_\n]+/)), '__')
-    )),
+    strong: $ => choice(
+      seq($._strong_open_star, repeat1(choice(
+        $.text,
+        $.inline_code,
+        $.link,
+        $.image,
+        $.html_inline,
+        $.inline_expression,
+        $.emphasis
+      )), $._strong_close_star),
+      seq($._strong_open_underscore, repeat1(choice(
+        $.text,
+        $.inline_code,
+        $.link,
+        $.image,
+        $.html_inline,
+        $.inline_expression,
+        $.emphasis
+      )), $._strong_close_underscore)
+    ),
 
     inline_code: $ => seq(
       '`',
@@ -556,9 +595,13 @@ module.exports = grammar({
       alias($.standalone_punct, $.text)
     ),
 
-    text: $ => token(/[^\n{<`*_\[\]!\->]+/),
+    text: $ => choice(
+      token(/[^\n{<`*_\[\]!\->]+/),  // regular text (excluding special chars)
+      token(/-+/),                     // dashes allowed inline
+      alias($._raw_delim, $.text)      // raw delimiters become text
+    ),
     
     // Fallback for standalone punctuation that doesn't start special syntax
-    standalone_punct: $ => '!',
+    standalone_punct: $ => token(choice('!')),
   }
 });
