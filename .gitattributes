@@ -1,5 +1,8 @@
 * text=auto eol=lf
 
+# Always keep the version of .gitignore from the branch being merged *into*
+.gitignore merge=ours
+
 # Generated source files
 src/*.json linguist-generated
 src/parser.c linguist-generated
