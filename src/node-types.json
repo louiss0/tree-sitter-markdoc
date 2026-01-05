@@ -518,7 +518,17 @@
   {
     "type": "frontmatter",
     "named": true,
-    "fields": {}
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "yaml",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "heading",
@@ -1261,6 +1271,11 @@
     }
   },
   {
+    "type": "markdown_table_sep_cell",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "markdown_table_separator",
     "named": true,
     "fields": {},
@@ -1683,14 +1698,9 @@
     }
   },
   {
-<<<<<<< HEAD
     "type": "yaml",
     "named": true,
     "fields": {}
-=======
-    "type": "!",
-    "named": false
->>>>>>> 9e258e8def96567b7e8bfc23a72c901bfeed263e
   },
   {
     "type": "![",
@@ -1902,10 +1912,6 @@
   },
   {
     "type": "markdown_table_cell",
-    "named": true
-  },
-  {
-    "type": "markdown_table_sep_cell",
     "named": true
   },
   {

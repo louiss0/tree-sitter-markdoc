@@ -103,6 +103,33 @@ static inline bool is_word_ch(int32_t c) {
   return iswalnum(c) || c == '_';
 }
 
+static bool has_valid_closing_delim(TSLexer *lexer, int32_t delim, int count) {
+  TSLexer scan = *lexer;
+  int run = 0;
+
+  while (scan.lookahead != 0 && !is_newline(scan.lookahead)) {
+    if (scan.lookahead == delim) {
+      run++;
+      if (run >= count) {
+        scan.advance(&scan, false);
+        int32_t after = scan.lookahead;
+        bool after_is_space = is_space_ch(after) || is_newline(after) || after == 0;
+        bool after_is_punct = is_punct_ch(after);
+        if (after_is_space || after_is_punct) {
+          return true;
+        }
+        run = 0;
+        continue;
+      }
+    } else {
+      run = 0;
+    }
+    scan.advance(&scan, false);
+  }
+
+  return false;
+}
+
 bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
                                               const bool *valid_symbols) {
   Scanner *s = (Scanner *)payload;
@@ -292,7 +319,7 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
     return false;
   }
   
-  // EMPHASIS DELIMITERS: handle * and _ with CommonMark flanking rules
+  // EMPHASIS DELIMITERS: allow open/close based on next-char only
   if (lexer->lookahead == '*' || lexer->lookahead == '_') {
     // Check if any emphasis token is valid before scanning
     if (!valid_symbols[EM_OPEN_STAR] && !valid_symbols[EM_CLOSE_STAR] &&
@@ -307,83 +334,65 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
     }
 
     int32_t delim = lexer->lookahead;
-    int32_t prev = s->prev;
-    
-    // Peek ahead: consume first delim to see what's after
     lexer->advance(lexer, false);
     int32_t after_first = lexer->lookahead;
     
-    // Determine if we have 1 or 2+ delimiters by checking if next is same
     bool has_second = (after_first == delim);
-    
-    // If we have 2, peek one more to get the character after both
     int32_t next_after_run = after_first;
+    
+    TSLexer scan = *lexer;
     if (has_second) {
-      lexer->advance(lexer, false);
-      next_after_run = lexer->lookahead;
+      scan.advance(&scan, false);
+      next_after_run = scan.lookahead;
     }
     
-    // Determine flanking
     bool next_is_space = is_space_ch(next_after_run) || is_newline(next_after_run) || next_after_run == 0;
-    bool prev_is_space = is_space_ch(prev) || prev == 0 || is_newline(prev);
-    bool next_is_word = is_word_ch(next_after_run);
-    bool prev_is_word = is_word_ch(prev);
-    
-    bool left_flanking = next_is_word && (prev_is_space || is_punct_ch(prev));
-    bool right_flanking = prev_is_word && (next_is_space || is_punct_ch(next_after_run));
-    
-    // Single delim + space cannot open
-    bool is_single = !has_second;
-    if (is_single && next_is_space) {
-      left_flanking = false;
-    }
-    
-    // Mark end at current position (after consuming what we peeked)
-    lexer->mark_end(lexer);
+    bool next_is_punct = is_punct_ch(next_after_run);
+    bool has_close = has_second
+      ? has_valid_closing_delim(&scan, delim, 2)
+      : has_valid_closing_delim(lexer, delim, 1);
+    bool prev_is_space = is_space_ch(s->prev) || is_newline(s->prev) || s->prev == 0;
+    bool can_open = !next_is_space && has_close;
+    bool can_close = !prev_is_space && (next_is_space || next_is_punct);
     
     // Emit strong if we have 2+ and conditions allow
     if (has_second) {
-      if (left_flanking && !right_flanking) {
-        if (delim == '*' && valid_symbols[STRONG_OPEN_STAR]) {
-          lexer->result_symbol = STRONG_OPEN_STAR;
-          s->prev = delim;
-          return true;
-        }
-        if (delim == '_' && valid_symbols[STRONG_OPEN_UNDERSCORE]) {
-          lexer->result_symbol = STRONG_OPEN_UNDERSCORE;
-          s->prev = delim;
-          return true;
-        }
-      }
-      if (right_flanking) {
+      if (can_close) {
         if (delim == '*' && valid_symbols[STRONG_CLOSE_STAR]) {
+          lexer->advance(lexer, false);
+          lexer->mark_end(lexer);
           lexer->result_symbol = STRONG_CLOSE_STAR;
           s->prev = delim;
           return true;
         }
         if (delim == '_' && valid_symbols[STRONG_CLOSE_UNDERSCORE]) {
+          lexer->advance(lexer, false);
+          lexer->mark_end(lexer);
           lexer->result_symbol = STRONG_CLOSE_UNDERSCORE;
           s->prev = delim;
           return true;
         }
       }
-      // If strong didn't match, fall through to try emphasis
-    }
-    
-    // Emit emphasis (always 1 delimiter)
-    if (left_flanking && !right_flanking) {
-      if (delim == '*' && valid_symbols[EM_OPEN_STAR]) {
-        lexer->result_symbol = EM_OPEN_STAR;
-        s->prev = delim;
-        return true;
+      if (can_open) {
+        if (delim == '*' && valid_symbols[STRONG_OPEN_STAR]) {
+          lexer->advance(lexer, false);
+          lexer->mark_end(lexer);
+          lexer->result_symbol = STRONG_OPEN_STAR;
+          s->prev = delim;
+          return true;
+        }
+        if (delim == '_' && valid_symbols[STRONG_OPEN_UNDERSCORE]) {
+          lexer->advance(lexer, false);
+          lexer->mark_end(lexer);
+          lexer->result_symbol = STRONG_OPEN_UNDERSCORE;
+          s->prev = delim;
+          return true;
+        }
       }
-      if (delim == '_' && valid_symbols[EM_OPEN_UNDERSCORE]) {
-        lexer->result_symbol = EM_OPEN_UNDERSCORE;
-        s->prev = delim;
-        return true;
-      }
     }
-    if (right_flanking) {
+
+    lexer->mark_end(lexer);
+    if (can_close) {
       if (delim == '*' && valid_symbols[EM_CLOSE_STAR]) {
         lexer->result_symbol = EM_CLOSE_STAR;
         s->prev = delim;
@@ -391,6 +400,18 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
       }
       if (delim == '_' && valid_symbols[EM_CLOSE_UNDERSCORE]) {
         lexer->result_symbol = EM_CLOSE_UNDERSCORE;
+        s->prev = delim;
+        return true;
+      }
+    }
+    if (can_open) {
+      if (delim == '*' && valid_symbols[EM_OPEN_STAR]) {
+        lexer->result_symbol = EM_OPEN_STAR;
+        s->prev = delim;
+        return true;
+      }
+      if (delim == '_' && valid_symbols[EM_OPEN_UNDERSCORE]) {
+        lexer->result_symbol = EM_OPEN_UNDERSCORE;
         s->prev = delim;
         return true;
       }
