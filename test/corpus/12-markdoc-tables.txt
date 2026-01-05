@@ -1,0 +1,232 @@
+================================================================================
+Simple Markdoc table with header and one row
+================================================================================
+
+{% table %}
+* Heading 1
+* Heading 2
+---
+* Row 1 Cell 1
+* Row 1 Cell 2
+{% /table %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_table
+    (markdoc_table_open
+      (tag_name))
+    (markdoc_table_header
+      (markdoc_table_cell
+        marker: (list_marker)
+        content: (markdoc_table_cell_content
+          (markdoc_table_cell_item
+            (text))))
+      (markdoc_table_cell
+        marker: (list_marker)
+        content: (markdoc_table_cell_content
+          (markdoc_table_cell_item
+            (text)))))
+    (markdoc_table_separator)
+    (markdoc_table_row
+      (markdoc_table_cell
+        marker: (list_marker)
+        content: (markdoc_table_cell_content
+          (markdoc_table_cell_item
+            (text))))
+      (markdoc_table_cell
+        marker: (list_marker)
+        content: (markdoc_table_cell_content
+          (markdoc_table_cell_item
+            (text)))))
+    (markdoc_table_close
+      (tag_name))))
+
+================================================================================
+Markdoc table with multiple rows
+================================================================================
+
+{% table %}
+* Heading 1
+* Heading 2
+---
+* Row 1 Cell 1
+* Row 1 Cell 2
+---
+* Row 2 Cell 1
+* Row 2 Cell 2
+{% /table %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_table
+    (markdoc_table_open
+      (tag_name))
+    (markdoc_table_header
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (text)))
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (text))))
+    (markdoc_table_separator)
+    (markdoc_table_row
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (text)))
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (text))))
+    (markdoc_table_separator)
+    (markdoc_table_row
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (text)))
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (text))))
+    (markdoc_table_close
+      (tag_name))))
+
+================================================================================
+Markdoc table with attributes
+================================================================================
+
+{% table striped=true %}
+* Name
+* Age
+---
+* Alice
+* 30
+{% /table %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_table
+    (markdoc_table_open
+      (tag_name)
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (expression
+            (boolean)))))
+    (markdoc_table_header
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (text)))
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (text))))
+    (markdoc_table_separator)
+    (markdoc_table_row
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (text)))
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (text))))
+    (markdoc_table_close
+      (tag_name))))
+
+================================================================================
+Markdoc table with cell annotations
+================================================================================
+
+{% table %}
+* Name
+* Details
+---
+* Alice
+* Age: 30 {% colspan=2 %}
+{% /table %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_table
+    (markdoc_table_open
+      (tag_name))
+    (markdoc_table_header
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (text)))
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (text))))
+    (markdoc_table_separator)
+    (markdoc_table_row
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (text)))
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (text)
+          (markdoc_table_cell_annotation
+            (annotation_name)
+            (annotation_value)))))
+    (markdoc_table_close
+      (tag_name))))
+
+================================================================================
+Markdoc table with inline expressions in cells
+================================================================================
+
+{% table %}
+* Name
+* Age
+---
+* {{ user.name }}
+* {{ user.age }}
+{% /table %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_table
+    (markdoc_table_open
+      (tag_name))
+    (markdoc_table_header
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (text)))
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (text))))
+    (markdoc_table_separator)
+    (markdoc_table_row
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (inline_expression
+            (expression
+              (member_expression
+                (identifier)
+                (identifier))))))
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (inline_expression
+            (expression
+              (member_expression
+                (identifier)
+                (identifier)))))))
+    (markdoc_table_close
+      (tag_name))))

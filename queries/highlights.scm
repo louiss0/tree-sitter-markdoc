@@ -11,11 +11,10 @@
 ; ============================================================================
 
 ; ============================================================================
-; FRONTMATTER (YAML)
+; FRONTMATTER
 ; ============================================================================
 
 (frontmatter) @markup.raw.block
-(yaml) @markup.raw.block
 
 ; ============================================================================
 ; HEADINGS
@@ -62,6 +61,14 @@
 
 ; List markers (-, *, +, 1., 2., etc.)
 (list_marker) @markup.list
+
+; List item annotations: {% type %} after list content
+(list_item_annotation
+  "{%" @punctuation.bracket
+  "%}" @punctuation.bracket)
+
+; Annotation type name (e.g., important, warning, note)
+(annotation_type) @tag.attribute
 
 ; ============================================================================
 ; INLINE FORMATTING
@@ -114,6 +121,29 @@
 (html_comment) @comment
 
 ; ============================================================================
+; MARKDOC TABLES
+; ============================================================================
+
+; Table row separator: ---
+(markdoc_table_separator) @punctuation.special
+
+; Table-specific list markers (cells)
+(markdoc_table_header
+  (markdoc_table_cell
+    marker: (list_marker) @markup.list))
+(markdoc_table_row
+  (markdoc_table_cell
+    marker: (list_marker) @markup.list))
+
+; Table cell annotations: {% colspan=2 %}
+(markdoc_table_cell_annotation
+  "{%" @punctuation.bracket
+  (annotation_name) @attribute
+  "=" @operator
+  (annotation_value) @number
+  "%}" @punctuation.bracket)
+
+; ============================================================================
 ; MARKDOC TAGS
 ; ============================================================================
 
@@ -125,11 +155,28 @@
 ; Tag names (e.g., callout, table, partial)
 (tag_name) @tag
 
+; Table tag specifically (built-in)
+(markdoc_table_open (tag_name) @tag.builtin)
+(markdoc_table_close (tag_name) @tag.builtin)
+
 ; Closing tag slash
 ("/" @punctuation.delimiter)
 
 ; Comment blocks: {% comment %}...{% /comment %}
 (comment_block) @comment
+
+; ============================================================================
+; CONDITIONAL TAGS (if/else)
+; ============================================================================
+
+; If tag opening: {% if condition %}
+(if_tag_open) @keyword.control
+
+; If tag closing: {% /if %}
+(if_tag_close) @keyword.control
+
+; Else tag: {% else %} or {% else condition /%}
+(else_tag) @keyword.control
 
 ; ============================================================================
 ; TAG ATTRIBUTES

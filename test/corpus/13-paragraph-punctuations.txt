@@ -1,0 +1,128 @@
+===================
+Hyphens in paragraph
+===================
+
+foo - bar
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (text)
+    (text)))
+
+===================
+Underscores in paragraph
+===================
+
+foo _ bar
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (text)
+    (text)))
+
+===================
+Asterisks in paragraph
+===================
+
+foo * bar
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (text)
+    (text)))
+
+===================
+Leading punctuation in paragraph
+===================
+
+-foo bar
+
+_foo bar
+
+*foo bar
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (text))
+  (paragraph
+    (text)
+    (text))
+  (paragraph
+    (text)
+    (text)))
+
+===================
+End-of-word punctuation
+===================
+
+foo- bar
+
+foo_ bar
+
+foo* bar
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (text)
+    (text))
+  (paragraph
+    (text)
+    (text)
+    (text))
+  (paragraph
+    (text)
+    (text)
+    (text)))
+
+===================
+End-of-line punctuation
+===================
+
+foo-
+
+foo_
+
+foo*
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (text))
+  (paragraph
+    (text)
+    (text))
+  (paragraph
+    (text)
+    (text)))
+
+===================
+Hyphen within a word
+===================
+
+A well-known fact
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (text)
+    (text)))
+

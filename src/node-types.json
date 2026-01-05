@@ -254,11 +254,23 @@
           "named": true
         },
         {
+          "type": "if_tag",
+          "named": true
+        },
+        {
           "type": "list",
           "named": true
         },
         {
+          "type": "markdoc_table",
+          "named": true
+        },
+        {
           "type": "markdoc_tag",
+          "named": true
+        },
+        {
+          "type": "markdown_table",
           "named": true
         },
         {
@@ -301,6 +313,21 @@
     }
   },
   {
+    "type": "class_shorthand",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "shorthand_class",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "code",
     "named": true,
     "fields": {}
@@ -329,6 +356,22 @@
     "type": "comment_block",
     "named": true,
     "fields": {}
+  },
+  {
+    "type": "else_tag",
+    "named": true,
+    "fields": {
+      "condition": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      }
+    }
   },
   {
     "type": "emphasis",
@@ -475,17 +518,7 @@
   {
     "type": "frontmatter",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "yaml",
-          "named": true
-        }
-      ]
-    }
+    "fields": {}
   },
   {
     "type": "heading",
@@ -514,6 +547,11 @@
     }
   },
   {
+    "type": "heading_text",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "html_block",
     "named": true,
     "fields": {}
@@ -522,6 +560,129 @@
     "type": "html_inline",
     "named": true,
     "fields": {}
+  },
+  {
+    "type": "id_shorthand",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "shorthand_id",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "if_tag",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "blockquote",
+          "named": true
+        },
+        {
+          "type": "comment_block",
+          "named": true
+        },
+        {
+          "type": "else_tag",
+          "named": true
+        },
+        {
+          "type": "fenced_code_block",
+          "named": true
+        },
+        {
+          "type": "heading",
+          "named": true
+        },
+        {
+          "type": "html_block",
+          "named": true
+        },
+        {
+          "type": "html_comment",
+          "named": true
+        },
+        {
+          "type": "if_tag",
+          "named": true
+        },
+        {
+          "type": "if_tag_close",
+          "named": true
+        },
+        {
+          "type": "if_tag_open",
+          "named": true
+        },
+        {
+          "type": "list",
+          "named": true
+        },
+        {
+          "type": "markdoc_table",
+          "named": true
+        },
+        {
+          "type": "markdoc_tag",
+          "named": true
+        },
+        {
+          "type": "markdown_table",
+          "named": true
+        },
+        {
+          "type": "paragraph",
+          "named": true
+        },
+        {
+          "type": "tag_close",
+          "named": true
+        },
+        {
+          "type": "tag_open",
+          "named": true
+        },
+        {
+          "type": "tag_self_close",
+          "named": true
+        },
+        {
+          "type": "thematic_break",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "if_tag_close",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "if_tag_open",
+    "named": true,
+    "fields": {
+      "condition": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      }
+    }
   },
   {
     "type": "image",
@@ -595,6 +756,14 @@
           "named": true
         },
         {
+          "type": "class_shorthand",
+          "named": true
+        },
+        {
+          "type": "id_shorthand",
+          "named": true
+        },
+        {
           "type": "tag_name",
           "named": true
         }
@@ -663,6 +832,42 @@
           }
         ]
       }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "list_item_annotation",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "list_item_annotation",
+    "named": true,
+    "fields": {
+      "type": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "annotation_type",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "attribute",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -713,6 +918,221 @@
     }
   },
   {
+    "type": "markdoc_table",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "markdoc_table_close",
+          "named": true
+        },
+        {
+          "type": "markdoc_table_header",
+          "named": true
+        },
+        {
+          "type": "markdoc_table_open",
+          "named": true
+        },
+        {
+          "type": "markdoc_table_row",
+          "named": true
+        },
+        {
+          "type": "markdoc_table_separator",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "markdoc_table_cell",
+    "named": true,
+    "fields": {
+      "content": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "markdoc_table_cell_content",
+            "named": true
+          }
+        ]
+      },
+      "marker": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "list_marker",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "markdoc_table_cell_annotation",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "annotation_name",
+          "named": true
+        },
+        {
+          "type": "annotation_value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "markdoc_table_cell_content",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "markdoc_table_cell_item",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "markdoc_table_cell_item",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "emphasis",
+          "named": true
+        },
+        {
+          "type": "fenced_code_block",
+          "named": true
+        },
+        {
+          "type": "html_inline",
+          "named": true
+        },
+        {
+          "type": "image",
+          "named": true
+        },
+        {
+          "type": "inline_code",
+          "named": true
+        },
+        {
+          "type": "inline_expression",
+          "named": true
+        },
+        {
+          "type": "inline_tag",
+          "named": true
+        },
+        {
+          "type": "link",
+          "named": true
+        },
+        {
+          "type": "markdoc_table_cell_annotation",
+          "named": true
+        },
+        {
+          "type": "strong",
+          "named": true
+        },
+        {
+          "type": "text",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "markdoc_table_close",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "tag_name",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "markdoc_table_header",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "markdoc_table_cell",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "markdoc_table_open",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "tag_name",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "markdoc_table_row",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "markdoc_table_cell",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "markdoc_table_separator",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "markdoc_tag",
     "named": true,
     "fields": {},
@@ -745,11 +1165,23 @@
           "named": true
         },
         {
+          "type": "if_tag",
+          "named": true
+        },
+        {
           "type": "list",
           "named": true
         },
         {
+          "type": "markdoc_table",
+          "named": true
+        },
+        {
           "type": "markdoc_tag",
+          "named": true
+        },
+        {
+          "type": "markdown_table",
           "named": true
         },
         {
@@ -770,6 +1202,74 @@
         },
         {
           "type": "thematic_break",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "markdown_table",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "markdown_table_header",
+          "named": true
+        },
+        {
+          "type": "markdown_table_row",
+          "named": true
+        },
+        {
+          "type": "markdown_table_separator",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "markdown_table_header",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "markdown_table_cell",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "markdown_table_row",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "markdown_table_cell",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "markdown_table_separator",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "markdown_table_sep_cell",
           "named": true
         }
       ]
@@ -975,11 +1475,23 @@
           "named": true
         },
         {
+          "type": "if_tag",
+          "named": true
+        },
+        {
           "type": "list",
           "named": true
         },
         {
+          "type": "markdoc_table",
+          "named": true
+        },
+        {
           "type": "markdoc_tag",
+          "named": true
+        },
+        {
+          "type": "markdown_table",
           "named": true
         },
         {
@@ -1065,6 +1577,14 @@
           "named": true
         },
         {
+          "type": "class_shorthand",
+          "named": true
+        },
+        {
+          "type": "id_shorthand",
+          "named": true
+        },
+        {
           "type": "tag_name",
           "named": true
         }
@@ -1081,6 +1601,14 @@
       "types": [
         {
           "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "class_shorthand",
+          "named": true
+        },
+        {
+          "type": "id_shorthand",
           "named": true
         },
         {
@@ -1155,9 +1683,14 @@
     }
   },
   {
+<<<<<<< HEAD
     "type": "yaml",
     "named": true,
     "fields": {}
+=======
+    "type": "!",
+    "named": false
+>>>>>>> 9e258e8def96567b7e8bfc23a72c901bfeed263e
   },
   {
     "type": "![",
@@ -1165,6 +1698,10 @@
   },
   {
     "type": "\"",
+    "named": false
+  },
+  {
+    "type": "#",
     "named": false
   },
   {
@@ -1244,6 +1781,18 @@
     "named": false
   },
   {
+    "type": "annotation_name",
+    "named": true
+  },
+  {
+    "type": "annotation_type",
+    "named": true
+  },
+  {
+    "type": "annotation_value",
+    "named": true
+  },
+  {
     "type": "attribute_name",
     "named": true
   },
@@ -1304,15 +1853,15 @@
     "named": true
   },
   {
+    "type": "else",
+    "named": false
+  },
+  {
     "type": "false",
     "named": false
   },
   {
     "type": "heading_marker",
-    "named": true
-  },
-  {
-    "type": "heading_text",
     "named": true
   },
   {
@@ -1322,6 +1871,10 @@
   {
     "type": "identifier",
     "named": true
+  },
+  {
+    "type": "if",
+    "named": false
   },
   {
     "type": "image_alt",
@@ -1348,11 +1901,27 @@
     "named": true
   },
   {
+    "type": "markdown_table_cell",
+    "named": true
+  },
+  {
+    "type": "markdown_table_sep_cell",
+    "named": true
+  },
+  {
     "type": "null",
     "named": true
   },
   {
     "type": "number",
+    "named": true
+  },
+  {
+    "type": "shorthand_class",
+    "named": true
+  },
+  {
+    "type": "shorthand_id",
     "named": true
   },
   {
@@ -1389,6 +1958,10 @@
   },
   {
     "type": "{{",
+    "named": false
+  },
+  {
+    "type": "|",
     "named": false
   },
   {
