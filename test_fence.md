@@ -1,5 +1,0 @@
-# Heading
-
-```
-code
-```
