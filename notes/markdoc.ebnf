@@ -1,0 +1,60 @@
+(* Markdoc grammar sketch for this tree-sitter implementation. *)
+
+source_file = { newline }, [ block, { blank_line, block } ], { blank_line | newline } ;
+
+block =
+  comment_block
+  | markdoc_tag
+  | fenced_code_block
+  | heading
+  | thematic_break
+  | blockquote
+  | html_block
+  | list
+  | html_comment
+  | paragraph ;
+
+heading = heading_marker, [ heading_text ] ;
+heading_marker = ("#" | "##" | "###" | "####" | "#####" | "######"), ws1 ;
+
+markdoc_tag = tag_self_close | (tag_open, tag_body, tag_close) ;
+tag_open = "{%", ws, tag_name, { tag_ws1, attribute }, tag_ws, "%}" ;
+tag_close = "{%", ws, [ "/", ws ], tag_name, ws, "%}" ;
+tag_self_close = "{%", ws, tag_name, { tag_ws1, attribute }, tag_ws, "/%}" ;
+
+attribute = attribute_name, "=", attribute_value ;
+attribute_value = string | expression ;
+
+inline_expression = "{{", ws, (expression | emphasis | strong), ws, "}}" ;
+
+list = list_item, { list_item } ;
+list_item = list_marker, list_paragraph, [ newline ] ;
+list_marker = { ws }, ( "-" | "*" | "+" | digit, { digit }, "." ), ws1 ;
+
+paragraph = inline_first, { inline_content },
+            { newline, inline_first, { inline_content } } ;
+
+inline_first =
+  inline_expression | inline_tag | text | html_inline | link
+  | emphasis | strong | inline_code ;
+
+inline_content = inline_first | image | standalone_punct ;
+
+expression = arrow_function | binary_expression | unary_expression
+             | call_expression | member_expression | array_access
+             | primary_expression ;
+
+primary_expression =
+  variable | identifier | string | number | array_literal
+  | object_literal | boolean | null | parenthesized_expression ;
+
+parenthesized_expression = "(", ws, expression, ws, ")" ;
+arrow_function = "(", ws, [ identifier, { ws, ",", ws, identifier } ],
+                 ws, ")", ws, "=>", ws, expression ;
+
+ws = { " " | "\t" } ;
+ws1 = ( " " | "\t" ), { " " | "\t" } ;
+tag_ws = { " " | "\t" | "\r" | "\n" } ;
+tag_ws1 = ( " " | "\t" | "\r" | "\n" ), { " " | "\t" | "\r" | "\n" } ;
+newline = "\n" | "\r\n" ;
+blank_line = newline, newline, { newline } ;

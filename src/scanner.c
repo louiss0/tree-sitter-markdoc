@@ -1,15 +1,11 @@
-#include <tree_sitter/parser.h>
+#include "tree_sitter/parser.h"
 #include <stdlib.h>
-#include <string.h>
 #include <wctype.h>
 #include <stdbool.h>
 
 enum TokenType {
   CODE_CONTENT,
-  NEWLINE,
-  BLANK_LINE,
-  INDENT,
-  DEDENT,
+  LIST_CONTINUATION,
   EM_OPEN_STAR,
   EM_CLOSE_STAR,
   STRONG_OPEN_STAR,
@@ -18,19 +14,16 @@ enum TokenType {
   EM_CLOSE_UNDERSCORE,
   STRONG_OPEN_UNDERSCORE,
   STRONG_CLOSE_UNDERSCORE,
-  RAW_DELIM
+  RAW_DELIM,
+  TEXT
 };
 
 typedef struct {
-  uint16_t indent_stack[64];
-  uint8_t indent_len;
   int32_t prev;  // previous non-newline char for flanking detection
 } Scanner;
 
 void *tree_sitter_markdoc_external_scanner_create() {
   Scanner *scanner = (Scanner *)malloc(sizeof(Scanner));
-  scanner->indent_len = 1;
-  scanner->indent_stack[0] = 0;
   scanner->prev = 0;
   return scanner;
 }
@@ -42,12 +35,6 @@ void tree_sitter_markdoc_external_scanner_destroy(void *payload) {
 unsigned tree_sitter_markdoc_external_scanner_serialize(void *payload, char *buffer) {
   Scanner *s = (Scanner *)payload;
   unsigned i = 0;
-  buffer[i++] = s->indent_len;
-  for (uint8_t j = 0; j < s->indent_len && i + 1 < 255; j++) {
-    uint16_t v = s->indent_stack[j];
-    buffer[i++] = (char)(v & 0xFF);
-    buffer[i++] = (char)((v >> 8) & 0xFF);
-  }
   // Serialize prev character (4 bytes, little-endian)
   if (i + 4 < 255) {
     int32_t p = s->prev;
@@ -61,21 +48,9 @@ unsigned tree_sitter_markdoc_external_scanner_serialize(void *payload, char *buf
 
 void tree_sitter_markdoc_external_scanner_deserialize(void *payload, const char *buffer, unsigned length) {
   Scanner *s = (Scanner *)payload;
-  s->indent_len = 1;
-  s->indent_stack[0] = 0;
   s->prev = 0;
-  
-  if (length < 1) return;
-  
+
   unsigned i = 0;
-  s->indent_len = (uint8_t)buffer[i++];
-  if (s->indent_len == 0) s->indent_len = 1;
-  
-  for (uint8_t j = 0; j < s->indent_len && i + 1 <= length && j < 64; j++) {
-    uint16_t v = (uint8_t)buffer[i++] | (((uint16_t)(uint8_t)buffer[i++]) << 8);
-    s->indent_stack[j] = v;
-  }
-  
   // Deserialize prev character (4 bytes, little-endian)
   if (i + 4 <= length) {
     int32_t p = 0;
@@ -95,81 +70,135 @@ static inline bool is_space_ch(int32_t c) {
   return c == ' ' || c == '\t';
 }
 
-static inline bool is_punct_ch(int32_t c) {
-  return c && !iswalnum(c) && !is_space_ch(c) && !is_newline(c);
-}
-
 static inline bool is_word_ch(int32_t c) {
   return iswalnum(c) || c == '_';
+}
+
+static inline bool is_text_start_char(int32_t c) {
+  if (c == 0 || is_newline(c)) return false;
+  switch (c) {
+    case '{':
+    case '<':
+    case '[':
+    case '!':
+    case '`':
+    case '*':
+    case '_':
+      return false;
+    default:
+      return true;
+  }
+}
+
+static inline bool is_text_continue_char(int32_t c) {
+  if (c == 0 || is_newline(c)) return false;
+  switch (c) {
+    case '{':
+    case '<':
+    case '[':
+    case '!':
+    case '`':
+    case '*':
+    case '_':
+      return false;
+    default:
+      return true;
+  }
+}
+
+static bool is_list_marker_at_line_start(TSLexer *lexer) {
+  if (lexer->get_column(lexer) != 0) {
+    return false;
+  }
+
+  TSLexer saved_state = *lexer;
+
+  while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+    lexer->advance(lexer, false);
+  }
+
+  int32_t first = lexer->lookahead;
+  bool is_list = false;
+
+  if (first == '-' || first == '*' || first == '+') {
+    lexer->advance(lexer, false);
+    if (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+      is_list = true;
+    }
+  } else if (iswdigit(first)) {
+    while (iswdigit(lexer->lookahead)) {
+      lexer->advance(lexer, false);
+    }
+    if (lexer->lookahead == '.') {
+      lexer->advance(lexer, false);
+      if (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+        is_list = true;
+      }
+    }
+  }
+
+  *lexer = saved_state;
+  return is_list;
+}
+
+static bool has_closing_delim(TSLexer *lexer, int32_t delim, int run_len) {
+  TSLexer saved_state = *lexer;
+
+  int count = 0;
+  while (lexer->lookahead == delim && count < run_len) {
+    lexer->advance(lexer, false);
+    count++;
+  }
+
+  if (count < run_len) {
+    *lexer = saved_state;
+    return false;
+  }
+
+  while (lexer->lookahead != 0 && !is_newline(lexer->lookahead)) {
+    if (lexer->lookahead == delim) {
+      int close_count = 0;
+      while (lexer->lookahead == delim && close_count < run_len) {
+        lexer->advance(lexer, false);
+        close_count++;
+      }
+      if (close_count == run_len) {
+        *lexer = saved_state;
+        return true;
+      }
+    } else {
+      lexer->advance(lexer, false);
+    }
+  }
+
+  *lexer = saved_state;
+  return false;
 }
 
 bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
                                               const bool *valid_symbols) {
   Scanner *s = (Scanner *)payload;
-  
-  // INDENT/DEDENT: detect indentation changes
-  // Key: we need to handle spaces AFTER emitting the token so extras can skip them
-  if ((valid_symbols[INDENT] || valid_symbols[DEDENT]) && (lexer->lookahead == ' ' || lexer->lookahead == '\t')) {
-    // Count indentation (peek)
-    lexer->mark_end(lexer);
-    uint16_t indent = 0;
-    while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
-      indent += (lexer->lookahead == ' ') ? 1 : 4;
-      lexer->advance(lexer, false);
-    }
-    
-    // If at EOF or newline, don't emit INDENT/DEDENT
-    if (lexer->lookahead == 0 || is_newline(lexer->lookahead)) {
-      return false;
-    }
-    
-    uint16_t current = s->indent_stack[s->indent_len - 1];
-    
-    if (indent > current && valid_symbols[INDENT]) {
-      if (s->indent_len < 64) {
-        s->indent_stack[s->indent_len++] = indent;
-      }
-      // Mark end to consume the spaces we peeked at
-      lexer->mark_end(lexer);
-      lexer->result_symbol = INDENT;
-      return true;
-    }
-    
-    if (indent < current && valid_symbols[DEDENT]) {
-      if (s->indent_len > 1) {
-        s->indent_len--;
-      }
-      // Mark end to consume the spaces we peeked at
-      lexer->mark_end(lexer);
-      lexer->result_symbol = DEDENT;
-      return true;
-    }
-    
-    return false;
-  }
-  
+
   // CODE_CONTENT: consume everything until we see a code fence close pattern
   // The grammar will handle detecting code_fence_open and code_fence_close
   if (valid_symbols[CODE_CONTENT]) {
-    // Only match CODE_CONTENT if we're at the start of a line or have already seen a newline
-    // This ensures the info_string on the fence-opening line can be parsed first
-    if (lexer->get_column(lexer) != 0 && lexer->lookahead != '\n') {
-      // We're in the middle of a line, probably on the fence-opening line with info_string
-      // Don't match CODE_CONTENT yet, let the grammar parse info_string first
+    // Only match CODE_CONTENT if we are immediately after the fence line newline
+    if (!is_newline(lexer->lookahead)) {
       return false;
     }
-    
+
+    TSLexer start_state = *lexer;
     lexer->mark_end(lexer);
     bool has_content = false;
-    
+
     // Skip the newline after the opening fence
     if (lexer->lookahead == '\n') {
       lexer->advance(lexer, false);
-      lexer->mark_end(lexer);
     }
-    
+
     // Check if the very next thing is a closing fence (empty block)
     if (lexer->lookahead == '`' || lexer->lookahead == '~') {
+      TSLexer fence_state = *lexer;
       char fence_char = lexer->lookahead;
       int count = 0;
       while (lexer->lookahead == fence_char && count < 5) {
@@ -177,13 +206,12 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
         lexer->advance(lexer, false);
       }
       if (count >= 3) {
-        // Empty code block, don't emit CODE_CONTENT
+        *lexer = start_state;
         return false;
       }
-      // Not a fence, reset (will re-parse below)
-      lexer->mark_end(lexer);
+      *lexer = fence_state;
     }
-    
+
     // Consume content until we find ``` or ~~~ at start of line
     bool at_line_start = true;
     while (lexer->lookahead != 0) {
@@ -193,106 +221,315 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
         char fence_char = lexer->lookahead;
         int32_t next = lexer->lookahead;
         int count = 0;
-        
+
         // Save position
         TSLexer saved_state = *lexer;
-        
+
         // Count fence chars
         while (next == fence_char && count < 5) {  // limit lookahead
           count++;
           lexer->advance(lexer, false);
           next = lexer->lookahead;
         }
-        
+
         if (count >= 3) {
           // This looks like a closing fence, stop consuming content
           *lexer = saved_state;  // restore position
           break;
         }
-        
+
         // Not a fence, restore and continue
         *lexer = saved_state;
       }
-      
+
       // Track line starts
       if (lexer->lookahead == '\n') {
         at_line_start = true;
       } else if (lexer->lookahead != ' ' && lexer->lookahead != '\t') {
         at_line_start = false;
       }
-      
+
       has_content = true;
       lexer->advance(lexer, false);
       lexer->mark_end(lexer);
     }
-    
+
     if (has_content) {
       lexer->result_symbol = CODE_CONTENT;
       return true;
     }
-    
+
+    *lexer = start_state;
     return false;
   }
-  
-  // NEWLINE and BLANK_LINE: handle line breaks
-  if ((valid_symbols[NEWLINE] || valid_symbols[BLANK_LINE]) && is_newline(lexer->lookahead)) {
-    int newline_count = 0;
-    
-    // Consume newlines (handle CRLF)
-    while (is_newline(lexer->lookahead)) {
-      if (lexer->lookahead == '\r') {
+
+  // LIST_CONTINUATION: newline followed by indentation and non-list marker
+  if (valid_symbols[LIST_CONTINUATION] && is_newline(lexer->lookahead)) {
+    TSLexer saved_state = *lexer;
+
+    if (lexer->lookahead == '\r') {
+      lexer->advance(lexer, false);
+      if (lexer->lookahead == '\n') {
         lexer->advance(lexer, false);
-        if (lexer->lookahead == '\n') {
+      }
+    } else {
+      lexer->advance(lexer, false);
+    }
+
+    if (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+      while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+        lexer->advance(lexer, false);
+      }
+
+      if (!is_newline(lexer->lookahead) && lexer->lookahead != 0) {
+        int32_t first = lexer->lookahead;
+        bool is_list = false;
+
+        if (first == '-' || first == '*' || first == '+') {
           lexer->advance(lexer, false);
+          if (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+            is_list = true;
+          }
+        } else if (iswdigit(first)) {
+          while (iswdigit(lexer->lookahead)) {
+            lexer->advance(lexer, false);
+          }
+          if (lexer->lookahead == '.') {
+            lexer->advance(lexer, false);
+            if (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+              is_list = true;
+            }
+          }
         }
-        newline_count++;
-      } else if (lexer->lookahead == '\n') {
-        lexer->advance(lexer, false);
-        newline_count++;
+
+        if (!is_list) {
+          *lexer = saved_state;
+
+          if (lexer->lookahead == '\r') {
+            lexer->advance(lexer, false);
+            if (lexer->lookahead == '\n') {
+              lexer->advance(lexer, false);
+            }
+          } else {
+            lexer->advance(lexer, false);
+          }
+
+          while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+            lexer->advance(lexer, false);
+          }
+
+          lexer->mark_end(lexer);
+          lexer->result_symbol = LIST_CONTINUATION;
+          s->prev = '\n';
+          return true;
+        }
       }
     }
-    
-    lexer->mark_end(lexer);
-    
-    // Look at next character (without consuming spaces yet)
-    int32_t next_char = lexer->lookahead;
-    
-    // At EOF: don't emit tokens
-    if (next_char == 0) {
-      return false;
+
+    *lexer = saved_state;
+  }
+
+  if (valid_symbols[TEXT] && lexer->get_column(lexer) == 0 &&
+      (lexer->lookahead == ' ' || lexer->lookahead == '\t')) {
+    TSLexer saved_state = *lexer;
+
+    while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+      lexer->advance(lexer, false);
     }
-    
-    // Check if next line is indented more than current level
-    // This signals end of paragraph and start of nested block
-    uint16_t current_indent = s->indent_stack[s->indent_len - 1];
-    uint16_t next_indent = 0;
-    
-    int32_t temp_ch = next_char;
-    while (temp_ch == ' ' || temp_ch == '\t') {
-      next_indent += (temp_ch == ' ') ? 1 : 4;
-      // Note: can't advance lexer here, just counting
-      if (temp_ch == ' ') temp_ch = ' '; else temp_ch = '\t';
-      break; // Just peek one char
+
+    int32_t first = lexer->lookahead;
+
+    if (first == 0) {
+      *lexer = saved_state;
+    } else if (is_newline(first)) {
+      *lexer = saved_state;
+      lexer->mark_end(lexer);
+      int32_t last = 0;
+      while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+        last = lexer->lookahead;
+        lexer->advance(lexer, false);
+        lexer->mark_end(lexer);
+      }
+      if (last != 0) {
+        s->prev = last;
+        lexer->result_symbol = TEXT;
+        return true;
+      }
+    } else {
+      bool is_block = false;
+
+      if (first == '>' || first == '<') {
+        is_block = true;
+      } else if (first == '{') {
+        lexer->advance(lexer, false);
+        if (lexer->lookahead == '{' || lexer->lookahead == '%') {
+          is_block = true;
+        }
+      } else if (first == '#') {
+        lexer->advance(lexer, false);
+        if (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+          is_block = true;
+        }
+      } else if (first == '`' || first == '~') {
+        int count = 0;
+        int32_t ch = first;
+        while (lexer->lookahead == ch && count < 3) {
+          lexer->advance(lexer, false);
+          count++;
+        }
+        if (count >= 3) {
+          is_block = true;
+        }
+      } else if (first == '-' || first == '*' || first == '_') {
+        int count = 0;
+        int32_t ch = first;
+        while (lexer->lookahead == ch && count < 3) {
+          lexer->advance(lexer, false);
+          count++;
+        }
+        if (count >= 3 &&
+            (lexer->lookahead == 0 || is_newline(lexer->lookahead) ||
+             lexer->lookahead == ' ' || lexer->lookahead == '\t')) {
+          is_block = true;
+        } else if (count == 1 && (ch == '-' || ch == '*') &&
+                   (lexer->lookahead == ' ' || lexer->lookahead == '\t')) {
+          is_block = true;
+        }
+      } else if (first == '+') {
+        lexer->advance(lexer, false);
+        if (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+          is_block = true;
+        }
+      } else if (iswdigit(first)) {
+        while (iswdigit(lexer->lookahead)) {
+          lexer->advance(lexer, false);
+        }
+        if (lexer->lookahead == '.') {
+          lexer->advance(lexer, false);
+          if (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+            is_block = true;
+          }
+        }
+      }
+
+      *lexer = saved_state;
+
+      if (!is_block) {
+        lexer->mark_end(lexer);
+        int32_t last = 0;
+        while (is_text_continue_char(lexer->lookahead)) {
+          last = lexer->lookahead;
+          lexer->advance(lexer, false);
+          lexer->mark_end(lexer);
+        }
+
+        if (last != 0) {
+          s->prev = last;
+          lexer->result_symbol = TEXT;
+          return true;
+        }
+      }
     }
-    
-    bool next_more_indented = (next_char == ' ' || next_char == '\t');
-    
-    // Emit BLANK_LINE for multiple newlines
-    if (newline_count >= 2 && valid_symbols[BLANK_LINE]) {
-      lexer->result_symbol = BLANK_LINE;
-      return true;
-    }
-    
-    // Emit NEWLINE for single newline, UNLESS next line is indented
-    if (newline_count == 1 && valid_symbols[NEWLINE] && !next_more_indented) {
-      lexer->result_symbol = NEWLINE;
-      return true;
-    }
-    
+  }
+
+  if (valid_symbols[TEXT] && is_list_marker_at_line_start(lexer)) {
     return false;
   }
-  
-  // EMPHASIS DELIMITERS: handle * and _ with CommonMark flanking rules
+
+  if (valid_symbols[TEXT] && is_text_start_char(lexer->lookahead)) {
+    uint32_t column = lexer->get_column(lexer);
+    int32_t first = lexer->lookahead;
+
+    if (column == 0) {
+      if (first == '>' || first == '{' || first == '<') {
+        return false;
+      }
+
+      if (first == '#' ) {
+        TSLexer saved_state = *lexer;
+        uint32_t count = 0;
+        while (lexer->lookahead == '#' && count < 6) {
+          lexer->advance(lexer, false);
+          count++;
+        }
+        if (count > 0 && (lexer->lookahead == ' ' || lexer->lookahead == '\t')) {
+          *lexer = saved_state;
+          return false;
+        }
+        *lexer = saved_state;
+      }
+
+      if (first == '-' || first == '*' || first == '+' || first == '_') {
+        TSLexer saved_state = *lexer;
+        int32_t ch = lexer->lookahead;
+        if (ch == '-' || ch == '*' || ch == '_') {
+          int count = 0;
+          while (lexer->lookahead == ch && count < 3) {
+            lexer->advance(lexer, false);
+            count++;
+          }
+          if (count >= 3 && (lexer->lookahead == 0 || is_newline(lexer->lookahead) || lexer->lookahead == ' ' || lexer->lookahead == '\t')) {
+            *lexer = saved_state;
+            return false;
+          }
+        }
+        *lexer = saved_state;
+        if (first == '-' || first == '*' || first == '+') {
+          lexer->advance(lexer, false);
+          int32_t next = lexer->lookahead;
+          *lexer = saved_state;
+          if (next == ' ' || next == '\t') {
+            return false;
+          }
+        }
+      }
+
+      if (iswdigit(first)) {
+        TSLexer saved_state = *lexer;
+        while (iswdigit(lexer->lookahead)) {
+          lexer->advance(lexer, false);
+        }
+        if (lexer->lookahead == '.') {
+          lexer->advance(lexer, false);
+          if (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+            *lexer = saved_state;
+            return false;
+          }
+        }
+        *lexer = saved_state;
+      }
+
+      if (first == '`' || first == '~') {
+        TSLexer saved_state = *lexer;
+        int count = 0;
+        while (lexer->lookahead == first && count < 3) {
+          lexer->advance(lexer, false);
+          count++;
+        }
+        if (count >= 3) {
+          *lexer = saved_state;
+          return false;
+        }
+        *lexer = saved_state;
+      }
+    }
+
+    lexer->mark_end(lexer);
+    int32_t last = 0;
+    while (is_text_continue_char(lexer->lookahead)) {
+      last = lexer->lookahead;
+      lexer->advance(lexer, false);
+      lexer->mark_end(lexer);
+    }
+
+    if (last != 0) {
+      s->prev = last;
+      lexer->result_symbol = TEXT;
+      return true;
+    }
+  }
+
+  // EMPHASIS DELIMITERS: handle * and _ with simplified flanking rules
   if (lexer->lookahead == '*' || lexer->lookahead == '_') {
     // Check if any emphasis token is valid before scanning
     if (!valid_symbols[EM_OPEN_STAR] && !valid_symbols[EM_CLOSE_STAR] &&
@@ -308,108 +545,108 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
 
     int32_t delim = lexer->lookahead;
     int32_t prev = s->prev;
-    
-    // Peek ahead: consume first delim to see what's after
+    TSLexer saved_state = *lexer;
     lexer->advance(lexer, false);
-    int32_t after_first = lexer->lookahead;
-    
-    // Determine if we have 1 or 2+ delimiters by checking if next is same
-    bool has_second = (after_first == delim);
-    
-    // If we have 2, peek one more to get the character after both
-    int32_t next_after_run = after_first;
-    if (has_second) {
+    bool has_second = (lexer->lookahead == delim);
+    *lexer = saved_state;
+
+    int run_len = has_second ? 2 : 1;
+
+    lexer->advance(lexer, false);
+    if (run_len == 2) {
       lexer->advance(lexer, false);
-      next_after_run = lexer->lookahead;
     }
-    
-    // Determine flanking
-    bool next_is_space = is_space_ch(next_after_run) || is_newline(next_after_run) || next_after_run == 0;
-    bool prev_is_space = is_space_ch(prev) || prev == 0 || is_newline(prev);
-    bool next_is_word = is_word_ch(next_after_run);
+    int32_t next_after_run = lexer->lookahead;
+    *lexer = saved_state;
+
     bool prev_is_word = is_word_ch(prev);
-    
-    bool left_flanking = next_is_word && (prev_is_space || is_punct_ch(prev));
-    bool right_flanking = prev_is_word && (next_is_space || is_punct_ch(next_after_run));
-    
-    // Single delim + space cannot open
-    bool is_single = !has_second;
-    if (is_single && next_is_space) {
-      left_flanking = false;
-    }
-    
-    // Mark end at current position (after consuming what we peeked)
-    lexer->mark_end(lexer);
-    
-    // Emit strong if we have 2+ and conditions allow
-    if (has_second) {
-      if (left_flanking && !right_flanking) {
-        if (delim == '*' && valid_symbols[STRONG_OPEN_STAR]) {
-          lexer->result_symbol = STRONG_OPEN_STAR;
-          s->prev = delim;
-          return true;
-        }
-        if (delim == '_' && valid_symbols[STRONG_OPEN_UNDERSCORE]) {
-          lexer->result_symbol = STRONG_OPEN_UNDERSCORE;
-          s->prev = delim;
-          return true;
-        }
-      }
-      if (right_flanking) {
-        if (delim == '*' && valid_symbols[STRONG_CLOSE_STAR]) {
-          lexer->result_symbol = STRONG_CLOSE_STAR;
-          s->prev = delim;
-          return true;
-        }
-        if (delim == '_' && valid_symbols[STRONG_CLOSE_UNDERSCORE]) {
-          lexer->result_symbol = STRONG_CLOSE_UNDERSCORE;
-          s->prev = delim;
-          return true;
-        }
-      }
-      // If strong didn't match, fall through to try emphasis
-    }
-    
-    // Emit emphasis (always 1 delimiter)
-    if (left_flanking && !right_flanking) {
-      if (delim == '*' && valid_symbols[EM_OPEN_STAR]) {
-        lexer->result_symbol = EM_OPEN_STAR;
+    bool next_is_word = is_word_ch(next_after_run);
+    bool is_intraword = prev_is_word && next_is_word;
+
+    bool can_open = !is_intraword && next_after_run != 0 && !is_newline(next_after_run);
+    bool can_close = !is_intraword && prev != 0 && !is_newline(prev) && !is_space_ch(prev);
+
+    if (run_len == 2 && can_close) {
+      if (delim == '*' && valid_symbols[STRONG_CLOSE_STAR]) {
+        lexer->advance(lexer, false);
+        lexer->advance(lexer, false);
+        lexer->mark_end(lexer);
+        lexer->result_symbol = STRONG_CLOSE_STAR;
         s->prev = delim;
         return true;
       }
-      if (delim == '_' && valid_symbols[EM_OPEN_UNDERSCORE]) {
-        lexer->result_symbol = EM_OPEN_UNDERSCORE;
+      if (delim == '_' && valid_symbols[STRONG_CLOSE_UNDERSCORE]) {
+        lexer->advance(lexer, false);
+        lexer->advance(lexer, false);
+        lexer->mark_end(lexer);
+        lexer->result_symbol = STRONG_CLOSE_UNDERSCORE;
         s->prev = delim;
         return true;
       }
     }
-    if (right_flanking) {
+
+    if (run_len == 1 && can_close) {
       if (delim == '*' && valid_symbols[EM_CLOSE_STAR]) {
+        lexer->advance(lexer, false);
+        lexer->mark_end(lexer);
         lexer->result_symbol = EM_CLOSE_STAR;
         s->prev = delim;
         return true;
       }
       if (delim == '_' && valid_symbols[EM_CLOSE_UNDERSCORE]) {
+        lexer->advance(lexer, false);
+        lexer->mark_end(lexer);
         lexer->result_symbol = EM_CLOSE_UNDERSCORE;
         s->prev = delim;
         return true;
       }
     }
-    
-    // Not markup - emit as raw
+
+    if (run_len == 2 && can_open && has_closing_delim(lexer, delim, 2)) {
+      if (delim == '*' && valid_symbols[STRONG_OPEN_STAR]) {
+        lexer->advance(lexer, false);
+        lexer->advance(lexer, false);
+        lexer->mark_end(lexer);
+        lexer->result_symbol = STRONG_OPEN_STAR;
+        s->prev = delim;
+        return true;
+      }
+      if (delim == '_' && valid_symbols[STRONG_OPEN_UNDERSCORE]) {
+        lexer->advance(lexer, false);
+        lexer->advance(lexer, false);
+        lexer->mark_end(lexer);
+        lexer->result_symbol = STRONG_OPEN_UNDERSCORE;
+        s->prev = delim;
+        return true;
+      }
+    }
+
+    if (can_open && has_closing_delim(lexer, delim, 1)) {
+      if (delim == '*' && valid_symbols[EM_OPEN_STAR]) {
+        lexer->advance(lexer, false);
+        lexer->mark_end(lexer);
+        lexer->result_symbol = EM_OPEN_STAR;
+        s->prev = delim;
+        return true;
+      }
+      if (delim == '_' && valid_symbols[EM_OPEN_UNDERSCORE]) {
+        lexer->advance(lexer, false);
+        lexer->mark_end(lexer);
+        lexer->result_symbol = EM_OPEN_UNDERSCORE;
+        s->prev = delim;
+        return true;
+      }
+    }
+
     if (valid_symbols[RAW_DELIM]) {
+      lexer->advance(lexer, false);
+      lexer->mark_end(lexer);
       lexer->result_symbol = RAW_DELIM;
       s->prev = delim;
       return true;
     }
-    
-    s->prev = delim;
-    return false;
-  }
 
-  // Update prev for any other character
-  if (!is_newline(lexer->lookahead) && lexer->lookahead != 0) {
-    s->prev = lexer->lookahead;
+    return false;
   }
 
   return false;

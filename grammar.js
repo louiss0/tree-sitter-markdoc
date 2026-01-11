@@ -7,15 +7,17 @@
 /// <reference types="tree-sitter-cli/dsl" />
 // @ts-check
 
+const WS = /[ \t]*/;
+const WS1 = /[ \t]+/;
+const TAG_WS = /[ \t\r\n]*/;
+const TAG_WS1 = /[ \t\r\n]+/;
+
 module.exports = grammar({
   name: "markdoc",
 
   externals: $ => [
     $._code_content,
-    $._NEWLINE,
-    $._BLANK_LINE,
-    $._INDENT,
-    $._DEDENT,
+    $._LIST_CONTINUATION,
     $._em_open_star,
     $._em_close_star,
     $._strong_open_star,
@@ -24,12 +26,11 @@ module.exports = grammar({
     $._em_close_underscore,
     $._strong_open_underscore,
     $._strong_close_underscore,
-    $._raw_delim
+    $._raw_delim,
+    $._text
   ],
 
-  extras: $ => [
-    /[ \t\n\r]/
-  ],
+  extras: $ => [],
 
   conflicts: $ => [
     [$.source_file],
@@ -47,21 +48,28 @@ module.exports = grammar({
   ],
 
   rules: {
-    source_file: $ => prec.right(optional(seq(
-      choice(
-        $.frontmatter,
-        $._block
-      ),
-      repeat(seq(
-        choice(
-          $._BLANK_LINE
-        ),
+    source_file: $ => prec.right(seq(
+      repeat($._NEWLINE),
+      optional(seq(
         choice(
           $.frontmatter,
           $._block
-        )
+        ),
+        repeat(seq(
+          choice(
+            $._BLANK_LINE
+          ),
+          choice(
+            $.frontmatter,
+            $._block
+          )
+        ))
+      )),
+      repeat(choice(
+        $._BLANK_LINE,
+        $._NEWLINE
       ))
-    ))),
+    )),
 
     _block: $ => choice(
       $.comment_block,  // Must come before markdoc_tag to match {% comment %}
@@ -78,23 +86,22 @@ module.exports = grammar({
 
     frontmatter: $ => seq(
       token(prec(10, '---')),
+      $._NEWLINE,
       alias($.yaml_content, $.yaml),
       token(prec(10, '---'))
     ),
 
     yaml_content: $ => repeat1(
-      /[^-][^\n]*/ 
+      seq(/[^\n]+/, $._NEWLINE)
     ),
 
 
     heading: $ => prec.right(2, seq(
       field('heading_marker', $.heading_marker),
-      field('heading_text', optional($.heading_text))
+      field('heading_text', optional(alias($._text, $.heading_text)))
     )),
 
     heading_marker: $ => token(prec(3, /#{1,6}[ \t]/)),  // Require space/tab after #
-
-    heading_text: $ => /[^\n]+/,
 
     // Thematic break (horizontal rule) - must be at least 3 chars
     thematic_break: $ => token(prec(1, choice(
@@ -112,6 +119,7 @@ module.exports = grammar({
     fenced_code_block: $ => seq(
       field('open', $.code_fence_open),
       optional(field('code', $.code)),
+      optional($._NEWLINE),
       field('close', $.code_fence_close)
     ),
 
@@ -139,8 +147,8 @@ module.exports = grammar({
     comment_block: $ => seq(
       token(prec(10, seq('{%', /[ \t]*/, 'comment', /[ \t]*/, '%}'))),
       repeat(choice(
-        /[^{\n]+/,
-        /\{/
+        /[^{]+/,
+        /\{[^%]/
       )),
       token(prec(10, seq('{%', /[ \t]*/, '/', /[ \t]*/, 'comment', /[ \t]*/, '%}')))
     ),
@@ -172,31 +180,39 @@ module.exports = grammar({
 
     tag_open: $ => prec.right(seq(
       token(prec(6, '{%')),
+      WS,
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
-      repeat($.attribute),
+      repeat(seq(TAG_WS1, $.attribute)),
+      TAG_WS,
       token(prec(6, '%}'))
     )),
 
     tag_close: $ => prec.right(seq(
       token(prec(6, '{%')),
-      optional(token('/')),
+      WS,
+      optional(seq(token('/'), WS)),
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
+      WS,
       token(prec(6, '%}'))
     )),
 
     // Self-closing tag used at block level ({% tag /%})
     tag_self_close: $ => prec.right(seq(
       token(prec(6, '{%')),
+      WS,
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
-      repeat($.attribute),
+      repeat(seq(TAG_WS1, $.attribute)),
+      TAG_WS,
       token(prec(6, '/%}'))
     )),
 
     // Inline self-closing tag for use in paragraphs/lists
     inline_tag: $ => prec(1, seq(
       token('{%'),
+      WS,
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
-      repeat($.attribute),
+      repeat(seq(WS1, $.attribute)),
+      WS,
       token('/%}')
     )),
 
@@ -239,7 +255,9 @@ module.exports = grammar({
     // Parenthesized expressions for grouping
     parenthesized_expression: $ => seq(
       '(',
+      WS,
       $.expression,
+      WS,
       ')'
     ),
 
@@ -261,12 +279,16 @@ module.exports = grammar({
     // Arrow function: () => expr or (params) => expr
     arrow_function: $ => prec(10, seq(
       '(',
+      WS,
       optional(seq(
         $.identifier,
-        repeat(seq(',', $.identifier))
+        repeat(seq(WS, ',', WS, $.identifier))
       )),
+      WS,
       ')',
+      WS,
       '=>',
+      WS,
       $.expression
     )),
 
@@ -299,26 +321,26 @@ module.exports = grammar({
     // Use token(prec()) for operators to give them priority over conflicting markdown tokens
     // Add spaces around operators for proper parsing
     binary_expression: $ => choice(
-      prec.left(1, seq(field('left', $.expression), field('operator', $.binary_or), field('right', $.expression))),
-      prec.left(2, seq(field('left', $.expression), field('operator', $.binary_and), field('right', $.expression))),
-      prec.left(3, seq(field('left', $.expression), field('operator', $.binary_equal), field('right', $.expression))),
-      prec.left(3, seq(field('left', $.expression), field('operator', $.binary_not_equal), field('right', $.expression))),
-      prec.left(4, seq(field('left', $.expression), field('operator', $.binary_less_than), field('right', $.expression))),
-      prec.left(4, seq(field('left', $.expression), field('operator', $.binary_greater_than), field('right', $.expression))),
-      prec.left(4, seq(field('left', $.expression), field('operator', $.binary_less_equal), field('right', $.expression))),
-      prec.left(4, seq(field('left', $.expression), field('operator', $.binary_greater_equal), field('right', $.expression))),
-      prec.left(5, seq(field('left', $.expression), field('operator', $.binary_add), field('right', $.expression))),
-      prec.left(5, seq(field('left', $.expression), field('operator', $.binary_subtract), field('right', $.expression))),
-      prec.left(6, seq(field('left', $.expression), field('operator', $.binary_multiply), field('right', $.expression))),
-      prec.left(6, seq(field('left', $.expression), field('operator', $.binary_divide), field('right', $.expression))),
-      prec.left(6, seq(field('left', $.expression), field('operator', $.binary_modulo), field('right', $.expression)))
+      prec.left(1, seq(field('left', $.expression), WS, field('operator', $.binary_or), WS, field('right', $.expression))),
+      prec.left(2, seq(field('left', $.expression), WS, field('operator', $.binary_and), WS, field('right', $.expression))),
+      prec.left(3, seq(field('left', $.expression), WS, field('operator', $.binary_equal), WS, field('right', $.expression))),
+      prec.left(3, seq(field('left', $.expression), WS, field('operator', $.binary_not_equal), WS, field('right', $.expression))),
+      prec.left(4, seq(field('left', $.expression), WS, field('operator', $.binary_less_than), WS, field('right', $.expression))),
+      prec.left(4, seq(field('left', $.expression), WS, field('operator', $.binary_greater_than), WS, field('right', $.expression))),
+      prec.left(4, seq(field('left', $.expression), WS, field('operator', $.binary_less_equal), WS, field('right', $.expression))),
+      prec.left(4, seq(field('left', $.expression), WS, field('operator', $.binary_greater_equal), WS, field('right', $.expression))),
+      prec.left(5, seq(field('left', $.expression), WS, field('operator', $.binary_add), WS, field('right', $.expression))),
+      prec.left(5, seq(field('left', $.expression), WS, field('operator', $.binary_subtract), WS, field('right', $.expression))),
+      prec.left(6, seq(field('left', $.expression), WS, field('operator', $.binary_multiply), WS, field('right', $.expression))),
+      prec.left(6, seq(field('left', $.expression), WS, field('operator', $.binary_divide), WS, field('right', $.expression))),
+      prec.left(6, seq(field('left', $.expression), WS, field('operator', $.binary_modulo), WS, field('right', $.expression)))
     ),
 
     // Unary operators
     unary_expression: $ => choice(
-      prec.right(7, seq(field('operator', $.unary_not), field('argument', $.expression))),
-      prec.right(7, seq(field('operator', $.unary_minus), field('argument', $.expression))),
-      prec.right(7, seq(field('operator', $.unary_plus), field('argument', $.expression)))
+      prec.right(7, seq(field('operator', $.unary_not), WS, field('argument', $.expression))),
+      prec.right(7, seq(field('operator', $.unary_minus), WS, field('argument', $.expression))),
+      prec.right(7, seq(field('operator', $.unary_plus), WS, field('argument', $.expression)))
     ),
 
     // Ordered by precedence - call > member > array access 
@@ -328,10 +350,12 @@ module.exports = grammar({
         $.identifier
       ),
       '(',
+      WS,
       optional(seq(
         $.expression,
-        repeat(seq(',', $.expression))
+        repeat(seq(WS, ',', WS, $.expression))
       )),
+      WS,
       ')'
     )),
 
@@ -352,7 +376,9 @@ module.exports = grammar({
         $._primary_expression
       )),
       '[',
+      WS,
       field('index', $.expression),
+      WS,
       ']'
     )),
 
@@ -361,27 +387,33 @@ module.exports = grammar({
 
     array_literal: $ => seq(
       '[',
+      WS,
       optional(seq(
         $.expression,
-        repeat(seq(',', $.expression)),
-        optional(',')
+        repeat(seq(WS, ',', WS, $.expression)),
+        optional(seq(WS, ','))
       )),
+      WS,
       ']'
     ),
 
     object_literal: $ => seq(
       '{',
+      WS,
       optional(seq(
         $.pair,
-        repeat(seq(',', $.pair)),
-        optional(',')
+        repeat(seq(WS, ',', WS, $.pair)),
+        optional(seq(WS, ','))
       )),
+      WS,
       '}'
     ),
 
     pair: $ => seq(
       $.identifier,
+      WS,
       ':',
+      WS,
       $.expression
     ),
 
@@ -410,35 +442,32 @@ module.exports = grammar({
 
     inline_expression: $ => seq(
       '{{',
-      field('content', $.expression),
+      WS,
+      field('content', choice(
+        $.expression,
+        $.emphasis,
+        $.strong
+      )),
+      WS,
       '}}'
     ),
 
     // Lists: one or more list items
     // Items can be separated by optional newlines (handled by extras)
     // Nested lists use INDENT/DEDENT tokens from scanner
-    list: $ => prec.right(seq(
-      $.list_item,
-      repeat(choice(
-        // Nested list with indentation
-        prec(2, seq($._INDENT, $.list, $._DEDENT)),
-        // Another item at same level (newlines handled by extras)
-        prec(1, seq(
-          optional($._NEWLINE),
-          $.list_item
-        ))
-      ))
-    )),
+    list: $ => prec.right(repeat1($.list_item)),
 
     // A list item: marker + list_paragraph content
     list_item: $ => seq(
       field('marker', $.list_marker),
-      field('content', $.list_paragraph)
+      field('content', $.list_paragraph),
+      optional($._NEWLINE)
     ),
 
-    list_marker: $ => token(prec(2, choice(
-      /[-*+][ \t]+/,
-      /[0-9]+\.[ \t]+/
+    list_marker: $ => token(prec(2, seq(
+      /[ \t]*/,
+      choice(/[-*+]/, /[0-9]+\./),
+      /[ \t]+/
     ))),
 
     html_comment: $ => token(seq(
@@ -457,7 +486,7 @@ module.exports = grammar({
         /[a-zA-Z][a-zA-Z0-9]*/,
         /[^>]*/,
         '>',
-        /[\s\S]*?/,
+        /[\s\S]*/,
         '</',
         /[a-zA-Z][a-zA-Z0-9]*/,
         '>'
@@ -466,7 +495,7 @@ module.exports = grammar({
       token(prec(2, seq(
         '<',
         /[a-zA-Z][a-zA-Z0-9]*/,
-        /[^/]*?/,
+        /[^>]*/,
         '/>'
       )))
     ),
@@ -503,52 +532,29 @@ module.exports = grammar({
     )),
 
     // List paragraph: same as paragraph but semantically distinct for list items
-    list_paragraph: $ => prec.left(1, seq(
+    list_paragraph: $ => prec.right(1, seq(
       $._inline_first,
       repeat($._inline_content),
       repeat(seq(
-        $._NEWLINE,
-        seq($._inline_first, repeat($._inline_content))
+        $._LIST_CONTINUATION,
+        $._inline_first,
+        repeat($._inline_content)
       ))
     )),
 
     emphasis: $ => choice(
-      seq($._em_open_star, repeat1(choice(
-        $.text,
-        $.inline_code,
-        $.link,
-        $.image,
-        $.html_inline,
-        $.inline_expression
-      )), $._em_close_star),
-      seq($._em_open_underscore, repeat1(choice(
-        $.text,
-        $.inline_code,
-        $.link,
-        $.image,
-        $.html_inline,
-        $.inline_expression
-      )), $._em_close_underscore)
+      seq($._em_open_star, token.immediate(/[^*\n]+/), $._em_close_star),
+      seq($._em_open_underscore, token.immediate(/[^_\n]+/), $._em_close_underscore)
     ),
 
     strong: $ => choice(
       seq($._strong_open_star, repeat1(choice(
-        $.text,
-        $.inline_code,
-        $.link,
-        $.image,
-        $.html_inline,
-        $.inline_expression,
-        $.emphasis
+        $.emphasis,
+        token.immediate(/[^*\n]+/)
       )), $._strong_close_star),
       seq($._strong_open_underscore, repeat1(choice(
-        $.text,
-        $.inline_code,
-        $.link,
-        $.image,
-        $.html_inline,
-        $.inline_expression,
-        $.emphasis
+        $.emphasis,
+        token.immediate(/[^_\n]+/)
       )), $._strong_close_underscore)
     ),
 
@@ -596,12 +602,15 @@ module.exports = grammar({
     ),
 
     text: $ => choice(
-      token(/[^\n{<`*_\[\]!\->]+/),  // regular text (excluding special chars)
-      token(/-+/),                     // dashes allowed inline
-      alias($._raw_delim, $.text)      // raw delimiters become text
+      $._text,
+      $._raw_delim
     ),
     
     // Fallback for standalone punctuation that doesn't start special syntax
-    standalone_punct: $ => token(choice('!')),
+    standalone_punct: $ => token('!'),
+
+    _NEWLINE: $ => token(/\r?\n/),
+    _BLANK_LINE: $ => token(/\r?\n\r?\n+/)
+
   }
 });
