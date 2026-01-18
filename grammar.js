@@ -7,9 +7,9 @@
 /// <reference types="tree-sitter-cli/dsl" />
 // @ts-check
 
-const WS = /[ \t]*/;
+const WS = /[ \t]+/;
 const WS1 = /[ \t]+/;
-const TAG_WS = /[ \t\r\n]*/;
+const TAG_WS = /[ \t\r\n]+/;
 const TAG_WS1 = /[ \t\r\n]+/;
 const HTML_TAG_NAME = /[a-zA-Z][a-zA-Z0-9]*/;
 
@@ -177,29 +177,29 @@ module.exports = grammar({
 
     tag_open: $ => prec.right(seq(
       token(prec(6, '{%')),
-      WS,
+      optional(WS),
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
       repeat(seq(TAG_WS1, $.attribute)),
-      TAG_WS,
+      optional(TAG_WS),
       token(prec(6, '%}'))
     )),
 
     tag_close: $ => prec.right(seq(
       token(prec(6, '{%')),
-      WS,
-      optional(seq(token('/'), WS)),
+      optional(WS),
+      optional(seq(token('/'), optional(WS))),
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
-      WS,
+      optional(WS),
       token(prec(6, '%}'))
     )),
 
     // Self-closing tag used at block level ({% tag /%})
     tag_self_close: $ => prec.right(seq(
       token(prec(6, '{%')),
-      WS,
+      optional(WS),
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
       repeat(seq(TAG_WS1, $.attribute)),
-      TAG_WS,
+      optional(TAG_WS),
       token(prec(6, '/%}'))
     )),
 
@@ -212,9 +212,9 @@ module.exports = grammar({
 
     inline_tag_expression: $ => seq(
       token('{%'),
-      WS,
+      optional(WS),
       field('expression', $._tag_expression),
-      WS,
+      optional(WS),
       token('%}')
     ),
 
@@ -265,9 +265,9 @@ module.exports = grammar({
     // Parenthesized expressions for grouping
     parenthesized_expression: $ => seq(
       '(',
-      WS,
+      optional(WS),
       $.expression,
-      WS,
+      optional(WS),
       ')'
     ),
 
@@ -289,16 +289,16 @@ module.exports = grammar({
     // Arrow function: () => expr or (params) => expr
     arrow_function: $ => prec(10, seq(
       '(',
-      WS,
+      optional(WS),
       optional(seq(
         $.identifier,
-        repeat(seq(WS, ',', WS, $.identifier))
+        repeat(seq(optional(WS), ',', optional(WS), $.identifier))
       )),
-      WS,
+      optional(WS),
       ')',
-      WS,
+      optional(WS),
       '=>',
-      WS,
+      optional(WS),
       $.expression
     )),
 
@@ -331,26 +331,26 @@ module.exports = grammar({
     // Use token(prec()) for operators to give them priority over conflicting markdown tokens
     // Add spaces around operators for proper parsing
     binary_expression: $ => choice(
-      prec.left(1, seq(field('left', $.expression), WS, field('operator', $.binary_or), WS, field('right', $.expression))),
-      prec.left(2, seq(field('left', $.expression), WS, field('operator', $.binary_and), WS, field('right', $.expression))),
-      prec.left(3, seq(field('left', $.expression), WS, field('operator', $.binary_equal), WS, field('right', $.expression))),
-      prec.left(3, seq(field('left', $.expression), WS, field('operator', $.binary_not_equal), WS, field('right', $.expression))),
-      prec.left(4, seq(field('left', $.expression), WS, field('operator', $.binary_less_than), WS, field('right', $.expression))),
-      prec.left(4, seq(field('left', $.expression), WS, field('operator', $.binary_greater_than), WS, field('right', $.expression))),
-      prec.left(4, seq(field('left', $.expression), WS, field('operator', $.binary_less_equal), WS, field('right', $.expression))),
-      prec.left(4, seq(field('left', $.expression), WS, field('operator', $.binary_greater_equal), WS, field('right', $.expression))),
-      prec.left(5, seq(field('left', $.expression), WS, field('operator', $.binary_add), WS, field('right', $.expression))),
-      prec.left(5, seq(field('left', $.expression), WS, field('operator', $.binary_subtract), WS, field('right', $.expression))),
-      prec.left(6, seq(field('left', $.expression), WS, field('operator', $.binary_multiply), WS, field('right', $.expression))),
-      prec.left(6, seq(field('left', $.expression), WS, field('operator', $.binary_divide), WS, field('right', $.expression))),
-      prec.left(6, seq(field('left', $.expression), WS, field('operator', $.binary_modulo), WS, field('right', $.expression)))
+      prec.left(1, seq(field('left', $.expression), optional(WS), field('operator', $.binary_or), optional(WS), field('right', $.expression))),
+      prec.left(2, seq(field('left', $.expression), optional(WS), field('operator', $.binary_and), optional(WS), field('right', $.expression))),
+      prec.left(3, seq(field('left', $.expression), optional(WS), field('operator', $.binary_equal), optional(WS), field('right', $.expression))),
+      prec.left(3, seq(field('left', $.expression), optional(WS), field('operator', $.binary_not_equal), optional(WS), field('right', $.expression))),
+      prec.left(4, seq(field('left', $.expression), optional(WS), field('operator', $.binary_less_than), optional(WS), field('right', $.expression))),
+      prec.left(4, seq(field('left', $.expression), optional(WS), field('operator', $.binary_greater_than), optional(WS), field('right', $.expression))),
+      prec.left(4, seq(field('left', $.expression), optional(WS), field('operator', $.binary_less_equal), optional(WS), field('right', $.expression))),
+      prec.left(4, seq(field('left', $.expression), optional(WS), field('operator', $.binary_greater_equal), optional(WS), field('right', $.expression))),
+      prec.left(5, seq(field('left', $.expression), optional(WS), field('operator', $.binary_add), optional(WS), field('right', $.expression))),
+      prec.left(5, seq(field('left', $.expression), optional(WS), field('operator', $.binary_subtract), optional(WS), field('right', $.expression))),
+      prec.left(6, seq(field('left', $.expression), optional(WS), field('operator', $.binary_multiply), optional(WS), field('right', $.expression))),
+      prec.left(6, seq(field('left', $.expression), optional(WS), field('operator', $.binary_divide), optional(WS), field('right', $.expression))),
+      prec.left(6, seq(field('left', $.expression), optional(WS), field('operator', $.binary_modulo), optional(WS), field('right', $.expression)))
     ),
 
     // Unary operators
     unary_expression: $ => choice(
-      prec.right(7, seq(field('operator', $.unary_not), WS, field('argument', $.expression))),
-      prec.right(7, seq(field('operator', $.unary_minus), WS, field('argument', $.expression))),
-      prec.right(7, seq(field('operator', $.unary_plus), WS, field('argument', $.expression)))
+      prec.right(7, seq(field('operator', $.unary_not), optional(WS), field('argument', $.expression))),
+      prec.right(7, seq(field('operator', $.unary_minus), optional(WS), field('argument', $.expression))),
+      prec.right(7, seq(field('operator', $.unary_plus), optional(WS), field('argument', $.expression)))
     ),
 
     // Ordered by precedence - call > member > array access 
@@ -360,12 +360,12 @@ module.exports = grammar({
         $.identifier
       ),
       '(',
-      WS,
+      optional(WS),
       optional(seq(
         $.expression,
-        repeat(seq(WS, ',', WS, $.expression))
+        repeat(seq(optional(WS), ',', optional(WS), $.expression))
       )),
-      WS,
+      optional(WS),
       ')'
     )),
 
@@ -386,9 +386,9 @@ module.exports = grammar({
         $._primary_expression
       )),
       '[',
-      WS,
+      optional(WS),
       field('index', $.expression),
-      WS,
+      optional(WS),
       ']'
     )),
 
@@ -397,33 +397,33 @@ module.exports = grammar({
 
     array_literal: $ => seq(
       '[',
-      WS,
+      optional(WS),
       optional(seq(
         $.expression,
-        repeat(seq(WS, ',', WS, $.expression)),
-        optional(seq(WS, ','))
+        repeat(seq(optional(WS), ',', optional(WS), $.expression)),
+        optional(seq(optional(WS), ','))
       )),
-      WS,
+      optional(WS),
       ']'
     ),
 
     object_literal: $ => seq(
       '{',
-      WS,
+      optional(WS),
       optional(seq(
         $.pair,
-        repeat(seq(WS, ',', WS, $.pair)),
-        optional(seq(WS, ','))
+        repeat(seq(optional(WS), ',', optional(WS), $.pair)),
+        optional(seq(optional(WS), ','))
       )),
-      WS,
+      optional(WS),
       '}'
     ),
 
     pair: $ => seq(
       $.identifier,
-      WS,
+      optional(WS),
       ':',
-      WS,
+      optional(WS),
       $.expression
     ),
 
@@ -452,13 +452,13 @@ module.exports = grammar({
 
     inline_expression: $ => seq(
       '{{',
-      WS,
+      optional(WS),
       field('content', choice(
         $.expression,
         $.emphasis,
         $.strong
       )),
-      WS,
+      optional(WS),
       '}}'
     ),
 
