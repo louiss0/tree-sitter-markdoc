@@ -127,11 +127,14 @@ static bool scan_markdoc_comment_close(TSLexer *lexer) {
     lexer->advance(lexer, false);
   }
 
-  if (lexer->lookahead == '/') {
+  if (lexer->lookahead != '/') {
+    return false;
+  }
+
+  lexer->advance(lexer, false);
+
+  while (is_space_ch(lexer->lookahead)) {
     lexer->advance(lexer, false);
-    while (is_space_ch(lexer->lookahead)) {
-      lexer->advance(lexer, false);
-    }
   }
 
   if (!scan_literal(lexer, "comment")) {
