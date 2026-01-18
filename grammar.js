@@ -11,6 +11,7 @@ const WS = /[ \t]*/;
 const WS1 = /[ \t]+/;
 const TAG_WS = /[ \t\r\n]*/;
 const TAG_WS1 = /[ \t\r\n]+/;
+const HTML_TAG_NAME = /[a-zA-Z][a-zA-Z0-9]*/;
 
 module.exports = grammar({
   name: "markdoc",
@@ -29,7 +30,8 @@ module.exports = grammar({
     $._RAW_DELIM,
     $._TEXT,
     $._COMMENT_BLOCK,
-    $._HTML_COMMENT
+    $._HTML_COMMENT,
+    $._HTML_BLOCK
   ],
 
   extras: $ => [],
@@ -202,14 +204,19 @@ module.exports = grammar({
     )),
 
     // Inline self-closing tag for use in paragraphs/lists
-    inline_tag: $ => prec(1, seq(
+    inline_tag: $ => prec(1, choice(
+      $.inline_tag_expression,
+      $.tag_self_close,
+      $.tag_open
+    )),
+
+    inline_tag_expression: $ => seq(
       token('{%'),
       WS,
-      alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
-      repeat(seq(WS1, $.attribute)),
+      field('expression', $._tag_expression),
       WS,
-      token('/%}')
-    )),
+      token('%}')
+    ),
 
     attribute: $ => seq(
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.attribute_name),
@@ -244,6 +251,14 @@ module.exports = grammar({
       $.object_literal,
       $.boolean,
       $.null,
+      $.parenthesized_expression
+    ),
+
+    _tag_expression: $ => choice(
+      $.variable,
+      $.call_expression,
+      $.member_expression,
+      $.array_access,
       $.parenthesized_expression
     ),
 
@@ -467,43 +482,24 @@ module.exports = grammar({
 
     html_comment: $ => $._HTML_COMMENT,
 
-    html_block: $ => choice(
-      // Multi-line HTML block (opening tag at start of line)
-      token(prec(2, seq(
-        '<',
-        /[a-zA-Z][a-zA-Z0-9]*/,
-        /[^>]*/,
-        '>',
-        /[\s\S]*/,
-        '</',
-        /[a-zA-Z][a-zA-Z0-9]*/,
-        '>'
-      ))),
-      // Self-closing HTML tag
-      token(prec(2, seq(
-        '<',
-        /[a-zA-Z][a-zA-Z0-9]*/,
-        /[^>]*/,
-        '/>'
-      )))
-    ),
+    html_block: $ => $._HTML_BLOCK,
 
     html_inline: $ => choice(
       // Opening and closing tag
       token(prec(1, seq(
         '<',
-        /[a-zA-Z][a-zA-Z0-9]*/,
+        HTML_TAG_NAME,
         optional(/[^>]*/),
         '>',
         optional(/[^<]*/),
         '</',
-        /[a-zA-Z][a-zA-Z0-9]*/,
+        HTML_TAG_NAME,
         '>'
       ))),
       // Self-closing tag
       token(prec(1, seq(
         '<',
-        /[a-zA-Z][a-zA-Z0-9]*/,
+        HTML_TAG_NAME,
         optional(/[^>]*/),
         '/>'
       )))

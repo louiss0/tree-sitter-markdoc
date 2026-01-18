@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <wctype.h>
 #include <stdbool.h>
+#include <string.h>
 
 enum TokenType {
   CODE_CONTENT,
@@ -17,7 +18,8 @@ enum TokenType {
   RAW_DELIM,
   TEXT,
   COMMENT_BLOCK,
-  HTML_COMMENT
+  HTML_COMMENT,
+  HTML_BLOCK
 };
 
 typedef struct {
@@ -211,6 +213,118 @@ static bool scan_html_comment(TSLexer *lexer) {
       }
       *lexer = close_state;
     }
+    lexer->advance(lexer, false);
+  }
+
+  *lexer = saved_state;
+  return false;
+}
+
+static bool scan_html_tag_name(TSLexer *lexer, char *buffer, size_t buffer_len, size_t *name_len) {
+  if (!iswalpha(lexer->lookahead)) {
+    return false;
+  }
+
+  size_t i = 0;
+  while (iswalpha(lexer->lookahead) || iswdigit(lexer->lookahead)) {
+    if (i + 1 >= buffer_len) {
+      return false;
+    }
+    buffer[i++] = (char)lexer->lookahead;
+    lexer->advance(lexer, false);
+  }
+  buffer[i] = '\0';
+  *name_len = i;
+  return i > 0;
+}
+
+static bool scan_html_block(TSLexer *lexer) {
+  if (lexer->get_column(lexer) != 0 || lexer->lookahead != '<') {
+    return false;
+  }
+
+  TSLexer saved_state = *lexer;
+
+  if (!scan_literal(lexer, "<")) {
+    *lexer = saved_state;
+    return false;
+  }
+
+  char tag_name[64];
+  size_t tag_len = 0;
+  if (!scan_html_tag_name(lexer, tag_name, sizeof(tag_name), &tag_len)) {
+    *lexer = saved_state;
+    return false;
+  }
+
+  bool self_closing = false;
+  while (lexer->lookahead != 0) {
+    if (lexer->lookahead == '"' || lexer->lookahead == '\'') {
+      int32_t quote = lexer->lookahead;
+      lexer->advance(lexer, false);
+      while (lexer->lookahead != 0 && lexer->lookahead != quote) {
+        lexer->advance(lexer, false);
+      }
+      if (lexer->lookahead == quote) {
+        lexer->advance(lexer, false);
+      }
+      continue;
+    }
+
+    if (lexer->lookahead == '/') {
+      TSLexer slash_state = *lexer;
+      lexer->advance(lexer, false);
+      if (lexer->lookahead == '>') {
+        lexer->advance(lexer, false);
+        lexer->mark_end(lexer);
+        self_closing = true;
+        break;
+      }
+      *lexer = slash_state;
+    }
+
+    if (lexer->lookahead == '>') {
+      lexer->advance(lexer, false);
+      lexer->mark_end(lexer);
+      break;
+    }
+
+    lexer->advance(lexer, false);
+  }
+
+  if (self_closing) {
+    return true;
+  }
+
+  if (lexer->lookahead == 0) {
+    *lexer = saved_state;
+    return false;
+  }
+
+  while (lexer->lookahead != 0) {
+    if (lexer->lookahead == '<') {
+      TSLexer close_state = *lexer;
+      lexer->advance(lexer, false);
+      if (lexer->lookahead == '/') {
+        lexer->advance(lexer, false);
+        size_t match_len = 0;
+        char close_name[64];
+        if (scan_html_tag_name(lexer, close_name, sizeof(close_name), &match_len) &&
+            match_len == tag_len &&
+            strncmp(close_name, tag_name, tag_len) == 0) {
+          while (is_space_ch(lexer->lookahead)) {
+            lexer->advance(lexer, false);
+          }
+          if (lexer->lookahead == '>') {
+            lexer->advance(lexer, false);
+            lexer->mark_end(lexer);
+            return true;
+          }
+        }
+      }
+      *lexer = close_state;
+    }
+
     lexer->advance(lexer, false);
   }
 
@@ -490,6 +604,12 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
 
   if (valid_symbols[HTML_COMMENT] && scan_html_comment(lexer)) {
     lexer->result_symbol = HTML_COMMENT;
+    s->prev = 0;
+    return true;
+  }
+
+  if (valid_symbols[HTML_BLOCK] && scan_html_block(lexer)) {
+    lexer->result_symbol = HTML_BLOCK;
     s->prev = 0;
     return true;
   }
