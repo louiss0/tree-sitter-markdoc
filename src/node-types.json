@@ -489,6 +489,11 @@
     "fields": {}
   },
   {
+    "type": "html_comment",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "html_inline",
     "named": true,
     "fields": {}
@@ -1262,10 +1267,6 @@
   },
   {
     "type": "heading_text",
-    "named": true
-  },
-  {
-    "type": "html_comment",
     "named": true
   },
   {

@@ -16,18 +16,20 @@ module.exports = grammar({
   name: "markdoc",
 
   externals: $ => [
-    $._code_content,
+    $._CODE_CONTENT,
     $._LIST_CONTINUATION,
-    $._em_open_star,
-    $._em_close_star,
-    $._strong_open_star,
-    $._strong_close_star,
-    $._em_open_underscore,
-    $._em_close_underscore,
-    $._strong_open_underscore,
-    $._strong_close_underscore,
-    $._raw_delim,
-    $._text
+    $._EM_OPEN_STAR,
+    $._EM_CLOSE_STAR,
+    $._STRONG_OPEN_STAR,
+    $._STRONG_CLOSE_STAR,
+    $._EM_OPEN_UNDERSCORE,
+    $._EM_CLOSE_UNDERSCORE,
+    $._STRONG_OPEN_UNDERSCORE,
+    $._STRONG_CLOSE_UNDERSCORE,
+    $._RAW_DELIM,
+    $._TEXT,
+    $._COMMENT_BLOCK,
+    $._HTML_COMMENT
   ],
 
   extras: $ => [],
@@ -98,7 +100,7 @@ module.exports = grammar({
 
     heading: $ => prec.right(2, seq(
       field('heading_marker', $.heading_marker),
-      field('heading_text', optional(alias($._text, $.heading_text)))
+      field('heading_text', optional(alias($._TEXT, $.heading_text)))
     )),
 
     heading_marker: $ => token(prec(3, /#{1,6}[ \t]/)),  // Require space/tab after #
@@ -136,7 +138,7 @@ module.exports = grammar({
       optional(alias(/\{[^}\n]*\}/, $.attributes))
     ),
 
-    code: $ => $._code_content,
+    code: $ => $._CODE_CONTENT,
 
     code_fence_close: $ => choice(
       token(prec(3, '```')),
@@ -144,14 +146,7 @@ module.exports = grammar({
     ),
 
     // Markdoc comment block: {% comment %}...{% /comment %}
-    comment_block: $ => seq(
-      token(prec(10, seq('{%', /[ \t]*/, 'comment', /[ \t]*/, '%}'))),
-      repeat(choice(
-        /[^{]+/,
-        /\{[^%]/
-      )),
-      token(prec(10, seq('{%', /[ \t]*/, '/', /[ \t]*/, 'comment', /[ \t]*/, '%}')))
-    ),
+    comment_block: $ => $._COMMENT_BLOCK,
 
     // Block-level Markdoc tag ({% tag %}...{% /tag %} or {% tag /%})
     markdoc_tag: $ => prec.dynamic(10, choice(
@@ -470,14 +465,7 @@ module.exports = grammar({
       /[ \t]+/
     ))),
 
-    html_comment: $ => token(seq(
-      '<!--',
-      repeat(choice(
-        /[^-]+/,
-        /-[^-]/
-      )),
-      '-->'
-    )),
+    html_comment: $ => $._HTML_COMMENT,
 
     html_block: $ => choice(
       // Multi-line HTML block (opening tag at start of line)
@@ -543,19 +531,19 @@ module.exports = grammar({
     )),
 
     emphasis: $ => choice(
-      seq($._em_open_star, token.immediate(/[^*\n]+/), $._em_close_star),
-      seq($._em_open_underscore, token.immediate(/[^_\n]+/), $._em_close_underscore)
+      seq($._EM_OPEN_STAR, token.immediate(/[^*\n]+/), $._EM_CLOSE_STAR),
+      seq($._EM_OPEN_UNDERSCORE, token.immediate(/[^_\n]+/), $._EM_CLOSE_UNDERSCORE)
     ),
 
     strong: $ => choice(
-      seq($._strong_open_star, repeat1(choice(
+      seq($._STRONG_OPEN_STAR, repeat1(choice(
         $.emphasis,
         token.immediate(/[^*\n]+/)
-      )), $._strong_close_star),
-      seq($._strong_open_underscore, repeat1(choice(
+      )), $._STRONG_CLOSE_STAR),
+      seq($._STRONG_OPEN_UNDERSCORE, repeat1(choice(
         $.emphasis,
         token.immediate(/[^_\n]+/)
-      )), $._strong_close_underscore)
+      )), $._STRONG_CLOSE_UNDERSCORE)
     ),
 
     inline_code: $ => seq(
@@ -602,8 +590,8 @@ module.exports = grammar({
     ),
 
     text: $ => choice(
-      $._text,
-      $._raw_delim
+      $._TEXT,
+      $._RAW_DELIM
     ),
     
     // Fallback for standalone punctuation that doesn't start special syntax
