@@ -15,7 +15,9 @@ enum TokenType {
   STRONG_OPEN_UNDERSCORE,
   STRONG_CLOSE_UNDERSCORE,
   RAW_DELIM,
-  TEXT
+  TEXT,
+  COMMENT_BLOCK,
+  HTML_COMMENT
 };
 
 typedef struct {
@@ -104,6 +106,116 @@ static inline bool is_text_continue_char(int32_t c) {
     default:
       return true;
   }
+}
+
+static bool scan_literal(TSLexer *lexer, const char *text) {
+  for (const char *p = text; *p != '\0'; p++) {
+    if (lexer->lookahead != *p) {
+      return false;
+    }
+    lexer->advance(lexer, false);
+  }
+  return true;
+}
+
+static bool scan_markdoc_comment_close(TSLexer *lexer) {
+  if (!scan_literal(lexer, "{%")) {
+    return false;
+  }
+
+  while (is_space_ch(lexer->lookahead)) {
+    lexer->advance(lexer, false);
+  }
+
+  if (lexer->lookahead != '/') {
+    return false;
+  }
+
+  lexer->advance(lexer, false);
+
+  while (is_space_ch(lexer->lookahead)) {
+    lexer->advance(lexer, false);
+  }
+
+  if (!scan_literal(lexer, "comment")) {
+    return false;
+  }
+
+  while (is_space_ch(lexer->lookahead)) {
+    lexer->advance(lexer, false);
+  }
+
+  if (!scan_literal(lexer, "%}")) {
+    return false;
+  }
+
+  return true;
+}
+
+static bool scan_markdoc_comment(TSLexer *lexer) {
+  TSLexer saved_state = *lexer;
+
+  if (!scan_literal(lexer, "{%")) {
+    *lexer = saved_state;
+    return false;
+  }
+
+  while (is_space_ch(lexer->lookahead)) {
+    lexer->advance(lexer, false);
+  }
+
+  if (!scan_literal(lexer, "comment")) {
+    *lexer = saved_state;
+    return false;
+  }
+
+  while (is_space_ch(lexer->lookahead)) {
+    lexer->advance(lexer, false);
+  }
+
+  if (!scan_literal(lexer, "%}")) {
+    *lexer = saved_state;
+    return false;
+  }
+
+  while (lexer->lookahead != 0) {
+    if (lexer->lookahead == '{') {
+      TSLexer close_state = *lexer;
+      if (scan_markdoc_comment_close(lexer)) {
+        lexer->mark_end(lexer);
+        return true;
+      }
+      *lexer = close_state;
+    }
+    lexer->advance(lexer, false);
+  }
+
+  *lexer = saved_state;
+  return false;
+}
+
+static bool scan_html_comment(TSLexer *lexer) {
+  TSLexer saved_state = *lexer;
+
+  if (!scan_literal(lexer, "<!--")) {
+    *lexer = saved_state;
+    return false;
+  }
+
+  while (lexer->lookahead != 0) {
+    if (lexer->lookahead == '-') {
+      TSLexer close_state = *lexer;
+      if (scan_literal(lexer, "-->")) {
+        lexer->mark_end(lexer);
+        return true;
+      }
+      *lexer = close_state;
+    }
+    lexer->advance(lexer, false);
+  }
+
+  *lexer = saved_state;
+  return false;
 }
 
 static bool is_thematic_break_line(TSLexer *lexer) {
@@ -368,6 +480,18 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
     }
 
     *lexer = saved_state;
+  }
+
+  if (valid_symbols[COMMENT_BLOCK] && scan_markdoc_comment(lexer)) {
+    lexer->result_symbol = COMMENT_BLOCK;
+    s->prev = 0;
+    return true;
+  }
+
+  if (valid_symbols[HTML_COMMENT] && scan_html_comment(lexer)) {
+    lexer->result_symbol = HTML_COMMENT;
+    s->prev = 0;
+    return true;
   }
 
   if (valid_symbols[TEXT] && lexer->get_column(lexer) == 0 &&
