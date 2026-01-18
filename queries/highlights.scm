@@ -248,17 +248,6 @@
   "{" @punctuation.bracket
   "}" @punctuation.bracket)
 
-; Object pairs - key: value
-; First child is the key (identifier)
-(pair
-  (identifier) @property
-  ":" @punctuation.delimiter)
-
-; Commas in arrays and objects
-(array_literal "," @punctuation.delimiter)
-(object_literal "," @punctuation.delimiter)
-(call_expression "," @punctuation.delimiter)
-
 ; ============================================================================
 ; TEXT CONTENT
 ; ============================================================================
