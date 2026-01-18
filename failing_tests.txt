@@ -1,27 +1,27 @@
-10. ✗ [31mHeading without space after marker (invalid)[0m
-42. ✗ [31mMixed content with tags and expressions[0m
-44. ✗ [31mHTML block tag[0m
-45. ✗ [31mHTML self-closing tag[0m
-46. ✗ [31mHTML comment[0m
-47. ✗ [31mMulti-line HTML comment[0m
-48. ✗ [31mMarkdoc comment block[0m
-49. ✗ [31mMixed HTML and Markdoc content[0m
-56. ✗ [31mNested unordered list (simple)[0m
-57. ✗ [31mNested ordered list[0m
-58. ✗ [31mComplex member access expressions[0m
-59. ✗ [31mFunction call expressions[0m
-60. ✗ [31mObject and array expressions[0m
-61. ✗ [31mBinary and unary expressions[0m
-62. ✗ [31mTag with complex attribute expressions[0m
-70. ✗ [31mImage with alt text[0m
-82. ✗ [31mAlternative tag closing syntax (without slash)[0m
-83. ✗ [31mTag with extra whitespace[0m
-84. ✗ [31mNested list indentation[0m
-85. ✗ [31mMixed list and tag indentation[0m
-86. ✗ [31mTag with blank lines in content[0m
-87. ✗ [31mIndented code block in tag[0m
-98. ✗ [31mBasic paragraphs[0m
-99. ✗ [31mList with paragraphs[0m
-100. ✗ [31mMixed blocks and lists[0m
-104. ✗ [31mList with items separated by newlines[0m
-106. ✗ [31mBlank line with only whitespace[0m
+10. ✗ Heading without space after marker (invalid)
+42. ✗ Mixed content with tags and expressions
+44. ✗ HTML block tag
+45. ✗ HTML self-closing tag
+46. ✗ HTML comment
+47. ✗ Multi-line HTML comment
+48. ✗ Markdoc comment block
+49. ✗ Mixed HTML and Markdoc content
+56. ✗ Nested unordered list (simple)
+57. ✗ Nested ordered list
+58. ✗ Complex member access expressions
+59. ✗ Function call expressions
+60. ✗ Object and array expressions
+61. ✗ Binary and unary expressions
+62. ✗ Tag with complex attribute expressions
+70. ✗ Image with alt text
+82. ✗ Alternative tag closing syntax (without slash)
+83. ✗ Tag with extra whitespace
+84. ✗ Nested list indentation
+85. ✗ Mixed list and tag indentation
+86. ✗ Tag with blank lines in content
+87. ✗ Indented code block in tag
+98. ✗ Basic paragraphs
+99. ✗ List with paragraphs
+100. ✗ Mixed blocks and lists
+104. ✗ List with items separated by newlines
+106. ✗ Blank line with only whitespace
