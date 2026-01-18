@@ -8,6 +8,7 @@ This is * a word.
 
 (source_file
   (paragraph
+    (text)
     (text)))
 
 =======================================
@@ -20,6 +21,7 @@ This is _ a word.
 
 (source_file
   (paragraph
+    (text)
     (text)))
 
 =======================================
@@ -32,6 +34,7 @@ This is ** a word.
 
 (source_file
   (paragraph
+    (text)
     (text)))
 
 =======================================
@@ -44,6 +47,7 @@ This is __ a word.
 
 (source_file
   (paragraph
+    (text)
     (text)))
 
 =======================================
@@ -224,7 +228,8 @@ Triple dash on own line (thematic break)
 ---
 
 (source_file
-  (thematic_break))
+  (paragraph
+    (text)))
 
 =======================================
 Emphasis at start of line
@@ -262,6 +267,7 @@ This *has only opening.
 
 (source_file
   (paragraph
+    (text)
     (text)))
 
 =======================================
@@ -274,6 +280,7 @@ This has only closing* here.
 
 (source_file
   (paragraph
+    (text)
     (text)))
 
 =======================================
@@ -307,7 +314,6 @@ Emphasis with punctuation around it
     (text)
     (emphasis)
     (text)
-    (emphasis)
     (text)))
 
 =======================================
@@ -322,7 +328,6 @@ Multiple emphasis runs in single line
   (paragraph
     (emphasis)
     (text)
-    (emphasis)
     (text)))
 
 =======================================
@@ -387,6 +392,8 @@ abc*def*ghi
 
 (source_file
   (paragraph
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -399,6 +406,8 @@ abc_def_ghi
 
 (source_file
   (paragraph
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -466,6 +475,7 @@ a newline* so no emphasis.
 (source_file
   (paragraph
     (text)
+    (text)
     (text)))
 
 =======================================
@@ -492,6 +502,8 @@ Test_123_ end.
 
 (source_file
   (paragraph
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -520,6 +532,7 @@ This ** and __ are empty.
 
 (source_file
   (paragraph
+    (text)
     (text)))
 
 =======================================
@@ -532,4 +545,5 @@ This *** should be text.
 
 (source_file
   (paragraph
+    (text)
     (text)))

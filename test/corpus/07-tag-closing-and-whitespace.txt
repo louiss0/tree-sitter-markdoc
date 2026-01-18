@@ -70,7 +70,6 @@ Nested list indentation
         (text)
         (text)))))
 
-
 =============================================================================
 Tag with blank lines in content
 =============================================================================
@@ -95,4 +94,3 @@ Second paragraph with blank line between
       (text))
     (tag_close
       (tag_name))))
-

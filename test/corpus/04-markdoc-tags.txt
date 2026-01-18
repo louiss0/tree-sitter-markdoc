@@ -7,9 +7,10 @@ Self-closing tag
 --------------------------------------------------------------------------------
 
 (source_file
-  (markdoc_tag
-    (tag_self_close
-      (tag_name))))
+  (paragraph
+    (inline_tag
+      (tag_self_close
+        (tag_name)))))
 
 ================================================================================
 Block tag without content

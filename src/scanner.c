@@ -110,6 +110,25 @@ static inline bool is_text_continue_char(int32_t c) {
   }
 }
 
+static bool scan_literal(TSLexer *lexer, const char *text);
+
+static bool is_frontmatter_delimiter(TSLexer *lexer) {
+  if (lexer->get_column(lexer) != 0 || lexer->lookahead != '-') {
+    return false;
+  }
+
+  TSLexer saved_state = *lexer;
+
+  if (!scan_literal(lexer, "---")) {
+    *lexer = saved_state;
+    return false;
+  }
+
+  bool ok = is_newline(lexer->lookahead) || lexer->lookahead == 0;
+  *lexer = saved_state;
+  return ok;
+}
+
 static bool scan_literal(TSLexer *lexer, const char *text) {
   for (const char *p = text; *p != '\0'; p++) {
     if (lexer->lookahead != *p) {
@@ -723,6 +742,10 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
     int32_t first = lexer->lookahead;
 
     if (column == 0) {
+      if (is_frontmatter_delimiter(lexer)) {
+        return false;
+      }
+
       if (first == '>' || first == '{' || first == '<') {
         return false;
       }
