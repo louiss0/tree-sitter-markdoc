@@ -209,6 +209,7 @@ Arithmetic operators - addition and subtraction
           operator: (binary_subtract)
           right: (expression
             (number)))))))
+
 =============================================================================
 Arithmetic operators - multiplication, division, modulo
 =============================================================================
@@ -468,7 +469,7 @@ Operator precedence test
               operator: (binary_and)
               right: (expression
                 (identifier))))))
-    (ERROR)))
+      (ERROR)))
   (paragraph
     (inline_expression
       content: (expression
@@ -483,6 +484,7 @@ Operator precedence test
               operator: (binary_multiply)
               right: (expression
                 (number)))))))))
+
 =============================================================================
 Operators in tag attributes
 =============================================================================

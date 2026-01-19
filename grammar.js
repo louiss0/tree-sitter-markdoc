@@ -19,6 +19,8 @@ module.exports = grammar({
   externals: $ => [
     $._CODE_CONTENT,
     $._LIST_CONTINUATION,
+    $._LIST_MARKER,
+    $._PARAGRAPH_CONTINUATION,
     $._EM_OPEN_STAR,
     $._EM_CLOSE_STAR,
     $._STRONG_OPEN_STAR,
@@ -61,18 +63,14 @@ module.exports = grammar({
           $._block
         ),
         repeat(seq(
-          choice(
-            $._BLANK_LINE,
-            $._NEWLINE
-          ),
+          $._BLANK_LINE,
           choice(
             $.frontmatter,
             $._block
           )
         ))
       )),
-      repeat($._BLANK_LINE),
-      optional($._NEWLINE)
+      repeat(choice($._BLANK_LINE, $._NEWLINE))
     )),
 
     _block: $ => choice(
@@ -117,6 +115,7 @@ module.exports = grammar({
     // Blockquote
     blockquote: $ => prec.right(seq(
       token(prec(2, '>')),
+      optional(WS),
       optional($._block)
     )),
 
@@ -475,11 +474,7 @@ module.exports = grammar({
       optional($._NEWLINE)
     ),
 
-    list_marker: $ => token(prec(2, seq(
-      /[ \t]*/,
-      choice(/[-*+]/, /[0-9]+\./),
-      /[ \t]+/
-    ))),
+    list_marker: $ => alias($._LIST_MARKER, $.list_marker),
 
     html_comment: $ => $._HTML_COMMENT,
 
@@ -511,7 +506,7 @@ module.exports = grammar({
       $._inline_line_start,
       repeat($._inline_content),
       repeat(seq(
-        $._NEWLINE,
+        $._PARAGRAPH_CONTINUATION,
         seq($._inline_line_start, repeat($._inline_content))
       )),
       optional($._NEWLINE)
