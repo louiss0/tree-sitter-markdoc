@@ -50,25 +50,13 @@ Nested list indentation
 -----------------------------------------------------------------------------
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)))
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)))
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)
-        (text)))
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)
-        (text)))))
+  (paragraph
+    (text)
+    (text)
+    (text)
+    (text)
+    (text)
+    (text)))
 
 =============================================================================
 Tag with blank lines in content

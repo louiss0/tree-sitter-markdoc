@@ -62,7 +62,8 @@ module.exports = grammar({
         ),
         repeat(seq(
           choice(
-            $._BLANK_LINE
+            $._BLANK_LINE,
+            $._NEWLINE
           ),
           choice(
             $.frontmatter,
@@ -70,7 +71,8 @@ module.exports = grammar({
           )
         ))
       )),
-      repeat($._BLANK_LINE)
+      repeat($._BLANK_LINE),
+      optional($._NEWLINE)
     )),
 
     _block: $ => choice(
@@ -135,6 +137,7 @@ module.exports = grammar({
 
     info_string: $ => seq(
       alias(/[a-zA-Z0-9_+-]+/, $.language),
+      optional(WS),
       optional(alias(/\{[^}\n]*\}/, $.attributes))
     ),
 
@@ -177,8 +180,8 @@ module.exports = grammar({
       token(prec(6, '{%')),
       optional(WS),
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
-      repeat(seq(TAG_WS1, $.attribute)),
-      optional(TAG_WS),
+      repeat(seq(WS1, $.attribute)),
+      optional(WS),
       token(prec(6, '%}'))
     )),
 
@@ -196,8 +199,8 @@ module.exports = grammar({
       token(prec(6, '{%')),
       optional(WS),
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
-      repeat(seq(TAG_WS1, $.attribute)),
-      optional(TAG_WS),
+      repeat(seq(WS1, $.attribute)),
+      optional(WS),
       token(prec(6, '/%}'))
     )),
 

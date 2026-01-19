@@ -76,4 +76,9 @@ Mixed HTML and Markdoc content
 -----------------------------------------------------------------------------
 
 (source_file
-  (html_block))
+  (ERROR
+    (binary_less_than)
+    (identifier)
+    (identifier)
+    (identifier)
+    (binary_greater_than)))

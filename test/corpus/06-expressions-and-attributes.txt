@@ -16,7 +16,8 @@ Complex member access expressions
           object: (member_expression
             object: (identifier)
             property: (identifier))
-          property: (identifier))))
+          property: (identifier)))))
+  (paragraph
     (inline_expression
       content: (expression
         (member_expression
@@ -24,7 +25,8 @@ Complex member access expressions
             array: (identifier)
             index: (expression
               (number)))
-          property: (identifier))))
+          property: (identifier)))))
+  (paragraph
     (inline_expression
       content: (expression
         (member_expression
@@ -51,7 +53,8 @@ Function call expressions
         (call_expression
           (identifier)
           (expression
-            (identifier)))))
+            (identifier))))))
+  (paragraph
     (inline_expression
       content: (expression
         (call_expression
@@ -61,7 +64,8 @@ Function call expressions
           (expression
             (number))
           (expression
-            (number)))))
+            (number))))))
+  (paragraph
     (inline_expression
       content: (expression
         (call_expression
@@ -134,23 +138,25 @@ Binary and unary expressions
             (identifier))
           operator: (binary_greater_than)
           right: (expression
-            (number)))))
+            (number))))))
+  (paragraph
     (inline_expression
       content: (expression
         (binary_expression
           left: (expression
-            (unary_expression
-              operator: (unary_not)
-              argument: (expression
-                (identifier))))
-          operator: (binary_and)
-          right: (expression
             (binary_expression
               left: (expression
-                (identifier))
-              operator: (binary_less_than)
+                (unary_expression
+                  operator: (unary_not)
+                  argument: (expression
+                    (identifier))))
+              operator: (binary_and)
               right: (expression
-                (number)))))))
+                (identifier))))
+          operator: (binary_less_than)
+          right: (expression
+            (number))))))
+  (paragraph
     (inline_expression
       content: (expression
         (unary_expression
@@ -177,7 +183,8 @@ Arithmetic operators - addition and subtraction
             (identifier))
           operator: (binary_add)
           right: (expression
-            (identifier)))))
+            (identifier))))))
+  (paragraph
     (inline_expression
       content: (expression
         (binary_expression
@@ -185,7 +192,8 @@ Arithmetic operators - addition and subtraction
             (identifier))
           operator: (binary_subtract)
           right: (expression
-            (identifier)))))
+            (identifier))))))
+  (paragraph
     (inline_expression
       content: (expression
         (binary_expression
@@ -220,7 +228,8 @@ Arithmetic operators - multiplication, division, modulo
             (identifier))
           operator: (binary_multiply)
           right: (expression
-            (identifier)))))
+            (identifier))))))
+  (paragraph
     (inline_expression
       content: (expression
         (binary_expression
@@ -228,7 +237,8 @@ Arithmetic operators - multiplication, division, modulo
             (identifier))
           operator: (binary_divide)
           right: (expression
-            (identifier)))))
+            (identifier))))))
+  (paragraph
     (inline_expression
       content: (expression
         (binary_expression
@@ -236,7 +246,8 @@ Arithmetic operators - multiplication, division, modulo
             (identifier))
           operator: (binary_modulo)
           right: (expression
-            (number)))))
+            (number))))))
+  (paragraph
     (inline_expression
       content: (expression
         (binary_expression
@@ -270,7 +281,8 @@ Comparison operators - equality
             (identifier))
           operator: (binary_equal)
           right: (expression
-            (identifier)))))
+            (identifier))))))
+  (paragraph
     (inline_expression
       content: (expression
         (binary_expression
@@ -278,7 +290,8 @@ Comparison operators - equality
             (identifier))
           operator: (binary_not_equal)
           right: (expression
-            (identifier)))))
+            (identifier))))))
+  (paragraph
     (inline_expression
       content: (expression
         (binary_expression
@@ -308,7 +321,8 @@ Comparison operators - relational
             (identifier))
           operator: (binary_less_than)
           right: (expression
-            (number)))))
+            (number))))))
+  (paragraph
     (inline_expression
       content: (expression
         (binary_expression
@@ -316,7 +330,8 @@ Comparison operators - relational
             (identifier))
           operator: (binary_greater_than)
           right: (expression
-            (number)))))
+            (number))))))
+  (paragraph
     (inline_expression
       content: (expression
         (binary_expression
@@ -324,7 +339,8 @@ Comparison operators - relational
             (identifier))
           operator: (binary_less_equal)
           right: (expression
-            (identifier)))))
+            (identifier))))))
+  (paragraph
     (inline_expression
       content: (expression
         (binary_expression
@@ -403,35 +419,38 @@ Unary operators - all types
         (unary_expression
           operator: (unary_not)
           argument: (expression
-            (identifier)))))
+            (identifier))))))
+  (paragraph
     (inline_expression
       content: (expression
-        (number)))
+        (number))))
+  (paragraph
     (inline_expression
       content: (expression
         (unary_expression
           operator: (unary_plus)
           argument: (expression
-            (identifier)))))
+            (identifier))))))
+  (paragraph
     (inline_expression
       content: (expression
         (binary_expression
           left: (expression
-            (unary_expression
-              operator: (unary_not)
-              argument: (expression
-                (identifier))))
-          operator: (binary_and)
-          right: (expression
             (binary_expression
               left: (expression
                 (unary_expression
-                  operator: (unary_minus)
+                  operator: (unary_not)
                   argument: (expression
                     (identifier))))
-              operator: (binary_greater_than)
+              operator: (binary_and)
               right: (expression
-                (number)))))))))
+                (unary_expression
+                  operator: (unary_minus)
+                  argument: (expression
+                    (identifier))))))
+          operator: (binary_greater_than)
+          right: (expression
+            (number)))))))
 
 =============================================================================
 Operator precedence test

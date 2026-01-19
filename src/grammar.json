@@ -45,6 +45,10 @@
                             {
                               "type": "SYMBOL",
                               "name": "_BLANK_LINE"
+                            },
+                            {
+                              "type": "SYMBOL",
+                              "name": "_NEWLINE"
                             }
                           ]
                         },
@@ -77,6 +81,18 @@
               "type": "SYMBOL",
               "name": "_BLANK_LINE"
             }
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_NEWLINE"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
           }
         ]
       }
@@ -396,6 +412,18 @@
           "type": "CHOICE",
           "members": [
             {
+              "type": "PATTERN",
+              "value": "[ \\t]+"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
               "type": "ALIAS",
               "content": {
                 "type": "PATTERN",
@@ -618,7 +646,7 @@
               "members": [
                 {
                   "type": "PATTERN",
-                  "value": "[ \\t\\r\\n]+"
+                  "value": "[ \\t]+"
                 },
                 {
                   "type": "SYMBOL",
@@ -632,7 +660,7 @@
             "members": [
               {
                 "type": "PATTERN",
-                "value": "[ \\t\\r\\n]+"
+                "value": "[ \\t]+"
               },
               {
                 "type": "BLANK"
@@ -794,7 +822,7 @@
               "members": [
                 {
                   "type": "PATTERN",
-                  "value": "[ \\t\\r\\n]+"
+                  "value": "[ \\t]+"
                 },
                 {
                   "type": "SYMBOL",
@@ -808,7 +836,7 @@
             "members": [
               {
                 "type": "PATTERN",
-                "value": "[ \\t\\r\\n]+"
+                "value": "[ \\t]+"
               },
               {
                 "type": "BLANK"

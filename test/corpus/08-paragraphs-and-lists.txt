@@ -27,16 +27,10 @@ List with paragraphs
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)))
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)
-        (text)))))
+  (paragraph
+    (text)
+    (text)
+    (text)))
 
 ===================
 Mixed blocks and lists
@@ -54,14 +48,8 @@ More text after list
 (source_file
   (paragraph
     (text))
-  (list
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)))
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text))))
+  (paragraph
+    (text)
+    (text))
   (paragraph
     (text)))

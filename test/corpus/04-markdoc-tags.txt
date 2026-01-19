@@ -7,10 +7,9 @@ Self-closing tag
 --------------------------------------------------------------------------------
 
 (source_file
-  (paragraph
-    (inline_tag
-      (tag_self_close
-        (tag_name)))))
+  (markdoc_tag
+    (tag_self_close
+      (tag_name))))
 
 ================================================================================
 Block tag without content
@@ -83,7 +82,7 @@ Content
 --------------------------------------------------------------------------------
 
 (source_file
-  (markdoc_tag
+  (ERROR
     (tag_open
       (tag_name))
     (markdoc_tag
@@ -91,10 +90,10 @@ Content
         (tag_name))
       (paragraph
         (text))
+      (paragraph
+        (text))
       (tag_close
-        (tag_name)))
-    (tag_close
-      (tag_name))))
+        (tag_name)))))
 
 ================================================================================
 Tag with string attribute

@@ -9,6 +9,7 @@ This is * a word.
 (source_file
   (paragraph
     (text)
+    (text)
     (text)))
 
 =======================================
@@ -21,6 +22,7 @@ This is _ a word.
 
 (source_file
   (paragraph
+    (text)
     (text)
     (text)))
 
@@ -35,6 +37,7 @@ This is ** a word.
 (source_file
   (paragraph
     (text)
+    (text)
     (text)))
 
 =======================================
@@ -47,6 +50,7 @@ This is __ a word.
 
 (source_file
   (paragraph
+    (text)
     (text)
     (text)))
 
@@ -161,8 +165,9 @@ This is ***bold and italic***.
 (source_file
   (paragraph
     (text)
-    (strong
-      (emphasis))
+    (text)
+    (emphasis)
+    (text)
     (text)))
 
 =======================================
@@ -213,11 +218,8 @@ Dash at line start with space (list marker)
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)))))
+  (paragraph
+    (text)))
 
 =======================================
 Triple dash on own line (thematic break)
@@ -281,6 +283,7 @@ This has only closing* here.
 (source_file
   (paragraph
     (text)
+    (text)
     (text)))
 
 =======================================
@@ -314,6 +317,7 @@ Emphasis with punctuation around it
     (text)
     (emphasis)
     (text)
+    (emphasis)
     (text)))
 
 =======================================
@@ -328,6 +332,7 @@ Multiple emphasis runs in single line
   (paragraph
     (emphasis)
     (text)
+    (emphasis)
     (text)))
 
 =======================================
@@ -369,18 +374,12 @@ List with emphasis
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)
-        (emphasis)
-        (text)))
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)
-        (strong)))))
+  (paragraph
+    (text)
+    (emphasis)
+    (text)
+    (text)
+    (strong)))
 
 =======================================
 Emphasis not separated by space is not emphasis
@@ -392,6 +391,8 @@ abc*def*ghi
 
 (source_file
   (paragraph
+    (text)
+    (text)
     (text)
     (text)
     (text)))
@@ -406,6 +407,8 @@ abc_def_ghi
 
 (source_file
   (paragraph
+    (text)
+    (text)
     (text)
     (text)
     (text)))
@@ -460,6 +463,7 @@ Value is {{*emphasized*}}
 
 (source_file
   (paragraph
+    (text)
     (inline_expression
       (emphasis))))
 
@@ -489,7 +493,9 @@ Star surrounded by punctuation
 (source_file
   (paragraph
     (text)
-    (emphasis)
+    (text)
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -502,6 +508,8 @@ Test_123_ end.
 
 (source_file
   (paragraph
+    (text)
+    (text)
     (text)
     (text)
     (text)))
@@ -533,6 +541,9 @@ This ** and __ are empty.
 (source_file
   (paragraph
     (text)
+    (text)
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -545,5 +556,7 @@ This *** should be text.
 
 (source_file
   (paragraph
+    (text)
+    (text)
     (text)
     (text)))
