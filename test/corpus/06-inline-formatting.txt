@@ -148,19 +148,12 @@ Inline formatting in list
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)
-        (emphasis)))
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)
-        (strong)))
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)
-        (inline_code)))))
+  (paragraph
+    (text)
+    (emphasis))
+  (paragraph
+    (text)
+    (strong))
+  (paragraph
+    (text)
+    (inline_code)))

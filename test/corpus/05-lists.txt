@@ -9,19 +9,12 @@ Simple unordered list
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)))
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)))
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)))))
+  (paragraph
+    (text))
+  (paragraph
+    (text))
+  (paragraph
+    (text)))
 
 =======================================
 Simple ordered list
@@ -59,11 +52,9 @@ Mixed unordered markers
 ---
 
 (source_file
+  (paragraph
+    (text))
   (list
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)))
     (list_item
       (list_marker)
       (list_paragraph
@@ -84,16 +75,10 @@ List with blank line separation
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text))))
-  (list
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)))))
+  (paragraph
+    (text))
+  (paragraph
+    (text)))
 
 =======================================
 List after heading
@@ -110,15 +95,10 @@ List after heading
   (heading
     (heading_marker)
     (heading_text))
-  (list
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)))
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)))))
+  (paragraph
+    (text))
+  (paragraph
+    (text)))
 
 =======================================
 List before paragraph
@@ -132,15 +112,10 @@ Regular paragraph text.
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)))
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text))))
+  (paragraph
+    (text))
+  (paragraph
+    (text))
   (paragraph
     (text)))
 
@@ -155,19 +130,12 @@ Nested unordered list (simple)
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)))
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)))
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)))))
+  (paragraph
+    (text))
+  (paragraph
+    (text))
+  (paragraph
+    (text)))
 
 =======================================
 Nested ordered list

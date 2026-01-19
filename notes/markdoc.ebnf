@@ -38,6 +38,9 @@ inline_first =
   inline_expression | inline_tag | text | html_inline | link
   | emphasis | strong | inline_code ;
 
+inline_tag = inline_tag_expression | tag_self_close | tag_open ;
+inline_tag_expression = "{%", ws, tag_expression, ws, "%}" ;
+
 inline_content = inline_first | image | standalone_punct ;
 
 expression = arrow_function | binary_expression | unary_expression
@@ -47,6 +50,9 @@ expression = arrow_function | binary_expression | unary_expression
 primary_expression =
   variable | identifier | string | number | array_literal
   | object_literal | boolean | null | parenthesized_expression ;
+
+tag_expression = variable | call_expression | member_expression
+                 | array_access | parenthesized_expression ;
 
 parenthesized_expression = "(", ws, expression, ws, ")" ;
 arrow_function = "(", ws, [ identifier, { ws, ",", ws, identifier } ],

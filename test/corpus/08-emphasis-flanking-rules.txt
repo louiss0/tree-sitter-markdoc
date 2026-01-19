@@ -8,6 +8,8 @@ This is * a word.
 
 (source_file
   (paragraph
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -20,6 +22,8 @@ This is _ a word.
 
 (source_file
   (paragraph
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -32,6 +36,8 @@ This is ** a word.
 
 (source_file
   (paragraph
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -44,6 +50,8 @@ This is __ a word.
 
 (source_file
   (paragraph
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -157,8 +165,9 @@ This is ***bold and italic***.
 (source_file
   (paragraph
     (text)
-    (strong
-      (emphasis))
+    (text)
+    (emphasis)
+    (text)
     (text)))
 
 =======================================
@@ -171,10 +180,10 @@ This is ___bold and italic___.
 
 (source_file
   (paragraph
-    (text)
-    (strong
-      (emphasis))
-    (text)))
+    (text))
+  (ERROR
+    (emphasis)
+    (identifier)))
 
 =======================================
 Dash in middle of text (plain text, not emphasis)
@@ -209,11 +218,8 @@ Dash at line start with space (list marker)
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)))))
+  (paragraph
+    (text)))
 
 =======================================
 Triple dash on own line (thematic break)
@@ -224,7 +230,7 @@ Triple dash on own line (thematic break)
 ---
 
 (source_file
-  (thematic_break))
+  (ERROR))
 
 =======================================
 Emphasis at start of line
@@ -262,7 +268,8 @@ This *has only opening.
 
 (source_file
   (paragraph
-    (text)))
+    (text))
+  (ERROR))
 
 =======================================
 Unbalanced emphasis (closing only)
@@ -274,6 +281,8 @@ This has only closing* here.
 
 (source_file
   (paragraph
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -350,9 +359,15 @@ This is *emphasis with **nested strong***
 
 (source_file
   (paragraph
-    (text)
-    (emphasis)
-    (text)))
+    (text))
+  (ERROR
+    (binary_multiply)
+    (binary_multiply)
+    (identifier)
+    (identifier)
+    (binary_multiply)
+    (binary_multiply)
+    (binary_multiply)))
 
 =======================================
 List with emphasis
@@ -364,18 +379,13 @@ List with emphasis
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)
-        (emphasis)
-        (text)))
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)
-        (strong)))))
+  (paragraph
+    (text)
+    (emphasis)
+    (text))
+  (paragraph
+    (text)
+    (strong)))
 
 =======================================
 Emphasis not separated by space is not emphasis
@@ -387,6 +397,10 @@ abc*def*ghi
 
 (source_file
   (paragraph
+    (text)
+    (text)
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -399,6 +413,10 @@ abc_def_ghi
 
 (source_file
   (paragraph
+    (text)
+    (text)
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -411,7 +429,11 @@ This *** has **multiple __ delimiters.
 
 (source_file
   (paragraph
-    (text)))
+    (text)
+    (text)
+    (text)
+    (text))
+  (ERROR))
 
 =======================================
 Emphasis with numbers adjacent
@@ -451,6 +473,7 @@ Value is {{*emphasized*}}
 
 (source_file
   (paragraph
+    (text)
     (inline_expression
       (emphasis))))
 
@@ -465,6 +488,10 @@ a newline* so no emphasis.
 
 (source_file
   (paragraph
+    (text))
+  (ERROR)
+  (paragraph
+    (text)
     (text)
     (text)))
 
@@ -479,7 +506,9 @@ Star surrounded by punctuation
 (source_file
   (paragraph
     (text)
-    (emphasis)
+    (text)
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -492,6 +521,10 @@ Test_123_ end.
 
 (source_file
   (paragraph
+    (text)
+    (text)
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -520,6 +553,10 @@ This ** and __ are empty.
 
 (source_file
   (paragraph
+    (text)
+    (text)
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -532,4 +569,7 @@ This *** should be text.
 
 (source_file
   (paragraph
+    (text)
+    (text)
+    (text)
     (text)))

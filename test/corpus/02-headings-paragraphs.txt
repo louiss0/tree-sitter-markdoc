@@ -84,7 +84,8 @@ This is a paragraph
 
 (source_file
   (paragraph
-    (text)
+    (text))
+  (paragraph
     (text)))
 
 ================================================================================
@@ -111,8 +112,10 @@ Line three
 
 (source_file
   (paragraph
-    (text)
-    (text)
+    (text))
+  (paragraph
+    (text))
+  (paragraph
     (text)))
 
 ================================================================================
@@ -128,7 +131,8 @@ Second paragraph here.
 
 (source_file
   (paragraph
-    (text)
+    (text))
+  (paragraph
     (text))
   (paragraph
     (text)))
