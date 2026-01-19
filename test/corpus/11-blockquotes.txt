@@ -1,0 +1,23 @@
+=======================================
+Simple blockquote
+=======================================
+
+> Quote
+
+---
+
+(source_file
+  (blockquote))
+
+=======================================
+Blockquote with nested tag
+=======================================
+
+> {% callout %}
+> Note
+> {% /callout %}
+
+---
+
+(source_file
+  (blockquote))

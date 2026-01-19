@@ -115,6 +115,7 @@ module.exports = grammar({
     // Blockquote
     blockquote: $ => prec.right(seq(
       token(prec(2, '>')),
+      optional(WS),
       optional($._block)
     )),
 

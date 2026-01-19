@@ -273,7 +273,7 @@ static bool scan_html_tag_name(TSLexer *lexer, char *buffer, size_t buffer_len, 
 }
 
 static bool scan_html_block(TSLexer *lexer) {
-  if (lexer->get_column(lexer) > 3 || lexer->lookahead != '<') {
+  if (lexer->get_column(lexer) != 0 || lexer->lookahead != '<') {
     return false;
   }
 
@@ -708,10 +708,12 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
     *lexer = saved_state;
   }
 
-  if (valid_symbols[LIST_MARKER] && scan_list_marker(lexer)) {
-    lexer->result_symbol = LIST_MARKER;
-    s->prev = ' ';
-    return true;
+  if (lexer->get_column(lexer) == 0 && scan_list_marker(lexer)) {
+    if (valid_symbols[LIST_MARKER] || valid_symbols[TEXT]) {
+      lexer->result_symbol = LIST_MARKER;
+      s->prev = ' ';
+      return true;
+    }
   }
 
   if (valid_symbols[PARAGRAPH_CONTINUATION] && is_newline(lexer->lookahead)) {
@@ -870,12 +872,10 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
   }
 
   if (valid_symbols[TEXT] && lexer->get_column(lexer) == 0) {
-    TSLexer saved_state = *lexer;
-    if (scan_list_marker(lexer)) {
-      *lexer = saved_state;
+    TSLexer list_state = *lexer;
+    if (is_list_marker_at_line_start(&list_state)) {
       return false;
     }
-    *lexer = saved_state;
   }
 
   if (valid_symbols[TEXT] && is_text_start_char(lexer->lookahead)) {

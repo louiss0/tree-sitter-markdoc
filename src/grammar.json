@@ -280,6 +280,18 @@
             "type": "CHOICE",
             "members": [
               {
+                "type": "PATTERN",
+                "value": "[ \\t]+"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
                 "type": "SYMBOL",
                 "name": "_block"
               },
