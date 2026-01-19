@@ -681,6 +681,21 @@
     }
   },
   {
+    "type": "list_marker",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "list_marker",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "list_paragraph",
     "named": true,
     "fields": {},
@@ -1343,10 +1358,6 @@
   },
   {
     "type": "link_text",
-    "named": true
-  },
-  {
-    "type": "list_marker",
     "named": true
   },
   {

@@ -40,17 +40,8 @@
                       "type": "SEQ",
                       "members": [
                         {
-                          "type": "CHOICE",
-                          "members": [
-                            {
-                              "type": "SYMBOL",
-                              "name": "_BLANK_LINE"
-                            },
-                            {
-                              "type": "SYMBOL",
-                              "name": "_NEWLINE"
-                            }
-                          ]
+                          "type": "SYMBOL",
+                          "name": "_BLANK_LINE"
                         },
                         {
                           "type": "CHOICE",
@@ -78,21 +69,18 @@
           {
             "type": "REPEAT",
             "content": {
-              "type": "SYMBOL",
-              "name": "_BLANK_LINE"
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "_BLANK_LINE"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "_NEWLINE"
+                }
+              ]
             }
-          },
-          {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "_NEWLINE"
-              },
-              {
-                "type": "BLANK"
-              }
-            ]
           }
         ]
       }
@@ -2999,37 +2987,13 @@
       ]
     },
     "list_marker": {
-      "type": "TOKEN",
+      "type": "ALIAS",
       "content": {
-        "type": "PREC",
-        "value": 2,
-        "content": {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "PATTERN",
-              "value": "[ \\t]*"
-            },
-            {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "PATTERN",
-                  "value": "[-*+]"
-                },
-                {
-                  "type": "PATTERN",
-                  "value": "[0-9]+\\."
-                }
-              ]
-            },
-            {
-              "type": "PATTERN",
-              "value": "[ \\t]+"
-            }
-          ]
-        }
-      }
+        "type": "SYMBOL",
+        "name": "_LIST_MARKER"
+      },
+      "named": true,
+      "value": "list_marker"
     },
     "html_comment": {
       "type": "SYMBOL",
@@ -3164,7 +3128,7 @@
               "members": [
                 {
                   "type": "SYMBOL",
-                  "name": "_NEWLINE"
+                  "name": "_PARAGRAPH_CONTINUATION"
                 },
                 {
                   "type": "SEQ",
@@ -3708,6 +3672,14 @@
     {
       "type": "SYMBOL",
       "name": "_LIST_CONTINUATION"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_LIST_MARKER"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_PARAGRAPH_CONTINUATION"
     },
     {
       "type": "SYMBOL",

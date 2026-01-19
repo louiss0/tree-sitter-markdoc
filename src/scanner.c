@@ -7,6 +7,8 @@
 enum TokenType {
   CODE_CONTENT,
   LIST_CONTINUATION,
+  LIST_MARKER,
+  PARAGRAPH_CONTINUATION,
   EM_OPEN_STAR,
   EM_CLOSE_STAR,
   STRONG_OPEN_STAR,
@@ -271,7 +273,7 @@ static bool scan_html_tag_name(TSLexer *lexer, char *buffer, size_t buffer_len, 
 }
 
 static bool scan_html_block(TSLexer *lexer) {
-  if (lexer->get_column(lexer) != 0 || lexer->lookahead != '<') {
+  if (lexer->get_column(lexer) > 3 || lexer->lookahead != '<') {
     return false;
   }
 
@@ -406,10 +408,6 @@ static bool is_thematic_break_line(TSLexer *lexer) {
 }
 
 static bool is_list_marker_at_line_start(TSLexer *lexer) {
-  if (lexer->get_column(lexer) != 0) {
-    return false;
-  }
-
   TSLexer saved_state = *lexer;
 
   while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
@@ -438,6 +436,122 @@ static bool is_list_marker_at_line_start(TSLexer *lexer) {
 
   *lexer = saved_state;
   return is_list;
+}
+
+static bool scan_list_marker(TSLexer *lexer) {
+  TSLexer saved_state = *lexer;
+
+  if (is_thematic_break_line(lexer)) {
+    *lexer = saved_state;
+    return false;
+  }
+
+  while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+    lexer->advance(lexer, false);
+  }
+
+  int32_t first = lexer->lookahead;
+
+  if (first == '-' || first == '*' || first == '+') {
+    lexer->advance(lexer, false);
+    if (lexer->lookahead != ' ' && lexer->lookahead != '\t') {
+      *lexer = saved_state;
+      return false;
+    }
+  } else if (iswdigit(first)) {
+    while (iswdigit(lexer->lookahead)) {
+      lexer->advance(lexer, false);
+    }
+    if (lexer->lookahead != '.') {
+      *lexer = saved_state;
+      return false;
+    }
+    lexer->advance(lexer, false);
+    if (lexer->lookahead != ' ' && lexer->lookahead != '\t') {
+      *lexer = saved_state;
+      return false;
+    }
+  } else {
+    *lexer = saved_state;
+    return false;
+  }
+
+  while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+    lexer->advance(lexer, false);
+  }
+
+  lexer->mark_end(lexer);
+  return true;
+}
+
+static bool is_paragraph_continuation_line(TSLexer *lexer) {
+  TSLexer lookahead_state = *lexer;
+
+  if (is_frontmatter_delimiter_line(&lookahead_state)) {
+    return false;
+  }
+
+  lookahead_state = *lexer;
+  if (is_thematic_break_line(&lookahead_state)) {
+    return false;
+  }
+
+  lookahead_state = *lexer;
+  if (is_list_marker_at_line_start(&lookahead_state)) {
+    return false;
+  }
+
+  lookahead_state = *lexer;
+  while (lookahead_state.lookahead == ' ' || lookahead_state.lookahead == '\t') {
+    lookahead_state.advance(&lookahead_state, false);
+  }
+
+  if (lookahead_state.lookahead == 0 || is_newline(lookahead_state.lookahead)) {
+    return false;
+  }
+
+  if (lookahead_state.lookahead == '>') {
+    return false;
+  }
+
+  if (lookahead_state.lookahead == '#') {
+    int count = 0;
+    while (lookahead_state.lookahead == '#' && count < 6) {
+      lookahead_state.advance(&lookahead_state, false);
+      count++;
+    }
+    if (count > 0 && (lookahead_state.lookahead == ' ' || lookahead_state.lookahead == '\t')) {
+      return false;
+    }
+  }
+
+  if (lookahead_state.lookahead == '`' || lookahead_state.lookahead == '~') {
+    int32_t fence = lookahead_state.lookahead;
+    int count = 0;
+    while (lookahead_state.lookahead == fence && count < 3) {
+      lookahead_state.advance(&lookahead_state, false);
+      count++;
+    }
+    if (count >= 3) {
+      return false;
+    }
+  }
+
+  if (lookahead_state.lookahead == '<') {
+    TSLexer html_state = lookahead_state;
+    if (scan_html_block(&html_state) || scan_html_comment(&html_state)) {
+      return false;
+    }
+  }
+
+  if (lookahead_state.lookahead == '{') {
+    TSLexer markdoc_state = lookahead_state;
+    if (scan_markdoc_comment(&markdoc_state)) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
@@ -594,6 +708,45 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
     *lexer = saved_state;
   }
 
+  if (valid_symbols[LIST_MARKER] && scan_list_marker(lexer)) {
+    lexer->result_symbol = LIST_MARKER;
+    s->prev = ' ';
+    return true;
+  }
+
+  if (valid_symbols[PARAGRAPH_CONTINUATION] && is_newline(lexer->lookahead)) {
+    TSLexer saved_state = *lexer;
+
+    if (lexer->lookahead == '\r') {
+      lexer->advance(lexer, false);
+      if (lexer->lookahead == '\n') {
+        lexer->advance(lexer, false);
+      }
+    } else {
+      lexer->advance(lexer, false);
+    }
+
+    if (!is_newline(lexer->lookahead) && lexer->lookahead != 0 &&
+        is_paragraph_continuation_line(lexer)) {
+      *lexer = saved_state;
+      if (lexer->lookahead == '\r') {
+        lexer->advance(lexer, false);
+        if (lexer->lookahead == '\n') {
+          lexer->advance(lexer, false);
+        }
+      } else {
+        lexer->advance(lexer, false);
+      }
+
+      lexer->mark_end(lexer);
+      lexer->result_symbol = PARAGRAPH_CONTINUATION;
+      s->prev = '\n';
+      return true;
+    }
+
+    *lexer = saved_state;
+  }
+
   if (valid_symbols[COMMENT_BLOCK] && scan_markdoc_comment(lexer)) {
     lexer->result_symbol = COMMENT_BLOCK;
     s->prev = 0;
@@ -716,8 +869,13 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
     }
   }
 
-  if (valid_symbols[TEXT] && is_list_marker_at_line_start(lexer)) {
-    return false;
+  if (valid_symbols[TEXT] && lexer->get_column(lexer) == 0) {
+    TSLexer saved_state = *lexer;
+    if (scan_list_marker(lexer)) {
+      *lexer = saved_state;
+      return false;
+    }
+    *lexer = saved_state;
   }
 
   if (valid_symbols[TEXT] && is_text_start_char(lexer->lookahead)) {
