@@ -522,9 +522,9 @@ static bool scan_simple_list_marker(TSLexer *lexer, const bool *valid_symbols) {
 
   int32_t first = lexer->lookahead;
   if (first == '-' || first == '*' || first == '+') {
-    TokenType symbol = first == '-' ? LIST_MARKER_MINUS
-                                    : (first == '*' ? LIST_MARKER_STAR : LIST_MARKER_PLUS);
-    TokenType dont_interrupt_symbol =
+    enum TokenType symbol = first == '-' ? LIST_MARKER_MINUS
+                                         : (first == '*' ? LIST_MARKER_STAR : LIST_MARKER_PLUS);
+    enum TokenType dont_interrupt_symbol =
         first == '-' ? LIST_MARKER_MINUS_DONT_INTERRUPT
                      : (first == '*' ? LIST_MARKER_STAR_DONT_INTERRUPT
                                      : LIST_MARKER_PLUS_DONT_INTERRUPT);
@@ -567,8 +567,8 @@ static bool scan_simple_list_marker(TSLexer *lexer, const bool *valid_symbols) {
       *lexer = saved_state;
       return false;
     }
-    TokenType symbol = dot ? LIST_MARKER_DOT : LIST_MARKER_PARENTHESIS;
-    TokenType dont_interrupt_symbol =
+    enum TokenType symbol = dot ? LIST_MARKER_DOT : LIST_MARKER_PARENTHESIS;
+    enum TokenType dont_interrupt_symbol =
         dot ? LIST_MARKER_DOT_DONT_INTERRUPT : LIST_MARKER_PARENTHESIS_DONT_INTERRUPT;
     if (!valid_symbols[symbol] && !valid_symbols[dont_interrupt_symbol]) {
       *lexer = saved_state;
@@ -771,7 +771,7 @@ static bool parse_minus(TSLexer *lexer, const bool *valid_symbols) {
   return false;
 }
 
-static bool is_paragraph_continuation_line(TSLexer *lexer) {
+static bool is_paragraph_continuation_line(TSLexer *lexer, const bool *valid_symbols) {
   TSLexer lookahead_state = *lexer;
 
   if (is_frontmatter_delimiter_line(&lookahead_state)) {
@@ -784,7 +784,10 @@ static bool is_paragraph_continuation_line(TSLexer *lexer) {
   }
 
   lookahead_state = *lexer;
-  if (is_simple_list_marker_start(&lookahead_state)) {
+  bool list_marker_valid = valid_symbols[LIST_MARKER_MINUS] || valid_symbols[LIST_MARKER_PLUS] ||
+                           valid_symbols[LIST_MARKER_STAR] || valid_symbols[LIST_MARKER_DOT] ||
+                           valid_symbols[LIST_MARKER_PARENTHESIS];
+  if (list_marker_valid && is_simple_list_marker_start(&lookahead_state)) {
     return false;
   }
 
@@ -1053,7 +1056,7 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
     }
 
     if (!is_newline(lexer->lookahead) && lexer->lookahead != 0 &&
-        is_paragraph_continuation_line(lexer)) {
+        is_paragraph_continuation_line(lexer, valid_symbols)) {
       *lexer = saved_state;
       if (lexer->lookahead == '\r') {
         lexer->advance(lexer, false);
