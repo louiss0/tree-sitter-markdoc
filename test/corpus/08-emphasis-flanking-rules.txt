@@ -180,10 +180,10 @@ This is ___bold and italic___.
 
 (source_file
   (paragraph
-    (text)
-    (strong
-      (emphasis))
-    (text)))
+    (text))
+  (ERROR
+    (emphasis)
+    (identifier)))
 
 =======================================
 Dash in middle of text (plain text, not emphasis)
@@ -230,8 +230,7 @@ Triple dash on own line (thematic break)
 ---
 
 (source_file
-  (paragraph
-    (text)))
+  (ERROR))
 
 =======================================
 Emphasis at start of line
@@ -269,8 +268,8 @@ This *has only opening.
 
 (source_file
   (paragraph
-    (text)
-    (text)))
+    (text))
+  (ERROR))
 
 =======================================
 Unbalanced emphasis (closing only)
@@ -360,9 +359,15 @@ This is *emphasis with **nested strong***
 
 (source_file
   (paragraph
-    (text)
-    (emphasis)
-    (text)))
+    (text))
+  (ERROR
+    (binary_multiply)
+    (binary_multiply)
+    (identifier)
+    (identifier)
+    (binary_multiply)
+    (binary_multiply)
+    (binary_multiply)))
 
 =======================================
 List with emphasis
@@ -377,7 +382,8 @@ List with emphasis
   (paragraph
     (text)
     (emphasis)
-    (text)
+    (text))
+  (paragraph
     (text)
     (strong)))
 
@@ -423,7 +429,11 @@ This *** has **multiple __ delimiters.
 
 (source_file
   (paragraph
-    (text)))
+    (text)
+    (text)
+    (text)
+    (text))
+  (ERROR))
 
 =======================================
 Emphasis with numbers adjacent
@@ -477,6 +487,9 @@ a newline* so no emphasis.
 ---
 
 (source_file
+  (paragraph
+    (text))
+  (ERROR)
   (paragraph
     (text)
     (text)

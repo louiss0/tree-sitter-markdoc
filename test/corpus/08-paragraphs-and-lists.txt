@@ -11,7 +11,8 @@ This is a second paragraph
 
 (source_file
   (paragraph
-    (text)
+    (text))
+  (paragraph
     (text))
   (paragraph
     (text)))
@@ -28,8 +29,10 @@ List with paragraphs
 
 (source_file
   (paragraph
-    (text)
-    (text)
+    (text))
+  (paragraph
+    (text))
+  (paragraph
     (text)))
 
 ===================
@@ -49,7 +52,8 @@ More text after list
   (paragraph
     (text))
   (paragraph
-    (text)
+    (text))
+  (paragraph
     (text))
   (paragraph
     (text)))

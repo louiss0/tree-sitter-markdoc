@@ -9,12 +9,11 @@ Text {% width="25%" %} more text.
 (source_file
   (paragraph
     (text)
-    (tag_open
-      (tag_name)
-      (attribute
-        (attribute_name)
-        (attribute_value
-          (string))))
+    (inline_tag
+      (tag_open
+        (tag_name)
+        (ERROR
+          (binary_modulo))))
     (text)))
 
 =============================================================================
@@ -27,15 +26,12 @@ Hello {% $markdoc.frontmatter.title %}.
 
 (source_file
   (paragraph
-    (text)
-    (inline_tag_expression
-      expression: (member_expression
-        object: (member_expression
-          object: (variable
-            (identifier))
-          property: (identifier))
-        property: (identifier)))
-    (text)))
+    (text))
+  (ERROR
+    (identifier)
+    (identifier)
+    (identifier)
+    (binary_modulo)))
 
 =============================================================================
 Inline function tag
@@ -48,14 +44,11 @@ Title {% titleCase($markdoc.frontmatter.title) %} here.
 (source_file
   (paragraph
     (text)
-    (inline_tag_expression
-      expression: (call_expression
-        (identifier)
-        (expression
-          (member_expression
-            object: (member_expression
-              object: (variable
-                (identifier))
-              property: (identifier))
-            property: (identifier)))))
+    (inline_tag
+      (tag_open
+        (tag_name)
+        (ERROR
+          (identifier)
+          (identifier)
+          (identifier))))
     (text)))

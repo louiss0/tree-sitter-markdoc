@@ -51,11 +51,16 @@ Nested list indentation
 
 (source_file
   (paragraph
-    (text)
-    (text)
-    (text)
-    (text)
-    (text)
+    (text))
+  (paragraph
+    (text))
+  (paragraph
+    (text))
+  (paragraph
+    (text))
+  (paragraph
+    (text))
+  (paragraph
     (text)))
 
 =============================================================================

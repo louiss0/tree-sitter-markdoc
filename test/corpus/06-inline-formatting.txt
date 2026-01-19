@@ -150,8 +150,10 @@ Inline formatting in list
 (source_file
   (paragraph
     (text)
-    (emphasis)
+    (emphasis))
+  (paragraph
     (text)
-    (strong)
+    (strong))
+  (paragraph
     (text)
     (inline_code)))

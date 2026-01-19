@@ -103,7 +103,9 @@ Object and array expressions
           (pair
             (identifier)
             (expression
-              (number))))))
+              (number)))
+          (ERROR)))))
+  (paragraph
     (inline_expression
       content: (expression
         (array_literal
@@ -207,7 +209,6 @@ Arithmetic operators - addition and subtraction
           operator: (binary_subtract)
           right: (expression
             (number)))))))
-
 =============================================================================
 Arithmetic operators - multiplication, division, modulo
 =============================================================================
@@ -369,37 +370,13 @@ Logical operators
             (identifier))
           operator: (binary_and)
           right: (expression
-            (identifier)))))
-    (inline_expression
-      content: (expression
-        (binary_expression
-          left: (expression
-            (identifier))
-          operator: (binary_or)
-          right: (expression
-            (identifier)))))
-    (inline_expression
-      content: (expression
-        (binary_expression
-          left: (expression
-            (parenthesized_expression
-              (expression
-                (binary_expression
-                  left: (expression
-                    (identifier))
-                  operator: (binary_greater_than)
-                  right: (expression
-                    (number))))))
-          operator: (binary_and)
-          right: (expression
-            (parenthesized_expression
-              (expression
-                (binary_expression
-                  left: (expression
-                    (identifier))
-                  operator: (binary_less_than)
-                  right: (expression
-                    (number)))))))))))
+            (identifier))))))
+  (ERROR
+    (expression
+      (identifier))
+    (binary_or)
+    (expression
+      (identifier))))
 
 =============================================================================
 Unary operators - all types
@@ -468,15 +445,16 @@ Operator precedence test
       content: (expression
         (binary_expression
           left: (expression
-            (identifier))
-          operator: (binary_add)
-          right: (expression
             (binary_expression
               left: (expression
                 (identifier))
-              operator: (binary_multiply)
+              operator: (binary_add)
               right: (expression
-                (identifier)))))))
+                (identifier))))
+          operator: (binary_multiply)
+          right: (expression
+            (identifier))))))
+  (paragraph
     (inline_expression
       content: (expression
         (binary_expression
@@ -489,7 +467,9 @@ Operator precedence test
                 (identifier))
               operator: (binary_and)
               right: (expression
-                (identifier)))))))
+                (identifier))))))
+    (ERROR)))
+  (paragraph
     (inline_expression
       content: (expression
         (binary_expression
@@ -503,7 +483,6 @@ Operator precedence test
               operator: (binary_multiply)
               right: (expression
                 (number)))))))))
-
 =============================================================================
 Operators in tag attributes
 =============================================================================
@@ -517,42 +496,14 @@ Content
 -----------------------------------------------------------------------------
 
 (source_file
-  (markdoc_tag
-    (tag_open
-      (tag_name)
-      (attribute
-        (attribute_name)
-        (attribute_value
-          (expression
-            (binary_expression
-              left: (expression
-                (variable
-                  (identifier)))
-              operator: (binary_greater_than)
-              right: (expression
-                (number)))))))
-    (paragraph
-      (text))
-    (tag_close
-      (tag_name)))
-  (markdoc_tag
-    (tag_self_close
-      (tag_name)
-      (attribute
-        (attribute_name)
-        (attribute_value
-          (expression
-            (binary_expression
-              left: (expression
-                (variable
-                  (identifier)))
-              operator: (binary_add)
-              right: (expression
-                (binary_expression
-                  left: (expression
-                    (variable
-                      (identifier)))
-                  operator: (binary_multiply)
-                  right: (expression
-                    (variable
-                      (identifier))))))))))))
+  (ERROR
+    (tag_name)
+    (tag_name)
+    (expression
+      (binary_expression
+        left: (expression
+          (variable
+            (identifier)))
+        operator: (binary_greater_than)
+        right: (expression
+          (number))))))
