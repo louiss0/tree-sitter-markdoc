@@ -522,6 +522,16 @@ static bool scan_simple_list_marker(TSLexer *lexer, const bool *valid_symbols) {
 
   int32_t first = lexer->lookahead;
   if (first == '-' || first == '*' || first == '+') {
+    TokenType symbol = first == '-' ? LIST_MARKER_MINUS
+                                    : (first == '*' ? LIST_MARKER_STAR : LIST_MARKER_PLUS);
+    TokenType dont_interrupt_symbol =
+        first == '-' ? LIST_MARKER_MINUS_DONT_INTERRUPT
+                     : (first == '*' ? LIST_MARKER_STAR_DONT_INTERRUPT
+                                     : LIST_MARKER_PLUS_DONT_INTERRUPT);
+    if (!valid_symbols[symbol] && !valid_symbols[dont_interrupt_symbol]) {
+      *lexer = saved_state;
+      return false;
+    }
     lexer->advance(lexer, false);
     if (lexer->lookahead != ' ' && lexer->lookahead != '\t') {
       *lexer = saved_state;
@@ -531,9 +541,7 @@ static bool scan_simple_list_marker(TSLexer *lexer, const bool *valid_symbols) {
       lexer->advance(lexer, false);
     }
     lexer->mark_end(lexer);
-    lexer->result_symbol =
-        first == '-' ? LIST_MARKER_MINUS
-                     : (first == '*' ? LIST_MARKER_STAR : LIST_MARKER_PLUS);
+    lexer->result_symbol = valid_symbols[symbol] ? symbol : dont_interrupt_symbol;
     return true;
   }
 
@@ -559,6 +567,13 @@ static bool scan_simple_list_marker(TSLexer *lexer, const bool *valid_symbols) {
       *lexer = saved_state;
       return false;
     }
+    TokenType symbol = dot ? LIST_MARKER_DOT : LIST_MARKER_PARENTHESIS;
+    TokenType dont_interrupt_symbol =
+        dot ? LIST_MARKER_DOT_DONT_INTERRUPT : LIST_MARKER_PARENTHESIS_DONT_INTERRUPT;
+    if (!valid_symbols[symbol] && !valid_symbols[dont_interrupt_symbol]) {
+      *lexer = saved_state;
+      return false;
+    }
     if (lexer->lookahead != ' ' && lexer->lookahead != '\t') {
       *lexer = saved_state;
       return false;
@@ -567,7 +582,7 @@ static bool scan_simple_list_marker(TSLexer *lexer, const bool *valid_symbols) {
       lexer->advance(lexer, false);
     }
     lexer->mark_end(lexer);
-    lexer->result_symbol = dot ? LIST_MARKER_DOT : LIST_MARKER_PARENTHESIS;
+    lexer->result_symbol = valid_symbols[symbol] ? symbol : dont_interrupt_symbol;
     return true;
   }
 
