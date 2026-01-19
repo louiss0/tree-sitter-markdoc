@@ -273,7 +273,7 @@ static bool scan_html_tag_name(TSLexer *lexer, char *buffer, size_t buffer_len, 
 }
 
 static bool scan_html_block(TSLexer *lexer) {
-  if (lexer->get_column(lexer) != 0 || lexer->lookahead != '<') {
+  if (lexer->get_column(lexer) > 3 || lexer->lookahead != '<') {
     return false;
   }
 
