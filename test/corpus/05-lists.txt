@@ -161,3 +161,41 @@ Nested ordered list
       (list_marker)
       (list_paragraph
         (text)))))
+
+=======================================
+Deeply nested unordered list
+=======================================
+
+- Top level
+  - Level two
+    - Level three
+      - Level four
+
+---
+
+(source_file
+  (paragraph
+    (text)))
+
+=======================================
+Mixed ordered and unordered nesting
+=======================================
+
+1. First ordered
+   - Nested unordered
+     1. Nested ordered again
+   - Another nested unordered
+2. Second ordered
+
+---
+
+(source_file
+  (list
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))))
