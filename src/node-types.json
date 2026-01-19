@@ -713,11 +713,19 @@
           "named": true
         },
         {
+          "type": "inline_tag_expression",
+          "named": true
+        },
+        {
           "type": "link",
           "named": true
         },
         {
           "type": "strong",
+          "named": true
+        },
+        {
+          "type": "tag_self_close",
           "named": true
         },
         {
@@ -923,11 +931,19 @@
           "named": true
         },
         {
+          "type": "inline_tag_expression",
+          "named": true
+        },
+        {
           "type": "link",
           "named": true
         },
         {
           "type": "strong",
+          "named": true
+        },
+        {
+          "type": "tag_self_close",
           "named": true
         },
         {

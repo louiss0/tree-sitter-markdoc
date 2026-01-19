@@ -78,6 +78,9 @@ static inline bool is_word_ch(int32_t c) {
   return iswalnum(c) || c == '_';
 }
 
+static inline bool is_punct_ch(int32_t c) {
+  return iswpunct(c);
+}
 static inline bool is_text_start_char(int32_t c) {
   if (c == 0 || is_newline(c)) return false;
   switch (c) {
@@ -112,16 +115,26 @@ static inline bool is_text_continue_char(int32_t c) {
 
 static bool scan_literal(TSLexer *lexer, const char *text);
 
-static bool is_frontmatter_delimiter(TSLexer *lexer) {
+static bool is_frontmatter_delimiter_line(TSLexer *lexer) {
   if (lexer->get_column(lexer) != 0 || lexer->lookahead != '-') {
     return false;
   }
 
   TSLexer saved_state = *lexer;
+  int count = 0;
 
-  if (!scan_literal(lexer, "---")) {
+  while (lexer->lookahead == '-' && count < 3) {
+    lexer->advance(lexer, false);
+    count++;
+  }
+
+  if (count != 3) {
     *lexer = saved_state;
     return false;
+  }
+
+  while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+    lexer->advance(lexer, false);
   }
 
   bool ok = is_newline(lexer->lookahead) || lexer->lookahead == 0;
@@ -427,40 +440,6 @@ static bool is_list_marker_at_line_start(TSLexer *lexer) {
   return is_list;
 }
 
-static bool has_closing_delim(TSLexer *lexer, int32_t delim, int run_len) {
-  TSLexer saved_state = *lexer;
-
-  int count = 0;
-  while (lexer->lookahead == delim && count < run_len) {
-    lexer->advance(lexer, false);
-    count++;
-  }
-
-  if (count < run_len) {
-    *lexer = saved_state;
-    return false;
-  }
-
-  while (lexer->lookahead != 0 && !is_newline(lexer->lookahead)) {
-    if (lexer->lookahead == delim) {
-      int close_count = 0;
-      while (lexer->lookahead == delim && close_count < run_len) {
-        lexer->advance(lexer, false);
-        close_count++;
-      }
-      if (close_count == run_len) {
-        *lexer = saved_state;
-        return true;
-      }
-    } else {
-      lexer->advance(lexer, false);
-    }
-  }
-
-  *lexer = saved_state;
-  return false;
-}
-
 bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
                                               const bool *valid_symbols) {
   Scanner *s = (Scanner *)payload;
@@ -633,6 +612,10 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
     return true;
   }
 
+  if (valid_symbols[TEXT] && is_frontmatter_delimiter_line(lexer)) {
+    return false;
+  }
+
   if (valid_symbols[TEXT] && lexer->get_column(lexer) == 0 &&
       (lexer->lookahead == ' ' || lexer->lookahead == '\t')) {
     TSLexer saved_state = *lexer;
@@ -742,7 +725,7 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
     int32_t first = lexer->lookahead;
 
     if (column == 0) {
-      if (is_frontmatter_delimiter(lexer)) {
+      if (is_frontmatter_delimiter_line(lexer)) {
         return false;
       }
 
@@ -827,9 +810,8 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
     }
   }
 
-  // EMPHASIS DELIMITERS: handle * and _ with simplified flanking rules
+  // EMPHASIS DELIMITERS: handle * and _ with flanking rules
   if (lexer->lookahead == '*' || lexer->lookahead == '_') {
-    // Check if any emphasis token is valid before scanning
     if (!valid_symbols[EM_OPEN_STAR] && !valid_symbols[EM_CLOSE_STAR] &&
         !valid_symbols[STRONG_OPEN_STAR] && !valid_symbols[STRONG_CLOSE_STAR] &&
         !valid_symbols[EM_OPEN_UNDERSCORE] && !valid_symbols[EM_CLOSE_UNDERSCORE] &&
@@ -841,136 +823,92 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
       return false;
     }
 
-    if (lexer->get_column(lexer) == 0 && is_list_marker_at_line_start(lexer)) {
-      return false;
-    }
-
-    if (lexer->get_column(lexer) == 0 && is_thematic_break_line(lexer)) {
-      return false;
-    }
-
     int32_t delim = lexer->lookahead;
     int32_t prev = s->prev;
-    TSLexer saved_state = *lexer;
-    lexer->advance(lexer, false);
-    bool has_second = (lexer->lookahead == delim);
-    *lexer = saved_state;
-
-    int run_len = has_second ? 2 : 1;
 
     lexer->advance(lexer, false);
-    if (run_len == 2) {
+    int32_t after_first = lexer->lookahead;
+    bool has_second = (after_first == delim);
+
+    int32_t next_after_run = after_first;
+    if (has_second) {
       lexer->advance(lexer, false);
+      next_after_run = lexer->lookahead;
     }
-    int32_t next_after_run = lexer->lookahead;
-    *lexer = saved_state;
 
-    bool prev_is_word = is_word_ch(prev);
+    bool next_is_space = is_space_ch(next_after_run) || is_newline(next_after_run) || next_after_run == 0;
+    bool prev_is_space = is_space_ch(prev) || prev == 0 || is_newline(prev);
     bool next_is_word = is_word_ch(next_after_run);
-    bool is_intraword = prev_is_word && next_is_word;
+    bool prev_is_word = is_word_ch(prev) || (!is_space_ch(prev) && !is_newline(prev) && prev != 0);
 
-    bool can_open = !is_intraword && next_after_run != 0 && !is_newline(next_after_run);
-    bool can_close = !is_intraword && prev != 0 && !is_newline(prev) && !is_space_ch(prev);
+    bool left_flanking = next_is_word && (prev_is_space || is_punct_ch(prev));
+    bool right_flanking = prev_is_word && (next_is_space || is_punct_ch(next_after_run));
 
-    if (run_len == 2 && can_close) {
-      if (delim == '*' && valid_symbols[STRONG_CLOSE_STAR]) {
-        lexer->advance(lexer, false);
-        lexer->advance(lexer, false);
-        lexer->mark_end(lexer);
-        lexer->result_symbol = STRONG_CLOSE_STAR;
+    if (!has_second && next_is_space) {
+      left_flanking = false;
+    }
+
+    lexer->mark_end(lexer);
+
+    if (has_second) {
+      if (left_flanking && !right_flanking) {
+        if (delim == '*' && valid_symbols[STRONG_OPEN_STAR]) {
+          lexer->result_symbol = STRONG_OPEN_STAR;
+          s->prev = delim;
+          return true;
+        }
+        if (delim == '_' && valid_symbols[STRONG_OPEN_UNDERSCORE]) {
+          lexer->result_symbol = STRONG_OPEN_UNDERSCORE;
+          s->prev = delim;
+          return true;
+        }
+      }
+      if (right_flanking) {
+        if (delim == '*' && valid_symbols[STRONG_CLOSE_STAR]) {
+          lexer->result_symbol = STRONG_CLOSE_STAR;
+          s->prev = delim;
+          return true;
+        }
+        if (delim == '_' && valid_symbols[STRONG_CLOSE_UNDERSCORE]) {
+          lexer->result_symbol = STRONG_CLOSE_UNDERSCORE;
+          s->prev = delim;
+          return true;
+        }
+      }
+    }
+
+    if (left_flanking && !right_flanking) {
+      if (delim == '*' && valid_symbols[EM_OPEN_STAR]) {
+        lexer->result_symbol = EM_OPEN_STAR;
         s->prev = delim;
         return true;
       }
-      if (delim == '_' && valid_symbols[STRONG_CLOSE_UNDERSCORE]) {
-        lexer->advance(lexer, false);
-        lexer->advance(lexer, false);
-        lexer->mark_end(lexer);
-        lexer->result_symbol = STRONG_CLOSE_UNDERSCORE;
+      if (delim == '_' && valid_symbols[EM_OPEN_UNDERSCORE]) {
+        lexer->result_symbol = EM_OPEN_UNDERSCORE;
         s->prev = delim;
         return true;
       }
     }
-
-    if (run_len == 1 && can_close) {
+    if (right_flanking) {
       if (delim == '*' && valid_symbols[EM_CLOSE_STAR]) {
-        lexer->advance(lexer, false);
-        lexer->mark_end(lexer);
         lexer->result_symbol = EM_CLOSE_STAR;
         s->prev = delim;
         return true;
       }
       if (delim == '_' && valid_symbols[EM_CLOSE_UNDERSCORE]) {
-        lexer->advance(lexer, false);
-        lexer->mark_end(lexer);
         lexer->result_symbol = EM_CLOSE_UNDERSCORE;
         s->prev = delim;
         return true;
       }
     }
 
-    if (run_len == 2 && can_open && has_closing_delim(lexer, delim, 2)) {
-      if (delim == '*' && valid_symbols[STRONG_OPEN_STAR]) {
-        lexer->advance(lexer, false);
-        lexer->advance(lexer, false);
-        lexer->mark_end(lexer);
-        lexer->result_symbol = STRONG_OPEN_STAR;
-        s->prev = delim;
-        return true;
-      }
-      if (delim == '_' && valid_symbols[STRONG_OPEN_UNDERSCORE]) {
-        lexer->advance(lexer, false);
-        lexer->advance(lexer, false);
-        lexer->mark_end(lexer);
-        lexer->result_symbol = STRONG_OPEN_UNDERSCORE;
-        s->prev = delim;
-        return true;
-      }
-    }
-
-    if (can_open && has_closing_delim(lexer, delim, 1)) {
-      if (delim == '*' && valid_symbols[EM_OPEN_STAR]) {
-        lexer->advance(lexer, false);
-        lexer->mark_end(lexer);
-        lexer->result_symbol = EM_OPEN_STAR;
-        s->prev = delim;
-        return true;
-      }
-      if (delim == '_' && valid_symbols[EM_OPEN_UNDERSCORE]) {
-        lexer->advance(lexer, false);
-        lexer->mark_end(lexer);
-        lexer->result_symbol = EM_OPEN_UNDERSCORE;
-        s->prev = delim;
-        return true;
-      }
-    }
-
-    if (valid_symbols[TEXT]) {
-      lexer->advance(lexer, false);
-      if (run_len == 2) {
-        lexer->advance(lexer, false);
-      }
-      lexer->mark_end(lexer);
-      int32_t last = delim;
-      while (is_text_continue_char(lexer->lookahead)) {
-        last = lexer->lookahead;
-        lexer->advance(lexer, false);
-        lexer->mark_end(lexer);
-      }
-      if (last != 0) {
-        s->prev = last;
-        lexer->result_symbol = TEXT;
-        return true;
-      }
-    }
-
     if (valid_symbols[RAW_DELIM]) {
-      lexer->advance(lexer, false);
-      lexer->mark_end(lexer);
       lexer->result_symbol = RAW_DELIM;
       s->prev = delim;
       return true;
     }
 
+    s->prev = delim;
     return false;
   }
 

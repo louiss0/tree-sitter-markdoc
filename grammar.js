@@ -48,7 +48,8 @@ module.exports = grammar({
     [$.markdoc_tag],
     [$.attribute_value, $._primary_expression],
     [$.tag_open, $.tag_close],
-    [$.binary_expression]
+    [$.binary_expression],
+    [$.markdoc_tag, $._inline_line_start]
   ],
 
   rules: {
@@ -69,10 +70,7 @@ module.exports = grammar({
           )
         ))
       )),
-      repeat(choice(
-        $._BLANK_LINE,
-        $._NEWLINE
-      ))
+      repeat($._BLANK_LINE)
     )),
 
     _block: $ => choice(
@@ -507,23 +505,25 @@ module.exports = grammar({
 
     // Paragraph: consecutive lines of content (separated by single newlines, not double)
     paragraph: $ => prec.left(1, seq(
-      $._inline_first,
+      $._inline_line_start,
       repeat($._inline_content),
       repeat(seq(
         $._NEWLINE,
-        seq($._inline_first, repeat($._inline_content))
-      ))
+        seq($._inline_line_start, repeat($._inline_content))
+      )),
+      optional($._NEWLINE)
     )),
 
     // List paragraph: same as paragraph but semantically distinct for list items
     list_paragraph: $ => prec.right(1, seq(
-      $._inline_first,
+      $._inline_line_start,
       repeat($._inline_content),
       repeat(seq(
         $._LIST_CONTINUATION,
-        $._inline_first,
+        $._inline_line_start,
         repeat($._inline_content)
-      ))
+      )),
+      optional($._LIST_CONTINUATION)
     )),
 
     emphasis: $ => choice(
@@ -576,6 +576,20 @@ module.exports = grammar({
       $.emphasis,
       $.strong,
       $.inline_code
+    ),
+
+    _inline_line_start: $ => choice(
+      $.inline_expression,
+      $.inline_tag_expression,
+      $.tag_self_close,
+      $.text,
+      $.html_inline,
+      $.link,
+      $.emphasis,
+      $.strong,
+      $.inline_code,
+      $.image,
+      alias($.standalone_punct, $.text)
     ),
 
     // Inline content after first element
