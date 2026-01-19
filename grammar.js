@@ -12,6 +12,11 @@ const WS1 = /[ \t]+/;
 const TAG_WS = /[ \t\r\n]+/;
 const TAG_WS1 = /[ \t\r\n]+/;
 const HTML_TAG_NAME = /[a-zA-Z][a-zA-Z0-9]*/;
+const LIST_MARKER_MINUS_FALLBACK = /[ \t]*-[ \t]+/;
+const LIST_MARKER_PLUS_FALLBACK = /[ \t]*\+[ \t]+/;
+const LIST_MARKER_STAR_FALLBACK = /[ \t]*\*[ \t]+/;
+const LIST_MARKER_DOT_FALLBACK = /[ \t]*[0-9]{1,9}\.[ \t]+/;
+const LIST_MARKER_PAREN_FALLBACK = /[ \t]*[0-9]{1,9}\)[ \t]+/;
 
 module.exports = grammar({
   name: "markdoc",
@@ -19,7 +24,17 @@ module.exports = grammar({
   externals: $ => [
     $._CODE_CONTENT,
     $._LIST_CONTINUATION,
-    $._LIST_MARKER,
+    $._THEMATIC_BREAK,
+    $._LIST_MARKER_MINUS,
+    $._LIST_MARKER_PLUS,
+    $._LIST_MARKER_STAR,
+    $._LIST_MARKER_DOT,
+    $._LIST_MARKER_PARENTHESIS,
+    $._LIST_MARKER_MINUS_DONT_INTERRUPT,
+    $._LIST_MARKER_PLUS_DONT_INTERRUPT,
+    $._LIST_MARKER_STAR_DONT_INTERRUPT,
+    $._LIST_MARKER_DOT_DONT_INTERRUPT,
+    $._LIST_MARKER_PARENTHESIS_DONT_INTERRUPT,
     $._PARAGRAPH_CONTINUATION,
     $._EM_OPEN_STAR,
     $._EM_CLOSE_STAR,
@@ -41,6 +56,7 @@ module.exports = grammar({
   conflicts: $ => [
     [$.source_file],
     [$.list_item],
+    [$.list, $.paragraph],
     [$.attribute, $.expression],
     [$.paragraph, $._inline_content],
     [$.paragraph],
@@ -105,12 +121,8 @@ module.exports = grammar({
 
     heading_marker: $ => token(prec(3, /#{1,6}[ \t]/)),  // Require space/tab after #
 
-    // Thematic break (horizontal rule) - must be at least 3 chars
-    thematic_break: $ => token(prec(1, choice(
-      /\*\s*\*\s*\*[\s*]*/,
-      /-\s*-\s*-[\s-]*/,
-      /_\s*_\s*_[\s_]*/
-    ))),
+    // Thematic break (horizontal rule)
+    thematic_break: $ => $._THEMATIC_BREAK,
 
     // Blockquote
     blockquote: $ => prec.right(seq(
@@ -462,19 +474,86 @@ module.exports = grammar({
       '}}'
     ),
 
-    // Lists: one or more list items
-    // Items can be separated by optional newlines (handled by extras)
-    // Nested lists use INDENT/DEDENT tokens from scanner
-    list: $ => prec.right(repeat1($.list_item)),
-
-    // A list item: marker + list_paragraph content
-    list_item: $ => seq(
-      field('marker', $.list_marker),
-      field('content', $.list_paragraph),
-      optional($._NEWLINE)
+    // Lists (GFM)
+    list: $ => prec.dynamic(2, choice(
+      $._list_plus,
+      $._list_minus,
+      $._list_star,
+      $._list_dot,
+      $._list_parenthesis
+    )),
+    _list_plus: $ => prec.right(repeat1(alias($._list_item_plus, $.list_item))),
+    _list_minus: $ => prec.right(repeat1(alias($._list_item_minus, $.list_item))),
+    _list_star: $ => prec.right(repeat1(alias($._list_item_star, $.list_item))),
+    _list_dot: $ => prec.right(repeat1(alias($._list_item_dot, $.list_item))),
+    _list_parenthesis: $ => prec.right(repeat1(alias($._list_item_parenthesis, $.list_item))),
+    list_item: $ => choice(
+      $._list_item_plus,
+      $._list_item_minus,
+      $._list_item_star,
+      $._list_item_dot,
+      $._list_item_parenthesis
     ),
 
-    list_marker: $ => alias($._LIST_MARKER, $.list_marker),
+    list_marker_plus: $ => choice($._list_marker_plus, $._list_marker_plus_dont_interrupt, token(prec(2, LIST_MARKER_PLUS_FALLBACK))),
+    list_marker_minus: $ => choice($._list_marker_minus, $._list_marker_minus_dont_interrupt, token(prec(2, LIST_MARKER_MINUS_FALLBACK))),
+    list_marker_star: $ => choice($._list_marker_star, $._list_marker_star_dont_interrupt, token(prec(2, LIST_MARKER_STAR_FALLBACK))),
+    list_marker_dot: $ => choice($._list_marker_dot, $._list_marker_dot_dont_interrupt, token(prec(2, LIST_MARKER_DOT_FALLBACK))),
+    list_marker_parenthesis: $ => choice($._list_marker_parenthesis, $._list_marker_parenthesis_dont_interrupt, token(prec(2, LIST_MARKER_PAREN_FALLBACK))),
+
+    _list_marker_plus: $ => alias($._LIST_MARKER_PLUS, $.list_marker_plus),
+    _list_marker_minus: $ => alias($._LIST_MARKER_MINUS, $.list_marker_minus),
+    _list_marker_star: $ => alias($._LIST_MARKER_STAR, $.list_marker_star),
+    _list_marker_dot: $ => alias($._LIST_MARKER_DOT, $.list_marker_dot),
+    _list_marker_parenthesis: $ => alias($._LIST_MARKER_PARENTHESIS, $.list_marker_parenthesis),
+    _list_marker_plus_dont_interrupt: $ => alias($._LIST_MARKER_PLUS_DONT_INTERRUPT, $.list_marker_plus),
+    _list_marker_minus_dont_interrupt: $ => alias($._LIST_MARKER_MINUS_DONT_INTERRUPT, $.list_marker_minus),
+    _list_marker_star_dont_interrupt: $ => alias($._LIST_MARKER_STAR_DONT_INTERRUPT, $.list_marker_star),
+    _list_marker_dot_dont_interrupt: $ => alias($._LIST_MARKER_DOT_DONT_INTERRUPT, $.list_marker_dot),
+    _list_marker_parenthesis_dont_interrupt: $ => alias($._LIST_MARKER_PARENTHESIS_DONT_INTERRUPT, $.list_marker_parenthesis),
+
+    _list_item_plus: $ => seq(
+      $.list_marker_plus,
+      optional($.block_continuation),
+      $._list_item_content,
+      $._block_close,
+      optional($.block_continuation)
+    ),
+    _list_item_minus: $ => seq(
+      $.list_marker_minus,
+      optional($.block_continuation),
+      $._list_item_content,
+      $._block_close,
+      optional($.block_continuation)
+    ),
+    _list_item_star: $ => seq(
+      $.list_marker_star,
+      optional($.block_continuation),
+      $._list_item_content,
+      $._block_close,
+      optional($.block_continuation)
+    ),
+    _list_item_dot: $ => seq(
+      $.list_marker_dot,
+      optional($.block_continuation),
+      $._list_item_content,
+      $._block_close,
+      optional($.block_continuation)
+    ),
+    _list_item_parenthesis: $ => seq(
+      $.list_marker_parenthesis,
+      optional($.block_continuation),
+      $._list_item_content,
+      $._block_close,
+      optional($.block_continuation)
+    ),
+
+    block_continuation: $ => $._LIST_CONTINUATION,
+    _block_close: $ => $._NEWLINE,
+    _list_item_content: $ => choice(
+      $.list_paragraph,
+      $.list
+    ),
 
     html_comment: $ => $._HTML_COMMENT,
 
@@ -502,7 +581,7 @@ module.exports = grammar({
     ),
 
     // Paragraph: consecutive lines of content (separated by single newlines, not double)
-    paragraph: $ => prec.left(1, seq(
+    paragraph: $ => prec.left(-1, seq(
       $._inline_line_start,
       repeat($._inline_content),
       repeat(seq(

@@ -7,7 +7,17 @@
 enum TokenType {
   CODE_CONTENT,
   LIST_CONTINUATION,
-  LIST_MARKER,
+  THEMATIC_BREAK,
+  LIST_MARKER_MINUS,
+  LIST_MARKER_PLUS,
+  LIST_MARKER_STAR,
+  LIST_MARKER_DOT,
+  LIST_MARKER_PARENTHESIS,
+  LIST_MARKER_MINUS_DONT_INTERRUPT,
+  LIST_MARKER_PLUS_DONT_INTERRUPT,
+  LIST_MARKER_STAR_DONT_INTERRUPT,
+  LIST_MARKER_DOT_DONT_INTERRUPT,
+  LIST_MARKER_PARENTHESIS_DONT_INTERRUPT,
   PARAGRAPH_CONTINUATION,
   EM_OPEN_STAR,
   EM_CLOSE_STAR,
@@ -410,12 +420,19 @@ static bool is_thematic_break_line(TSLexer *lexer) {
 static bool is_list_marker_at_line_start(TSLexer *lexer) {
   TSLexer saved_state = *lexer;
 
+  uint8_t indentation = 0;
   while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
     lexer->advance(lexer, false);
+    indentation++;
   }
 
   int32_t first = lexer->lookahead;
   bool is_list = false;
+
+  if (indentation > 3) {
+    *lexer = saved_state;
+    return false;
+  }
 
   if (first == '-' || first == '*' || first == '+') {
     lexer->advance(lexer, false);
@@ -426,7 +443,7 @@ static bool is_list_marker_at_line_start(TSLexer *lexer) {
     while (iswdigit(lexer->lookahead)) {
       lexer->advance(lexer, false);
     }
-    if (lexer->lookahead == '.') {
+    if (lexer->lookahead == '.' || lexer->lookahead == ')') {
       lexer->advance(lexer, false);
       if (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
         is_list = true;
@@ -438,50 +455,305 @@ static bool is_list_marker_at_line_start(TSLexer *lexer) {
   return is_list;
 }
 
-static bool scan_list_marker(TSLexer *lexer) {
+static bool scan_indentation(TSLexer *lexer, uint8_t *indentation) {
+  while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+    lexer->advance(lexer, false);
+    (*indentation)++;
+  }
+  return *indentation <= 3;
+}
+
+static bool is_simple_list_marker_start(TSLexer *lexer) {
   TSLexer saved_state = *lexer;
+  uint8_t indentation = 0;
+  if (!scan_indentation(lexer, &indentation)) {
+    *lexer = saved_state;
+    return false;
+  }
 
   if (is_thematic_break_line(lexer)) {
     *lexer = saved_state;
     return false;
   }
 
-  while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+  int32_t first = lexer->lookahead;
+  if (first == '-' || first == '*' || first == '+') {
     lexer->advance(lexer, false);
+    bool ok = lexer->lookahead == ' ' || lexer->lookahead == '\t';
+    *lexer = saved_state;
+    return ok;
+  }
+
+  if (iswdigit(first)) {
+    size_t digits = 0;
+    while (iswdigit(lexer->lookahead) && digits < 9) {
+      digits++;
+      lexer->advance(lexer, false);
+    }
+    if (digits == 0) {
+      *lexer = saved_state;
+      return false;
+    }
+    if (lexer->lookahead == '.' || lexer->lookahead == ')') {
+      lexer->advance(lexer, false);
+      bool ok = lexer->lookahead == ' ' || lexer->lookahead == '\t';
+      *lexer = saved_state;
+      return ok;
+    }
+  }
+
+  *lexer = saved_state;
+  return false;
+}
+
+static bool scan_simple_list_marker(TSLexer *lexer, const bool *valid_symbols) {
+  TSLexer saved_state = *lexer;
+  uint8_t indentation = 0;
+
+  if (!scan_indentation(lexer, &indentation)) {
+    *lexer = saved_state;
+    return false;
+  }
+
+  if (is_thematic_break_line(lexer)) {
+    *lexer = saved_state;
+    return false;
   }
 
   int32_t first = lexer->lookahead;
-
   if (first == '-' || first == '*' || first == '+') {
     lexer->advance(lexer, false);
     if (lexer->lookahead != ' ' && lexer->lookahead != '\t') {
       *lexer = saved_state;
       return false;
     }
-  } else if (iswdigit(first)) {
-    while (iswdigit(lexer->lookahead)) {
+    while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
       lexer->advance(lexer, false);
     }
-    if (lexer->lookahead != '.') {
+    lexer->mark_end(lexer);
+    lexer->result_symbol =
+        first == '-' ? LIST_MARKER_MINUS
+                     : (first == '*' ? LIST_MARKER_STAR : LIST_MARKER_PLUS);
+    return true;
+  }
+
+  if (iswdigit(first)) {
+    size_t digits = 0;
+    while (iswdigit(lexer->lookahead) && digits < 9) {
+      digits++;
+      lexer->advance(lexer, false);
+    }
+    if (digits == 0) {
       *lexer = saved_state;
       return false;
     }
-    lexer->advance(lexer, false);
+    bool dot = false;
+    bool parenthesis = false;
+    if (lexer->lookahead == '.') {
+      dot = true;
+      lexer->advance(lexer, false);
+    } else if (lexer->lookahead == ')') {
+      parenthesis = true;
+      lexer->advance(lexer, false);
+    } else {
+      *lexer = saved_state;
+      return false;
+    }
     if (lexer->lookahead != ' ' && lexer->lookahead != '\t') {
       *lexer = saved_state;
       return false;
     }
+    while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+      lexer->advance(lexer, false);
+    }
+    lexer->mark_end(lexer);
+    lexer->result_symbol = dot ? LIST_MARKER_DOT : LIST_MARKER_PARENTHESIS;
+    return true;
+  }
+
+  *lexer = saved_state;
+  return false;
+}
+
+static bool parse_star(TSLexer *lexer, const bool *valid_symbols) {
+  TSLexer saved_state = *lexer;
+  uint8_t indentation = 0;
+  if (!scan_indentation(lexer, &indentation)) {
+    *lexer = saved_state;
+    return false;
+  }
+
+  size_t star_count = 0;
+  bool whitespace_after = false;
+
+  while (lexer->lookahead == '*' || lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+    if (lexer->lookahead == '*') {
+      star_count++;
+      lexer->advance(lexer, false);
+    } else {
+      whitespace_after = true;
+      lexer->advance(lexer, false);
+    }
+  }
+
+  bool line_end = lexer->lookahead == '\n' || lexer->lookahead == '\r' || lexer->lookahead == 0;
+  bool thematic_break = star_count >= 3 && line_end;
+  bool list_marker_star = star_count >= 1 && whitespace_after;
+
+  if (valid_symbols[THEMATIC_BREAK] && thematic_break) {
+    lexer->result_symbol = THEMATIC_BREAK;
+    lexer->mark_end(lexer);
+    return true;
+  }
+
+  if (!list_marker_star) {
+    *lexer = saved_state;
+    return false;
+  }
+
+  lexer->result_symbol = LIST_MARKER_STAR;
+  lexer->mark_end(lexer);
+  return true;
+
+  *lexer = saved_state;
+  return false;
+}
+
+static bool parse_plus(TSLexer *lexer, const bool *valid_symbols) {
+  TSLexer saved_state = *lexer;
+  uint8_t indentation = 0;
+  if (!scan_indentation(lexer, &indentation)) {
+    *lexer = saved_state;
+    return false;
+  }
+
+  if (lexer->lookahead != '+') {
+    *lexer = saved_state;
+    return false;
+  }
+
+  lexer->advance(lexer, false);
+  uint8_t spaces = 0;
+  while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+    spaces++;
+    lexer->advance(lexer, false);
+  }
+
+  bool line_end = lexer->lookahead == '\n' || lexer->lookahead == '\r' || lexer->lookahead == 0;
+  if (!line_end && spaces == 0) {
+    *lexer = saved_state;
+    return false;
+  }
+
+  lexer->result_symbol = LIST_MARKER_PLUS;
+  lexer->mark_end(lexer);
+  return true;
+
+  *lexer = saved_state;
+  return false;
+}
+
+static bool parse_ordered_list_marker(TSLexer *lexer, const bool *valid_symbols) {
+  TSLexer saved_state = *lexer;
+  uint8_t indentation = 0;
+  if (!scan_indentation(lexer, &indentation)) {
+    *lexer = saved_state;
+    return false;
+  }
+
+  size_t digits = 0;
+  while (iswdigit(lexer->lookahead) && digits < 9) {
+    digits++;
+    lexer->advance(lexer, false);
+  }
+
+  if (digits == 0) {
+    *lexer = saved_state;
+    return false;
+  }
+
+  bool dot = false;
+  bool parenthesis = false;
+  if (lexer->lookahead == '.') {
+    dot = true;
+    lexer->advance(lexer, false);
+  } else if (lexer->lookahead == ')') {
+    parenthesis = true;
+    lexer->advance(lexer, false);
   } else {
     *lexer = saved_state;
     return false;
   }
 
+  uint8_t spaces = 0;
   while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+    spaces++;
     lexer->advance(lexer, false);
   }
 
+  bool line_end = lexer->lookahead == '\n' || lexer->lookahead == '\r' || lexer->lookahead == 0;
+  if (!line_end && spaces == 0) {
+    *lexer = saved_state;
+    return false;
+  }
+
+  if (dot) {
+    lexer->result_symbol = LIST_MARKER_DOT;
+    lexer->mark_end(lexer);
+    return true;
+  }
+  if (parenthesis) {
+    lexer->result_symbol = LIST_MARKER_PARENTHESIS;
+    lexer->mark_end(lexer);
+    return true;
+  }
+
+  *lexer = saved_state;
+  return false;
+}
+
+static bool parse_minus(TSLexer *lexer, const bool *valid_symbols) {
+  TSLexer saved_state = *lexer;
+  uint8_t indentation = 0;
+  if (!scan_indentation(lexer, &indentation)) {
+    *lexer = saved_state;
+    return false;
+  }
+
+  size_t minus_count = 0;
+  bool whitespace_after = false;
+
+  while (lexer->lookahead == '-' || lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+    if (lexer->lookahead == '-') {
+      minus_count++;
+      lexer->advance(lexer, false);
+    } else {
+      whitespace_after = true;
+      lexer->advance(lexer, false);
+    }
+  }
+
+  bool line_end = lexer->lookahead == '\n' || lexer->lookahead == '\r' || lexer->lookahead == 0;
+  bool thematic_break = minus_count >= 3 && line_end;
+  bool list_marker_minus = minus_count >= 1 && whitespace_after;
+
+  if (valid_symbols[THEMATIC_BREAK] && thematic_break) {
+    lexer->result_symbol = THEMATIC_BREAK;
+    lexer->mark_end(lexer);
+    return true;
+  }
+
+  if (!list_marker_minus) {
+    *lexer = saved_state;
+    return false;
+  }
+
+  lexer->result_symbol = LIST_MARKER_MINUS;
   lexer->mark_end(lexer);
   return true;
+
+  *lexer = saved_state;
+  return false;
 }
 
 static bool is_paragraph_continuation_line(TSLexer *lexer) {
@@ -497,7 +769,7 @@ static bool is_paragraph_continuation_line(TSLexer *lexer) {
   }
 
   lookahead_state = *lexer;
-  if (is_list_marker_at_line_start(&lookahead_state)) {
+  if (is_simple_list_marker_start(&lookahead_state)) {
     return false;
   }
 
@@ -642,6 +914,11 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
     return false;
   }
 
+  if (lexer->get_column(lexer) == 0 && scan_simple_list_marker(lexer, valid_symbols)) {
+    s->prev = ' ';
+    return true;
+  }
+
   // LIST_CONTINUATION: newline followed by indentation and non-list marker
   if (valid_symbols[LIST_CONTINUATION] && is_newline(lexer->lookahead)) {
     TSLexer saved_state = *lexer;
@@ -708,11 +985,43 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
     *lexer = saved_state;
   }
 
-  if (lexer->get_column(lexer) == 0 && scan_list_marker(lexer)) {
-    if (valid_symbols[LIST_MARKER] || valid_symbols[TEXT]) {
-      lexer->result_symbol = LIST_MARKER;
-      s->prev = ' ';
-      return true;
+  if (valid_symbols[THEMATIC_BREAK] && is_thematic_break_line(lexer)) {
+    while (lexer->lookahead != 0 && !is_newline(lexer->lookahead)) {
+      lexer->advance(lexer, false);
+    }
+    lexer->mark_end(lexer);
+    lexer->result_symbol = THEMATIC_BREAK;
+    return true;
+  }
+
+  if (lexer->get_column(lexer) == 0) {
+    switch (lexer->lookahead) {
+      case '*':
+        if (parse_star(lexer, valid_symbols)) {
+          s->prev = ' ';
+          return true;
+        }
+        break;
+      case '+':
+        if (parse_plus(lexer, valid_symbols)) {
+          s->prev = ' ';
+          return true;
+        }
+        break;
+      case '-':
+        if (parse_minus(lexer, valid_symbols)) {
+          s->prev = ' ';
+          return true;
+        }
+        break;
+      default:
+        if (iswdigit(lexer->lookahead)) {
+          if (parse_ordered_list_marker(lexer, valid_symbols)) {
+            s->prev = ' ';
+            return true;
+          }
+        }
+        break;
     }
   }
 
@@ -873,7 +1182,7 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
 
   if (valid_symbols[TEXT] && lexer->get_column(lexer) == 0) {
     TSLexer list_state = *lexer;
-    if (is_list_marker_at_line_start(&list_state)) {
+    if (is_simple_list_marker_start(&list_state)) {
       return false;
     }
   }
