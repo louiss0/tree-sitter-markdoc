@@ -55,12 +55,10 @@ Nested list indentation
   (paragraph
     (text))
   (paragraph
+    (text)
     (text))
   (paragraph
-    (text))
-  (paragraph
-    (text))
-  (paragraph
+    (text)
     (text)))
 
 =============================================================================

@@ -2,7 +2,7 @@
 Inline annotations
 =============================================================================
 
-Text {% width="25%" %} more text.
+Text {% width value="25%" /%} more text.
 
 -----------------------------------------------------------------------------
 
@@ -10,10 +10,12 @@ Text {% width="25%" %} more text.
   (paragraph
     (text)
     (inline_tag
-      (tag_open
+      (tag_self_close
         (tag_name)
-        (ERROR
-          (binary_modulo))))
+        (attribute
+          (attribute_name)
+          (attribute_value
+            (string)))))
     (text)))
 
 =============================================================================
@@ -26,12 +28,16 @@ Hello {% $markdoc.frontmatter.title %}.
 
 (source_file
   (paragraph
-    (text))
-  (ERROR
-    (identifier)
-    (identifier)
-    (identifier)
-    (binary_modulo)))
+    (text)
+    (inline_expression
+      content: (expression
+        (member_expression
+          object: (member_expression
+            object: (variable
+              (identifier))
+            property: (identifier))
+          property: (identifier))))
+    (text)))
 
 =============================================================================
 Inline function tag
@@ -44,11 +50,15 @@ Title {% titleCase($markdoc.frontmatter.title) %} here.
 (source_file
   (paragraph
     (text)
-    (inline_tag
-      (tag_open
-        (tag_name)
-        (ERROR
+    (inline_expression
+      content: (expression
+        (call_expression
           (identifier)
-          (identifier)
-          (identifier))))
+          (expression
+            (member_expression
+              object: (member_expression
+                object: (variable
+                  (identifier))
+                property: (identifier))
+              property: (identifier))))))
     (text)))

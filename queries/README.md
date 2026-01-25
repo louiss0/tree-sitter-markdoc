@@ -19,7 +19,7 @@ Defines syntax highlighting rules for Markdoc syntax elements:
   - Tag delimiters (`{%`, `%}`, `/%}`)
   - Tag names
   - Attributes and their values
-- **Inline Expressions**: Variable references wrapped in `{{` and `}}` (when fully implemented)
+- **Inline Expressions**: Variable references wrapped in `{%` and `%}` (when fully implemented)
 - **Text**: Regular paragraph text content
 
 ### injections.scm
@@ -46,7 +46,7 @@ The following Tree-sitter capture names are used:
 | `@markup.raw.block` | Raw markup blocks | Frontmatter, code content |
 | `@markup.heading.marker` | Heading level markers | `#`, `##`, etc. |
 | `@markup.heading` | Heading text content | Text after heading marker |
-| `@punctuation.bracket` | Bracket-like delimiters | ` ``` `, `{%`, `}}` |
+| `@punctuation.bracket` | Bracket-like delimiters | ` ``` `, `{%`, `%}`, `/%}` |
 | `@punctuation.delimiter` | Separator characters | `.`, `/` |
 | `@property` | Property or attribute keys | Language identifiers, attribute names |
 | `@tag` | Structural tags | Markdoc tag names |
@@ -85,7 +85,7 @@ Each heading marker and its text receive distinct highlighting based on heading 
 
 As of version 0.1.0, the following features are **not yet fully supported** in the grammar and queries:
 
-- Inline expressions (`{{ variable }}`)
+- Inline expressions (`{% variable %}`)
 - Markdoc tags (block and self-closing)
 - Complex attribute expressions
 - Multi-line paragraphs

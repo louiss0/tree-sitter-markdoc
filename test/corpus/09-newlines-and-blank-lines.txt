@@ -22,10 +22,8 @@ and should be treated as one
 
 (source_file
   (paragraph
-    (text))
-  (paragraph
-    (text))
-  (paragraph
+    (text)
+    (text)
     (text)))
 
 ================================================================================
@@ -94,5 +92,4 @@ Paragraph two
   (paragraph
     (text))
   (paragraph
-    (text)
     (text)))

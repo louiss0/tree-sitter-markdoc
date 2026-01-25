@@ -467,7 +467,7 @@ This *includes, text, and: punctuation* inside.
 Inline expression with emphasis
 =======================================
 
-Value is {{*emphasized*}}
+Value is {%*emphasized*%}
 
 ---
 
@@ -488,9 +488,8 @@ a newline* so no emphasis.
 
 (source_file
   (paragraph
-    (text))
-  (ERROR)
-  (paragraph
+    (text)
+    (ERROR)
     (text)
     (text)
     (text)))

@@ -36,6 +36,7 @@ module.exports = grammar({
     $._LIST_MARKER_DOT_DONT_INTERRUPT,
     $._LIST_MARKER_PARENTHESIS_DONT_INTERRUPT,
     $._PARAGRAPH_CONTINUATION,
+    $._TAG_START,
     $._EM_OPEN_STAR,
     $._EM_CLOSE_STAR,
     $._STRONG_OPEN_STAR,
@@ -46,7 +47,6 @@ module.exports = grammar({
     $._STRONG_CLOSE_UNDERSCORE,
     $._RAW_DELIM,
     $._TEXT,
-    $._COMMENT_BLOCK,
     $._HTML_COMMENT,
     $._HTML_BLOCK
   ],
@@ -67,7 +67,16 @@ module.exports = grammar({
     [$.attribute_value, $._primary_expression],
     [$.tag_open, $.tag_close],
     [$.binary_expression],
-    [$.markdoc_tag, $._inline_line_start]
+    [$.markdoc_tag, $._inline_line_start],
+    [$.tag_open, $._primary_expression],
+    [$.tag_self_close, $._primary_expression],
+    [$.tag_open, $.tag_self_close, $._primary_expression],
+    [$.tag_open, $.tag_close, $.tag_self_close, $._primary_expression],
+    [$.tag_open, $.tag_close, $._primary_expression]
+  ],
+
+  inline: $ => [
+    $.line_break
   ],
 
   rules: {
@@ -79,7 +88,7 @@ module.exports = grammar({
           $._block
         ),
         repeat(seq(
-          $._BLANK_LINE,
+          choice($._BLANK_LINE, $._NEWLINE),
           choice(
             $.frontmatter,
             $._block
@@ -124,12 +133,8 @@ module.exports = grammar({
     // Thematic break (horizontal rule)
     thematic_break: $ => $._THEMATIC_BREAK,
 
-    // Blockquote
-    blockquote: $ => prec.right(seq(
-      token(prec(2, '>')),
-      optional(WS),
-      optional($._block)
-    )),
+    // Blockquote (consume consecutive > lines as a single block)
+    blockquote: $ => token(prec(2, />[^\r\n]*(\r?\n>[^\r\n]*)*\r?\n?/)),
 
     fenced_code_block: $ => seq(
       field('open', $.code_fence_open),
@@ -160,18 +165,25 @@ module.exports = grammar({
     ),
 
     // Markdoc comment block: {% comment %}...{% /comment %}
-    comment_block: $ => $._COMMENT_BLOCK,
+    comment_block: $ => token(prec(6, /\{%\s*comment\s*%\}(.|\r|\n)*\{%\s*\/comment\s*%\}/)),
 
     // Block-level Markdoc tag ({% tag %}...{% /tag %} or {% tag /%})
-    markdoc_tag: $ => prec.dynamic(10, choice(
-      // Self-closing tag
-      $.tag_self_close,
-      // Full tag with content
+    markdoc_tag: $ => prec.dynamic(4, choice(
+      // Self-closing tag on its own line
+      seq(
+        $.block_tag_self_close,
+        $.line_break
+      ),
+      // Full tag with content on following lines
       seq(
         $.tag_open,
+        $.line_break,
         choice(
           // Empty tag
-          seq(optional($._NEWLINE), $.tag_close),
+          seq(
+            repeat(choice($._NEWLINE, $._BLANK_LINE)),
+            $.tag_close
+          ),
           // Tag with content
           seq(
             repeat(choice($._NEWLINE, $._BLANK_LINE)),
@@ -180,7 +192,7 @@ module.exports = grammar({
               seq($._BLANK_LINE, $._block),
               seq($._NEWLINE, $._block)
             )),
-            repeat(choice($._NEWLINE, $._BLANK_LINE)),
+            repeat1(choice($._NEWLINE, $._BLANK_LINE)),
             $.tag_close
           )
         )
@@ -188,28 +200,28 @@ module.exports = grammar({
     )),
 
     tag_open: $ => prec.right(seq(
-      token(prec(6, '{%')),
+      $._TAG_START,
       optional(WS),
-      alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
+      alias($.identifier, $.tag_name),
       repeat(seq(WS1, $.attribute)),
       optional(WS),
       token(prec(6, '%}'))
     )),
 
     tag_close: $ => prec.right(seq(
-      token(prec(6, '{%')),
+      $._TAG_START,
       optional(WS),
       optional(seq(token('/'), optional(WS))),
-      alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
+      alias($.identifier, $.tag_name),
       optional(WS),
       token(prec(6, '%}'))
     )),
 
     // Self-closing tag used at block level ({% tag /%})
-    tag_self_close: $ => prec.right(seq(
-      token(prec(6, '{%')),
+    block_tag_self_close: $ => prec.right(seq(
+      $._TAG_START,
       optional(WS),
-      alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.tag_name),
+      alias($.identifier, $.tag_name),
       repeat(seq(WS1, $.attribute)),
       optional(WS),
       token(prec(6, '/%}'))
@@ -217,18 +229,17 @@ module.exports = grammar({
 
     // Inline self-closing tag for use in paragraphs/lists
     inline_tag: $ => prec(1, choice(
-      $.inline_tag_expression,
-      $.tag_self_close,
-      $.tag_open
+      $.tag_self_close
     )),
 
-    inline_tag_expression: $ => seq(
-      token('{%'),
+    tag_self_close: $ => prec.right(seq(
+      token(prec(6, '{%')),
       optional(WS),
-      field('expression', $._tag_expression),
+      alias($.identifier, $.tag_name),
+      repeat(seq(WS1, $.attribute)),
       optional(WS),
-      token('%}')
-    ),
+      token(prec(6, '/%}'))
+    )),
 
     attribute: $ => seq(
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.attribute_name),
@@ -463,7 +474,7 @@ module.exports = grammar({
     number: $ => /-?[0-9]+(\.[0-9]+)?/,
 
     inline_expression: $ => seq(
-      '{{',
+      token(prec(6, '{%')),
       optional(WS),
       field('content', choice(
         $.expression,
@@ -471,88 +482,37 @@ module.exports = grammar({
         $.strong
       )),
       optional(WS),
-      '}}'
+      token(prec(6, '%}'))
     ),
 
-    // Lists (GFM)
-    list: $ => prec.dynamic(2, choice(
-      $._list_plus,
-      $._list_minus,
-      $._list_star,
-      $._list_dot,
-      $._list_parenthesis
+    // Lists
+    list: $ => prec.dynamic(2, seq(
+      $.list_item,
+      repeat($.list_item)
     )),
-    _list_plus: $ => prec.right(repeat1(alias($._list_item_plus, $.list_item))),
-    _list_minus: $ => prec.right(repeat1(alias($._list_item_minus, $.list_item))),
-    _list_star: $ => prec.right(repeat1(alias($._list_item_star, $.list_item))),
-    _list_dot: $ => prec.right(repeat1(alias($._list_item_dot, $.list_item))),
-    _list_parenthesis: $ => prec.right(repeat1(alias($._list_item_parenthesis, $.list_item))),
-    list_item: $ => choice(
-      $._list_item_plus,
-      $._list_item_minus,
-      $._list_item_star,
-      $._list_item_dot,
-      $._list_item_parenthesis
+    list_item: $ => seq(
+      field('marker', $.list_marker),
+      $._list_item_content,
+      $._block_close
     ),
 
-    list_marker_plus: $ => choice($._list_marker_plus, $._list_marker_plus_dont_interrupt, token(prec(2, LIST_MARKER_PLUS_FALLBACK))),
-    list_marker_minus: $ => choice($._list_marker_minus, $._list_marker_minus_dont_interrupt, token(prec(2, LIST_MARKER_MINUS_FALLBACK))),
-    list_marker_star: $ => choice($._list_marker_star, $._list_marker_star_dont_interrupt, token(prec(2, LIST_MARKER_STAR_FALLBACK))),
-    list_marker_dot: $ => choice($._list_marker_dot, $._list_marker_dot_dont_interrupt, token(prec(2, LIST_MARKER_DOT_FALLBACK))),
-    list_marker_parenthesis: $ => choice($._list_marker_parenthesis, $._list_marker_parenthesis_dont_interrupt, token(prec(2, LIST_MARKER_PAREN_FALLBACK))),
-
-    _list_marker_plus: $ => alias($._LIST_MARKER_PLUS, $.list_marker_plus),
-    _list_marker_minus: $ => alias($._LIST_MARKER_MINUS, $.list_marker_minus),
-    _list_marker_star: $ => alias($._LIST_MARKER_STAR, $.list_marker_star),
-    _list_marker_dot: $ => alias($._LIST_MARKER_DOT, $.list_marker_dot),
-    _list_marker_parenthesis: $ => alias($._LIST_MARKER_PARENTHESIS, $.list_marker_parenthesis),
-    _list_marker_plus_dont_interrupt: $ => alias($._LIST_MARKER_PLUS_DONT_INTERRUPT, $.list_marker_plus),
-    _list_marker_minus_dont_interrupt: $ => alias($._LIST_MARKER_MINUS_DONT_INTERRUPT, $.list_marker_minus),
-    _list_marker_star_dont_interrupt: $ => alias($._LIST_MARKER_STAR_DONT_INTERRUPT, $.list_marker_star),
-    _list_marker_dot_dont_interrupt: $ => alias($._LIST_MARKER_DOT_DONT_INTERRUPT, $.list_marker_dot),
-    _list_marker_parenthesis_dont_interrupt: $ => alias($._LIST_MARKER_PARENTHESIS_DONT_INTERRUPT, $.list_marker_parenthesis),
-
-    _list_item_plus: $ => seq(
-      $.list_marker_plus,
-      optional($.block_continuation),
-      $._list_item_content,
-      $._block_close,
-      optional($.block_continuation)
-    ),
-    _list_item_minus: $ => seq(
-      $.list_marker_minus,
-      optional($.block_continuation),
-      $._list_item_content,
-      $._block_close,
-      optional($.block_continuation)
-    ),
-    _list_item_star: $ => seq(
-      $.list_marker_star,
-      optional($.block_continuation),
-      $._list_item_content,
-      $._block_close,
-      optional($.block_continuation)
-    ),
-    _list_item_dot: $ => seq(
-      $.list_marker_dot,
-      optional($.block_continuation),
-      $._list_item_content,
-      $._block_close,
-      optional($.block_continuation)
-    ),
-    _list_item_parenthesis: $ => seq(
-      $.list_marker_parenthesis,
-      optional($.block_continuation),
-      $._list_item_content,
-      $._block_close,
-      optional($.block_continuation)
+    list_marker: $ => choice(
+      $._LIST_MARKER_PLUS,
+      $._LIST_MARKER_PLUS_DONT_INTERRUPT,
+      $._LIST_MARKER_STAR,
+      $._LIST_MARKER_STAR_DONT_INTERRUPT,
+      $._LIST_MARKER_DOT,
+      $._LIST_MARKER_DOT_DONT_INTERRUPT,
+      $._LIST_MARKER_PARENTHESIS,
+      $._LIST_MARKER_PARENTHESIS_DONT_INTERRUPT
     ),
 
-    block_continuation: $ => $._LIST_CONTINUATION,
     _block_close: $ => $._NEWLINE,
-    _list_item_content: $ => choice(
-      $.list_paragraph,
-      $.list
+    _list_item_content: $ => $.list_paragraph,
+
+    line_break: $ => choice(
+      $._BLANK_LINE,
+      $._NEWLINE
     ),
 
     html_comment: $ => $._HTML_COMMENT,
@@ -586,9 +546,11 @@ module.exports = grammar({
       repeat($._inline_content),
       repeat(seq(
         $._PARAGRAPH_CONTINUATION,
-        seq($._inline_line_start, repeat($._inline_content))
-      )),
-      optional($._NEWLINE)
+        choice(
+          $._inline_expression_line,
+          seq($._inline_line_start_no_expression, repeat($._inline_content))
+        )
+      ))
     )),
 
     // List paragraph: same as paragraph but semantically distinct for list items
@@ -597,10 +559,11 @@ module.exports = grammar({
       repeat($._inline_content),
       repeat(seq(
         $._LIST_CONTINUATION,
-        $._inline_line_start,
-        repeat($._inline_content)
-      )),
-      optional($._LIST_CONTINUATION)
+        choice(
+          $._inline_expression_line,
+          seq($._inline_line_start_no_expression, repeat($._inline_content))
+        )
+      ))
     )),
 
     emphasis: $ => choice(
@@ -657,7 +620,6 @@ module.exports = grammar({
 
     _inline_line_start: $ => choice(
       $.inline_expression,
-      $.inline_tag_expression,
       $.tag_self_close,
       $.text,
       $.html_inline,
@@ -667,6 +629,23 @@ module.exports = grammar({
       $.inline_code,
       $.image,
       alias($.standalone_punct, $.text)
+    ),
+
+    _inline_line_start_no_expression: $ => choice(
+      $.tag_self_close,
+      $.text,
+      $.html_inline,
+      $.link,
+      $.emphasis,
+      $.strong,
+      $.inline_code,
+      $.image,
+      alias($.standalone_punct, $.text)
+    ),
+
+    _inline_expression_line: $ => seq(
+      $.inline_expression,
+      repeat1($._inline_content)
     ),
 
     // Inline content after first element
@@ -685,7 +664,7 @@ module.exports = grammar({
     standalone_punct: $ => token('!'),
 
     _NEWLINE: $ => token(/\r?\n/),
-    _BLANK_LINE: $ => token(/\r?\n\r?\n+/)
+    _BLANK_LINE: $ => token(/\r?\n[ \t]*\r?\n+/)
 
   }
 });

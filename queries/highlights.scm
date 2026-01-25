@@ -37,7 +37,7 @@
 ; BLOCKQUOTES
 ; ============================================================================
 
-(blockquote ">" @markup.quote)
+(blockquote) @markup.quote
 
 ; ============================================================================
 ; CODE BLOCKS (FENCED)
@@ -142,13 +142,11 @@
 (attribute ("=" @operator))
 
 ; ============================================================================
-; INLINE EXPRESSIONS {{ ... }}
+; INLINE EXPRESSIONS {% ... %}
 ; ============================================================================
 
-; Expression delimiters
-(inline_expression
-  "{{" @punctuation.bracket
-  "}}" @punctuation.bracket)
+; Expression blocks
+(inline_expression) @markup.raw.inline
 
 ; ============================================================================
 ; EXPRESSIONS AND OPERATORS

@@ -167,7 +167,7 @@ Self-closing tag with attributes
 Simple inline expression
 ================================================================================
 
-Hello {{ name }}
+Hello {% name %}
 
 --------------------------------------------------------------------------------
 
@@ -182,7 +182,7 @@ Hello {{ name }}
 Inline expression with property access
 ================================================================================
 
-Hello {{ user.name }}
+Hello {% user.name %}
 
 --------------------------------------------------------------------------------
 
@@ -199,7 +199,7 @@ Hello {{ user.name }}
 Multiple inline expressions in paragraph
 ================================================================================
 
-{{ greeting }} {{ name }}!
+{% greeting %} {% name %}!
 
 --------------------------------------------------------------------------------
 
@@ -269,10 +269,10 @@ Mixed content with tags and expressions
 # Title
 
 {% callout %}
-Important: {{ message }}
+Important: {% message %}
 {% /callout %}
 
-Regular {{ text }} here.
+Regular {% text %} here.
 
 --------------------------------------------------------------------------------
 

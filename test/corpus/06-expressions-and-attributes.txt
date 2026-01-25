@@ -2,9 +2,9 @@
 Complex member access expressions
 =============================================================================
 
-{{ user.profile.name }}
-{{ items[0].title }}
-{{ data['key'].value }}
+{% user.profile.name %}
+{% items[0].title %}
+{% data['key'].value %}
 
 -----------------------------------------------------------------------------
 
@@ -40,9 +40,9 @@ Complex member access expressions
 Function call expressions
 =============================================================================
 
-{{ formatDate(date) }}
-{{ calculate(1, 2, 3) }}
-{{ process(user.name, options['default']) }}
+{% formatDate(date) %}
+{% calculate(1, 2, 3) %}
+{% process(user.name, options['default']) %}
 
 -----------------------------------------------------------------------------
 
@@ -84,8 +84,8 @@ Function call expressions
 Object and array expressions
 =============================================================================
 
-{{ { name: user.name, age: 25 } }}
-{{ ['first', 2, user.items[0]] }}
+{% { name: user.name, age: 25 } %}
+{% ['first', 2, user.items[0]] %}
 
 -----------------------------------------------------------------------------
 
@@ -125,9 +125,9 @@ Object and array expressions
 Binary and unary expressions
 =============================================================================
 
-{{ age > 18 }}
-{{ !isDone && count < 10 }}
-{{ -value }}
+{% age > 18 %}
+{% !isDone && count < 10 %}
+{% -value %}
 
 -----------------------------------------------------------------------------
 
@@ -170,9 +170,9 @@ Binary and unary expressions
 Arithmetic operators - addition and subtraction
 =============================================================================
 
-{{ a + b }}
-{{ x - y }}
-{{ 10 + 5 - 3 }}
+{% a + b %}
+{% x - y %}
+{% 10 + 5 - 3 %}
 
 -----------------------------------------------------------------------------
 
@@ -214,10 +214,10 @@ Arithmetic operators - addition and subtraction
 Arithmetic operators - multiplication, division, modulo
 =============================================================================
 
-{{ a * b }}
-{{ x / y }}
-{{ n % 10 }}
-{{ 2 * 3 + 4 }}
+{% a * b %}
+{% x / y %}
+{% n % 10 %}
+{% 2 * 3 + 4 %}
 
 -----------------------------------------------------------------------------
 
@@ -268,9 +268,9 @@ Arithmetic operators - multiplication, division, modulo
 Comparison operators - equality
 =============================================================================
 
-{{ x == y }}
-{{ a != b }}
-{{ status == "active" }}
+{% x == y %}
+{% a != b %}
+{% status == "active" %}
 
 -----------------------------------------------------------------------------
 
@@ -307,10 +307,10 @@ Comparison operators - equality
 Comparison operators - relational
 =============================================================================
 
-{{ age < 18 }}
-{{ count > 100 }}
-{{ score <= maxScore }}
-{{ price >= minPrice }}
+{% age < 18 %}
+{% count > 100 %}
+{% score <= maxScore %}
+{% price >= minPrice %}
 
 -----------------------------------------------------------------------------
 
@@ -356,9 +356,9 @@ Comparison operators - relational
 Logical operators
 =============================================================================
 
-{{ isActive && isVerified }}
-{{ hasError || hasWarning }}
-{{ (x > 5) && (y < 10) }}
+{% isActive && isVerified %}
+{% hasError || hasWarning %}
+{% (x > 5) && (y < 10) %}
 
 -----------------------------------------------------------------------------
 
@@ -383,10 +383,10 @@ Logical operators
 Unary operators - all types
 =============================================================================
 
-{{ !condition }}
-{{ -10 }}
-{{ +value }}
-{{ !isActive && -balance > 0 }}
+{% !condition %}
+{% -10 %}
+{% +value %}
+{% !isActive && -balance > 0 %}
 
 -----------------------------------------------------------------------------
 
@@ -434,9 +434,9 @@ Unary operators - all types
 Operator precedence test
 =============================================================================
 
-{{ a + b * c }}
-{{ x || y && z }}
-{{ 10 - 5 * 2 }}
+{% a + b * c %}
+{% x || y && z %}
+{% 10 - 5 * 2 %}
 
 -----------------------------------------------------------------------------
 
@@ -499,8 +499,8 @@ Content
 
 (source_file
   (ERROR
-    (tag_name)
-    (tag_name)
+    (identifier)
+    (attribute_name)
     (expression
       (binary_expression
         left: (expression

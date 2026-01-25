@@ -175,6 +175,12 @@ Deeply nested unordered list
 
 (source_file
   (paragraph
+    (text))
+  (paragraph
+    (text))
+  (paragraph
+    (text))
+  (paragraph
     (text)))
 
 =======================================
@@ -194,6 +200,9 @@ Mixed ordered and unordered nesting
     (list_item
       (list_marker)
       (list_paragraph
+        (text)
+        (text)
+        (text)
         (text)))
     (list_item
       (list_marker)
