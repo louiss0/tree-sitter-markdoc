@@ -17,7 +17,9 @@ block =
 heading = heading_marker, [ heading_text ] ;
 heading_marker = ("#" | "##" | "###" | "####" | "#####" | "######"), ws1 ;
 
-(* Block tags are line-based: the tag line contains only the tag. *)
+(* Tags and expressions use {% %} delimiters (not {{ }}). *)
+(* Block tags are line-based: the tag line contains only the tag, similar to the
+   thematic-break/frontmatter line heuristics in the parser. *)
 markdoc_tag = tag_self_close, line_break
             | tag_open, line_break, tag_body, tag_close ;
 tag_body = { blank_line | block } ;

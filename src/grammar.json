@@ -448,7 +448,7 @@
             "members": [
               {
                 "type": "SYMBOL",
-                "name": "block_tag_self_close"
+                "name": "tag_self_close"
               },
               {
                 "type": "SYMBOL",
@@ -462,10 +462,6 @@
               {
                 "type": "SYMBOL",
                 "name": "tag_open"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "line_break"
               },
               {
                 "type": "CHOICE",
@@ -588,8 +584,15 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "SYMBOL",
-            "name": "_TAG_START"
+            "type": "TOKEN",
+            "content": {
+              "type": "PREC",
+              "value": 6,
+              "content": {
+                "type": "STRING",
+                "value": "{%"
+              }
+            }
           },
           {
             "type": "CHOICE",
@@ -629,25 +632,13 @@
             }
           },
           {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "PATTERN",
-                "value": "[ \\t]+"
-              },
-              {
-                "type": "BLANK"
-              }
-            ]
-          },
-          {
             "type": "TOKEN",
             "content": {
               "type": "PREC",
               "value": 6,
               "content": {
-                "type": "STRING",
-                "value": "%}"
+                "type": "PATTERN",
+                "value": "[ \\t]*%}"
               }
             }
           }
@@ -661,8 +652,15 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "SYMBOL",
-            "name": "_TAG_START"
+            "type": "TOKEN",
+            "content": {
+              "type": "PREC",
+              "value": 6,
+              "content": {
+                "type": "STRING",
+                "value": "{%"
+              }
+            }
           },
           {
             "type": "CHOICE",
@@ -718,98 +716,13 @@
             "value": "tag_name"
           },
           {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "PATTERN",
-                "value": "[ \\t]+"
-              },
-              {
-                "type": "BLANK"
-              }
-            ]
-          },
-          {
             "type": "TOKEN",
             "content": {
               "type": "PREC",
               "value": 6,
               "content": {
-                "type": "STRING",
-                "value": "%}"
-              }
-            }
-          }
-        ]
-      }
-    },
-    "block_tag_self_close": {
-      "type": "PREC_RIGHT",
-      "value": 0,
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "SYMBOL",
-            "name": "_TAG_START"
-          },
-          {
-            "type": "CHOICE",
-            "members": [
-              {
                 "type": "PATTERN",
-                "value": "[ \\t]+"
-              },
-              {
-                "type": "BLANK"
-              }
-            ]
-          },
-          {
-            "type": "ALIAS",
-            "content": {
-              "type": "SYMBOL",
-              "name": "identifier"
-            },
-            "named": true,
-            "value": "tag_name"
-          },
-          {
-            "type": "REPEAT",
-            "content": {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "PATTERN",
-                  "value": "[ \\t]+"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "attribute"
-                }
-              ]
-            }
-          },
-          {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "PATTERN",
-                "value": "[ \\t]+"
-              },
-              {
-                "type": "BLANK"
-              }
-            ]
-          },
-          {
-            "type": "TOKEN",
-            "content": {
-              "type": "PREC",
-              "value": 6,
-              "content": {
-                "type": "STRING",
-                "value": "/%}"
+                "value": "[ \\t]*%}"
               }
             }
           }
@@ -884,25 +797,13 @@
             }
           },
           {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "PATTERN",
-                "value": "[ \\t]+"
-              },
-              {
-                "type": "BLANK"
-              }
-            ]
-          },
-          {
             "type": "TOKEN",
             "content": {
               "type": "PREC",
               "value": 6,
               "content": {
-                "type": "STRING",
-                "value": "/%}"
+                "type": "PATTERN",
+                "value": "[ \\t]*\\/%}"
               }
             }
           }
@@ -2113,16 +2014,8 @@
                 }
               },
               {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "PATTERN",
-                    "value": "[ \\t]+"
-                  },
-                  {
-                    "type": "BLANK"
-                  }
-                ]
+                "type": "PATTERN",
+                "value": "[ \\t]+"
               },
               {
                 "type": "FIELD",
@@ -2133,16 +2026,8 @@
                 }
               },
               {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "PATTERN",
-                    "value": "[ \\t]+"
-                  },
-                  {
-                    "type": "BLANK"
-                  }
-                ]
+                "type": "PATTERN",
+                "value": "[ \\t]+"
               },
               {
                 "type": "FIELD",
@@ -2939,7 +2824,7 @@
           "type": "TOKEN",
           "content": {
             "type": "PREC",
-            "value": 6,
+            "value": 10,
             "content": {
               "type": "STRING",
               "value": "%}"
@@ -3790,6 +3675,11 @@
     ],
     [
       "tag_open",
+      "tag_self_close",
+      "_primary_expression"
+    ],
+    [
+      "tag_open",
       "tag_close",
       "tag_self_close",
       "_primary_expression"
@@ -3857,10 +3747,6 @@
     {
       "type": "SYMBOL",
       "name": "_PARAGRAPH_CONTINUATION"
-    },
-    {
-      "type": "SYMBOL",
-      "name": "_TAG_START"
     },
     {
       "type": "SYMBOL",

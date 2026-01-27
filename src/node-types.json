@@ -222,25 +222,6 @@
     }
   },
   {
-    "type": "block_tag_self_close",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "tag_name",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "boolean",
     "named": true,
     "fields": {}
@@ -668,10 +649,6 @@
       "required": true,
       "types": [
         {
-          "type": "block_tag_self_close",
-          "named": true
-        },
-        {
           "type": "blockquote",
           "named": true
         },
@@ -713,6 +690,10 @@
         },
         {
           "type": "tag_open",
+          "named": true
+        },
+        {
+          "type": "tag_self_close",
           "named": true
         },
         {
@@ -1132,10 +1113,6 @@
   },
   {
     "type": "/",
-    "named": false
-  },
-  {
-    "type": "/%}",
     "named": false
   },
   {

@@ -36,7 +36,6 @@ module.exports = grammar({
     $._LIST_MARKER_DOT_DONT_INTERRUPT,
     $._LIST_MARKER_PARENTHESIS_DONT_INTERRUPT,
     $._PARAGRAPH_CONTINUATION,
-    $._TAG_START,
     $._EM_OPEN_STAR,
     $._EM_CLOSE_STAR,
     $._STRONG_OPEN_STAR,
@@ -70,6 +69,7 @@ module.exports = grammar({
     [$.markdoc_tag, $._inline_line_start],
     [$.tag_open, $._primary_expression],
     [$.tag_self_close, $._primary_expression],
+    [$.tag_open, $.tag_self_close, $._primary_expression],
     [$.tag_open, $.tag_self_close, $._primary_expression],
     [$.tag_open, $.tag_close, $.tag_self_close, $._primary_expression],
     [$.tag_open, $.tag_close, $._primary_expression]
@@ -171,13 +171,12 @@ module.exports = grammar({
     markdoc_tag: $ => prec.dynamic(4, choice(
       // Self-closing tag on its own line
       seq(
-        $.block_tag_self_close,
+        $.tag_self_close,
         $.line_break
       ),
       // Full tag with content on following lines
       seq(
         $.tag_open,
-        $.line_break,
         choice(
           // Empty tag
           seq(
@@ -200,31 +199,19 @@ module.exports = grammar({
     )),
 
     tag_open: $ => prec.right(seq(
-      $._TAG_START,
+      token(prec(6, '{%')),
       optional(WS),
       alias($.identifier, $.tag_name),
       repeat(seq(WS1, $.attribute)),
-      optional(WS),
-      token(prec(6, '%}'))
+      token(prec(6, /[ \t]*%}/))
     )),
 
     tag_close: $ => prec.right(seq(
-      $._TAG_START,
+      token(prec(6, '{%')),
       optional(WS),
       optional(seq(token('/'), optional(WS))),
       alias($.identifier, $.tag_name),
-      optional(WS),
-      token(prec(6, '%}'))
-    )),
-
-    // Self-closing tag used at block level ({% tag /%})
-    block_tag_self_close: $ => prec.right(seq(
-      $._TAG_START,
-      optional(WS),
-      alias($.identifier, $.tag_name),
-      repeat(seq(WS1, $.attribute)),
-      optional(WS),
-      token(prec(6, '/%}'))
+      token(prec(6, /[ \t]*%}/))
     )),
 
     // Inline self-closing tag for use in paragraphs/lists
@@ -237,8 +224,7 @@ module.exports = grammar({
       optional(WS),
       alias($.identifier, $.tag_name),
       repeat(seq(WS1, $.attribute)),
-      optional(WS),
-      token(prec(6, '/%}'))
+      token(prec(6, /[ \t]*\/%}/))
     )),
 
     attribute: $ => seq(
@@ -366,7 +352,7 @@ module.exports = grammar({
       prec.left(5, seq(field('left', $.expression), optional(WS), field('operator', $.binary_subtract), optional(WS), field('right', $.expression))),
       prec.left(6, seq(field('left', $.expression), optional(WS), field('operator', $.binary_multiply), optional(WS), field('right', $.expression))),
       prec.left(6, seq(field('left', $.expression), optional(WS), field('operator', $.binary_divide), optional(WS), field('right', $.expression))),
-      prec.left(6, seq(field('left', $.expression), optional(WS), field('operator', $.binary_modulo), optional(WS), field('right', $.expression)))
+      prec.left(6, seq(field('left', $.expression), WS1, field('operator', $.binary_modulo), WS1, field('right', $.expression)))
     ),
 
     // Unary operators
@@ -482,7 +468,7 @@ module.exports = grammar({
         $.strong
       )),
       optional(WS),
-      token(prec(6, '%}'))
+      token(prec(10, '%}'))
     ),
 
     // Lists
