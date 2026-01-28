@@ -675,34 +675,26 @@
             ]
           },
           {
-            "type": "CHOICE",
+            "type": "SEQ",
             "members": [
               {
-                "type": "SEQ",
-                "members": [
-                  {
-                    "type": "TOKEN",
-                    "content": {
-                      "type": "STRING",
-                      "value": "/"
-                    }
-                  },
-                  {
-                    "type": "CHOICE",
-                    "members": [
-                      {
-                        "type": "PATTERN",
-                        "value": "[ \\t]+"
-                      },
-                      {
-                        "type": "BLANK"
-                      }
-                    ]
-                  }
-                ]
+                "type": "TOKEN",
+                "content": {
+                  "type": "STRING",
+                  "value": "/"
+                }
               },
               {
-                "type": "BLANK"
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "PATTERN",
+                    "value": "[ \\t]+"
+                  },
+                  {
+                    "type": "BLANK"
+                  }
+                ]
               }
             ]
           },
@@ -3614,57 +3606,13 @@
       "source_file"
     ],
     [
-      "list_item"
-    ],
-    [
-      "list",
-      "paragraph"
-    ],
-    [
-      "attribute",
-      "expression"
-    ],
-    [
-      "paragraph",
-      "_inline_content"
-    ],
-    [
-      "paragraph"
-    ],
-    [
-      "list_paragraph"
-    ],
-    [
-      "attribute",
-      "_primary_expression"
-    ],
-    [
-      "markdoc_tag",
-      "paragraph"
-    ],
-    [
       "markdoc_tag"
-    ],
-    [
-      "attribute_value",
-      "_primary_expression"
-    ],
-    [
-      "tag_open",
-      "tag_close"
-    ],
-    [
-      "binary_expression"
     ],
     [
       "markdoc_tag",
       "_inline_line_start"
     ],
     [
-      "tag_open",
-      "_primary_expression"
-    ],
-    [
       "tag_self_close",
       "_primary_expression"
     ],
@@ -3674,19 +3622,10 @@
       "_primary_expression"
     ],
     [
-      "tag_open",
-      "tag_self_close",
-      "_primary_expression"
+      "binary_expression"
     ],
     [
-      "tag_open",
-      "tag_close",
-      "tag_self_close",
-      "_primary_expression"
-    ],
-    [
-      "tag_open",
-      "tag_close",
+      "attribute_value",
       "_primary_expression"
     ]
   ],

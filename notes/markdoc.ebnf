@@ -24,7 +24,7 @@ markdoc_tag = tag_self_close, line_break
             | tag_open, line_break, tag_body, tag_close ;
 tag_body = { blank_line | block } ;
 tag_open = "{%", ws, tag_name, { tag_ws1, attribute }, tag_ws, "%}" ;
-tag_close = "{%", ws, [ "/", ws ], tag_name, ws, "%}" ;
+tag_close = "{%", ws, "/", ws, tag_name, ws, "%}" ;
 tag_self_close = "{%", ws, tag_name, { tag_ws1, attribute }, tag_ws, "/%}" ;
 
 attribute = attribute_name, "=", attribute_value ;

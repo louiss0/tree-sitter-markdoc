@@ -54,25 +54,12 @@ module.exports = grammar({
 
   conflicts: $ => [
     [$.source_file],
-    [$.list_item],
-    [$.list, $.paragraph],
-    [$.attribute, $.expression],
-    [$.paragraph, $._inline_content],
-    [$.paragraph],
-    [$.list_paragraph],
-    [$.attribute, $._primary_expression],
-    [$.markdoc_tag, $.paragraph],
     [$.markdoc_tag],
-    [$.attribute_value, $._primary_expression],
-    [$.tag_open, $.tag_close],
-    [$.binary_expression],
     [$.markdoc_tag, $._inline_line_start],
-    [$.tag_open, $._primary_expression],
     [$.tag_self_close, $._primary_expression],
     [$.tag_open, $.tag_self_close, $._primary_expression],
-    [$.tag_open, $.tag_self_close, $._primary_expression],
-    [$.tag_open, $.tag_close, $.tag_self_close, $._primary_expression],
-    [$.tag_open, $.tag_close, $._primary_expression]
+    [$.binary_expression],
+    [$.attribute_value, $._primary_expression]
   ],
 
   inline: $ => [
@@ -209,7 +196,7 @@ module.exports = grammar({
     tag_close: $ => prec.right(seq(
       token(prec(6, '{%')),
       optional(WS),
-      optional(seq(token('/'), optional(WS))),
+      seq(token('/'), optional(WS)),
       alias($.identifier, $.tag_name),
       token(prec(6, /[ \t]*%}/))
     )),
