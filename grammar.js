@@ -203,7 +203,7 @@ module.exports = grammar({
       optional(WS),
       alias($.identifier, $.tag_name),
       repeat(seq(WS1, $.attribute)),
-      token(prec(6, /[ \t]*%}/))
+      token(prec(6, /[ \t]*%}\r?\n/))
     )),
 
     tag_close: $ => prec.right(seq(

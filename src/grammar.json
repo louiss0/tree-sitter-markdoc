@@ -638,7 +638,7 @@
               "value": 6,
               "content": {
                 "type": "PATTERN",
-                "value": "[ \\t]*%}"
+                "value": "[ \\t]*%}\\r?\\n"
               }
             }
           }

@@ -204,15 +204,15 @@ Multiple inline expressions in paragraph
 --------------------------------------------------------------------------------
 
 (source_file
-  (ERROR
-    (tag_open
-      (tag_name))
-    (paragraph
-      (text)
-      (inline_expression
-        (expression
-          (identifier)))
-      (text))))
+  (paragraph
+    (inline_expression
+      (expression
+        (identifier)))
+    (text)
+    (inline_expression
+      (expression
+        (identifier)))
+    (text)))
 
 ================================================================================
 Tag with heading inside
