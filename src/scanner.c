@@ -19,7 +19,6 @@ enum TokenType {
   LIST_MARKER_DOT_DONT_INTERRUPT,
   LIST_MARKER_PARENTHESIS_DONT_INTERRUPT,
   PARAGRAPH_CONTINUATION,
-  TAG_START,
   EM_OPEN_STAR,
   EM_CLOSE_STAR,
   STRONG_OPEN_STAR,
@@ -224,83 +223,6 @@ static bool is_braced_line_without_trailing_content(TSLexer *lexer) {
     return false;
   }
   lexer->advance(lexer, false);
-
-  bool found_close = false;
-  while (lexer->lookahead != 0 && !is_newline(lexer->lookahead)) {
-    if (scan_brace_close(lexer)) {
-      found_close = true;
-      break;
-    }
-    lexer->advance(lexer, false);
-  }
-
-  if (!found_close) {
-    *lexer = saved_state;
-    return false;
-  }
-
-  while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
-    lexer->advance(lexer, false);
-  }
-
-  bool ok = lexer->lookahead == 0 || is_newline(lexer->lookahead);
-  *lexer = saved_state;
-  return ok;
-}
-
-static bool is_tag_line(TSLexer *lexer) {
-  TSLexer saved_state = *lexer;
-  uint8_t indentation = 0;
-
-  while ((lexer->lookahead == ' ' || lexer->lookahead == '\t') && indentation < 4) {
-    lexer->advance(lexer, false);
-    indentation++;
-  }
-
-  if (indentation >= 4) {
-    *lexer = saved_state;
-    return false;
-  }
-
-  if (lexer->lookahead != '{') {
-    *lexer = saved_state;
-    return false;
-  }
-  lexer->advance(lexer, false);
-  if (lexer->lookahead != '%') {
-    *lexer = saved_state;
-    return false;
-  }
-  lexer->advance(lexer, false);
-
-  while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
-    lexer->advance(lexer, false);
-  }
-
-  TSLexer keyword_state = *lexer;
-  if (scan_literal(lexer, "comment")) {
-    *lexer = saved_state;
-    return false;
-  }
-  *lexer = keyword_state;
-
-  if (lexer->lookahead == '/') {
-    lexer->advance(lexer, false);
-    while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
-      lexer->advance(lexer, false);
-    }
-  }
-
-  if (!iswalpha(lexer->lookahead) && lexer->lookahead != '_') {
-    *lexer = saved_state;
-    return false;
-  }
-
-  lexer->advance(lexer, false);
-  while (iswalpha(lexer->lookahead) || iswdigit(lexer->lookahead) ||
-         lexer->lookahead == '_' || lexer->lookahead == '-') {
-    lexer->advance(lexer, false);
-  }
 
   bool found_close = false;
   while (lexer->lookahead != 0 && !is_newline(lexer->lookahead)) {
@@ -987,24 +909,6 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
     lexer->result_symbol = HTML_BLOCK;
     s->prev = 0;
     return true;
-  }
-
-  if (valid_symbols[TAG_START] && is_tag_line(lexer)) {
-    uint8_t indentation = 0;
-    while ((lexer->lookahead == ' ' || lexer->lookahead == '\t') && indentation < 4) {
-      lexer->advance(lexer, false);
-      indentation++;
-    }
-    if (lexer->lookahead == '{') {
-      lexer->advance(lexer, false);
-      if (lexer->lookahead == '%') {
-        lexer->advance(lexer, false);
-        lexer->mark_end(lexer);
-        lexer->result_symbol = TAG_START;
-        s->prev = '%';
-        return true;
-      }
-    }
   }
 
   if (valid_symbols[TEXT] && is_frontmatter_delimiter_line(lexer)) {

@@ -120,7 +120,6 @@
 ; Tag delimiters: {% and %} and /%}
 ("{%" @punctuation.bracket)
 ("%}" @punctuation.bracket)
-("/%}" @punctuation.bracket)
 
 ; Tag names (e.g., callout, table, partial)
 (tag_name) @tag

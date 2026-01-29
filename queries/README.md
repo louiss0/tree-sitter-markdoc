@@ -92,6 +92,12 @@ As of version 0.1.0, the following features are **not yet fully supported** in t
 
 These features are planned for future releases and will require an external scanner for proper parsing.
 
+## Tag Parsing Heuristics
+
+The grammar treats `{% %}` tags as line-based block delimiters (similar to the
+thematic-break/frontmatter line heuristics), so block tags are expected to appear
+on their own lines with content in between.
+
 ## Contributing
 
 When adding new grammar rules, ensure corresponding highlight queries are added to `highlights.scm` with appropriate capture names that follow Tree-sitter conventions.

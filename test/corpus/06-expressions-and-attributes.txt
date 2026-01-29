@@ -498,14 +498,42 @@ Content
 -----------------------------------------------------------------------------
 
 (source_file
-  (ERROR
-    (identifier)
-    (attribute_name)
-    (expression
-      (binary_expression
-        left: (expression
-          (variable
-            (identifier)))
-        operator: (binary_greater_than)
-        right: (expression
-          (number))))))
+  (markdoc_tag
+    (tag_open
+      (tag_name)
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (expression
+            (binary_expression
+              left: (expression
+                (variable
+                  (identifier)))
+              operator: (binary_greater_than)
+              right: (expression
+                (number)))))))
+    (paragraph
+      (text))
+    (tag_close
+      (tag_name)))
+  (markdoc_tag
+    (tag_self_close
+      (tag_name)
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (expression
+            (binary_expression
+              left: (expression
+                (binary_expression
+                  left: (expression
+                    (variable
+                      (identifier)))
+                  operator: (binary_add)
+                  right: (expression
+                    (variable
+                      (identifier)))))
+              operator: (binary_multiply)
+              right: (expression
+                (variable
+                  (identifier))))))))))
