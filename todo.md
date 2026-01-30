@@ -1,14 +1,13 @@
 # TODO
 
-## Tests that include ERROR nodes
-- The corpus fixtures still contain explicit `ERROR` nodes for negative cases in:
-  - `test/corpus/05-html-tags-and-comments.txt`
-  - `test/corpus/06-expressions-and-attributes.txt`
-  - `test/corpus/08-emphasis-flanking-rules.txt`
+## Tests that are failing
+- Not run yet after the latest grammar/scanner changes; run `npx tree-sitter test` to confirm.
 
 ## What bugs are present
-- Validate whether any remaining `ERROR` fixtures are expected by the spec or should be tightened now that tag parsing has been stabilized.
+- HTML blocks are not recognized: `<div>...` parses as `ERROR` and paragraph text because `HTML_BLOCK` is never returned by the external scanner.
+- Frontmatter takes precedence at file start; a file starting with `---` but without a closing delimiter now errors instead of producing a thematic break (decide if this is acceptable per spec).
 
 ## What to do next
-1. Audit the remaining `ERROR` fixtures to confirm they still represent intentionally invalid inputs and document the rationale in the corpus headers if needed.
-2. Keep an eye on list parsing as new tag edge cases are added, especially where tags appear inside list items or after blank lines.
+- Debug `scan_html_block` using `tree-sitter parse --debug` (no custom logs) and fix the external scanner so `HTML_BLOCK` is emitted at column 0.
+- Update corpus tests to match the corrected grammar (frontmatter/thematic break behavior, list markers including `-`, and HTML blocks) and re-run `npx tree-sitter test -u` as needed.
+- Re-run `npx tree-sitter generate` after any grammar edits, then `npx tree-sitter test` to verify.
