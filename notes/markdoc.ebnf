@@ -1,6 +1,13 @@
 (* Markdoc grammar sketch for this tree-sitter implementation. *)
 
-source_file = { newline }, [ block, { blank_line, block } ], { blank_line | newline } ;
+source_file =
+  frontmatter, { block_separator, block }, { blank_line | newline }
+  | { newline }, [ block, { block_separator, block } ], { blank_line | newline } ;
+
+block_separator = blank_line | newline ;
+
+frontmatter = frontmatter_delimiter, newline, yaml, frontmatter_delimiter ;
+frontmatter_delimiter = "---" ;
 
 block =
   comment_block
@@ -17,13 +24,20 @@ block =
 heading = heading_marker, [ heading_text ] ;
 heading_marker = ("#" | "##" | "###" | "####" | "#####" | "######"), ws1 ;
 
+thematic_break = ("-" | "*" | "_"), { ws | "-" | "*" | "_" }, newline ;
+
+blockquote = ">", { not_newline }, { newline, ">", { not_newline } } ;
+
 (* Tags and expressions use {% %} delimiters (not {{ }}). *)
-(* Block tags are line-based: the tag line contains only the tag, similar to the
-   thematic-break/frontmatter line heuristics in the parser. *)
+(* Block tags are line-based: the opening tag ends the line. *)
 markdoc_tag = tag_self_close, line_break
-            | tag_open, line_break, tag_body, tag_close ;
+            | tag_open, tag_body, tag_close ;
+
 tag_body = { blank_line | block } ;
-tag_open = "{%", ws, tag_name, { tag_ws1, attribute }, tag_ws, "%}" ;
+
+comment_block = "{%", ws, "comment", ws, "%}", { any }, "{%", ws, "/comment", ws, "%}" ;
+
+tag_open = "{%", ws, tag_name, { tag_ws1, attribute }, tag_ws, "%}", line_break ;
 tag_close = "{%", ws, "/", ws, tag_name, ws, "%}" ;
 tag_self_close = "{%", ws, tag_name, { tag_ws1, attribute }, tag_ws, "/%}" ;
 
@@ -33,11 +47,13 @@ attribute_value = string | expression ;
 inline_expression = "{%", ws, (expression | emphasis | strong), ws, "%}" ;
 
 list = list_item, { list_item } ;
-list_item = list_marker, list_paragraph, [ newline ] ;
-list_marker = { ws }, ( "-" | "*" | "+" | digit, { digit }, "." ), ws1 ;
+list_item = list_marker, list_paragraph, newline ;
+list_marker = { ws }, ("-" | "*" | "+" | digit, { digit }, ("." | ")")), ws1 ;
 
 paragraph = inline_first, { inline_content },
             { newline, inline_first, { inline_content } } ;
+
+list_paragraph = paragraph ;
 
 inline_first =
   inline_expression | inline_tag | text | html_inline | link
@@ -55,12 +71,46 @@ primary_expression =
   variable | identifier | string | number | array_literal
   | object_literal | boolean | null | parenthesized_expression ;
 
-tag_expression = variable | call_expression | member_expression
-                 | array_access | parenthesized_expression ;
+binary_expression = expression, ws, binary_operator, ws, expression ;
+binary_operator = "||" | "&&" | "==" | "!=" | "<" | ">" | "<=" | ">="
+                | "+" | "-" | "*" | "/" | "%" ;
+
+unary_expression = unary_operator, ws, expression ;
+unary_operator = "!" | "-" | "+" ;
+
+call_expression = (identifier | member_expression), "(", [ expression, { ws, ",", ws, expression } ], ")" ;
+member_expression = (member_expression | array_access | primary_expression), ".", identifier ;
+array_access = (member_expression | array_access | primary_expression), "[", ws, expression, ws, "]" ;
+
+variable = "$", identifier ;
+identifier = letter, { letter | digit | "_" } ;
+string = "\"", { not_quote }, "\"" | "'", { not_single_quote }, "'" ;
+number = [ "-" ], digit, { digit }, [ ".", digit, { digit } ] ;
+boolean = "true" | "false" ;
+null = "null" ;
+
+tag_name = identifier ;
+attribute_name = identifier ;
+html_tag_name = identifier ;
 
 parenthesized_expression = "(", ws, expression, ws, ")" ;
 arrow_function = "(", ws, [ identifier, { ws, ",", ws, identifier } ],
                  ws, ")", ws, "=>", ws, expression ;
+
+array_literal = "[", ws, [ expression, { ws, ",", ws, expression }, [ ws, "," ] ], ws, "]" ;
+object_literal = "{", ws, [ pair, { ws, ",", ws, pair }, [ ws, "," ] ], ws, "}" ;
+pair = identifier, ws, ":", ws, expression ;
+
+inline_code = "`", { not_backtick }, "`" ;
+link = "[", link_text, "]", "(", link_destination, ")" ;
+image = "![", image_alt, "]", "(", image_destination, ")" ;
+
+html_comment = "<!--", { any }, "-->" ;
+html_block = "<", html_tag_name, { any }, ">", { any }, "</", html_tag_name, ">"
+           | "<", html_tag_name, { any }, "/>" ;
+html_inline = html_block ;
+
+line_break = blank_line | newline ;
 
 ws = { " " | "\t" } ;
 ws1 = ( " " | "\t" ), { " " | "\t" } ;
@@ -68,3 +118,13 @@ tag_ws = { " " | "\t" | "\r" | "\n" } ;
 tag_ws1 = ( " " | "\t" | "\r" | "\n" ), { " " | "\t" | "\r" | "\n" } ;
 newline = "\n" | "\r\n" ;
 blank_line = newline, newline, { newline } ;
+
+(* Helper terminals used in the sketch. *)
+any = ? any character ? ;
+not_newline = ? any character except newline ? ;
+not_backtick = ? any character except backtick or newline ? ;
+not_quote = ? any character except " or newline ? ;
+not_single_quote = ? any character except ' or newline ? ;
+letter = ? ASCII letter or underscore ? ;
+digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+yaml = { any } ;

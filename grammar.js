@@ -67,23 +67,31 @@ module.exports = grammar({
   ],
 
   rules: {
-    source_file: $ => prec.right(seq(
-      repeat($._NEWLINE),
-      optional(seq(
-        choice(
-          $.frontmatter,
-          $._block
-        ),
-        repeat(seq(
-          choice($._BLANK_LINE, $._NEWLINE),
-          choice(
-            $.frontmatter,
+    source_file: $ => choice(
+      prec(1, seq(
+        $.frontmatter,
+        repeat(choice($._BLANK_LINE, $._NEWLINE)),
+        optional(seq(
+          $._block,
+          repeat(seq(
+            choice($._BLANK_LINE, $._NEWLINE),
             $._block
-          )
-        ))
+          ))
+        )),
+        repeat(choice($._BLANK_LINE, $._NEWLINE))
       )),
-      repeat(choice($._BLANK_LINE, $._NEWLINE))
-    )),
+      prec.right(seq(
+        repeat($._NEWLINE),
+        optional(seq(
+          $._block,
+          repeat(seq(
+            choice($._BLANK_LINE, $._NEWLINE),
+            $._block
+          ))
+        )),
+        repeat(choice($._BLANK_LINE, $._NEWLINE))
+      ))
+    ),
 
     _block: $ => choice(
       $.comment_block,  // Must come before markdoc_tag to match {% comment %}
@@ -118,7 +126,7 @@ module.exports = grammar({
     heading_marker: $ => token(prec(3, /#{1,6}[ \t]/)),  // Require space/tab after #
 
     // Thematic break (horizontal rule)
-    thematic_break: $ => $._THEMATIC_BREAK,
+    thematic_break: $ => prec.dynamic(1, $._THEMATIC_BREAK),
 
     // Blockquote (consume consecutive > lines as a single block)
     blockquote: $ => token(prec(2, />[^\r\n]*(\r?\n>[^\r\n]*)*\r?\n?/)),
@@ -470,6 +478,8 @@ module.exports = grammar({
     ),
 
     list_marker: $ => choice(
+      $._LIST_MARKER_MINUS,
+      $._LIST_MARKER_MINUS_DONT_INTERRUPT,
       $._LIST_MARKER_PLUS,
       $._LIST_MARKER_PLUS_DONT_INTERRUPT,
       $._LIST_MARKER_STAR,
@@ -497,9 +507,9 @@ module.exports = grammar({
       token(prec(1, seq(
         '<',
         HTML_TAG_NAME,
-        optional(/[^>]*/),
+        optional(/[^\n>]*/),
         '>',
-        optional(/[^<]*/),
+        optional(/[^\n<]*/),
         '</',
         HTML_TAG_NAME,
         '>'
@@ -508,7 +518,7 @@ module.exports = grammar({
       token(prec(1, seq(
         '<',
         HTML_TAG_NAME,
-        optional(/[^>]*/),
+        optional(/[^\n>]*/),
         '/>'
       )))
     ),
