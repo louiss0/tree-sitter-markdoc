@@ -933,17 +933,7 @@
   {
     "type": "strong",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "emphasis",
-          "named": true
-        }
-      ]
-    }
+    "fields": {}
   },
   {
     "type": "tag_close",
@@ -1101,10 +1091,6 @@
   },
   {
     "type": ",",
-    "named": false
-  },
-  {
-    "type": "---",
     "named": false
   },
   {

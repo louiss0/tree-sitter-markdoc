@@ -23,6 +23,7 @@ module.exports = grammar({
 
   externals: $ => [
     $._CODE_CONTENT,
+    $._FRONTMATTER_DELIM,
     $._LIST_CONTINUATION,
     $._THEMATIC_BREAK,
     $._LIST_MARKER_MINUS,
@@ -35,17 +36,6 @@ module.exports = grammar({
     $._LIST_MARKER_STAR_DONT_INTERRUPT,
     $._LIST_MARKER_DOT_DONT_INTERRUPT,
     $._LIST_MARKER_PARENTHESIS_DONT_INTERRUPT,
-    $._PARAGRAPH_CONTINUATION,
-    $._EM_OPEN_STAR,
-    $._EM_CLOSE_STAR,
-    $._STRONG_OPEN_STAR,
-    $._STRONG_CLOSE_STAR,
-    $._EM_OPEN_UNDERSCORE,
-    $._EM_CLOSE_UNDERSCORE,
-    $._STRONG_OPEN_UNDERSCORE,
-    $._STRONG_CLOSE_UNDERSCORE,
-    $._RAW_DELIM,
-    $._TEXT,
     $._HTML_COMMENT,
     $._HTML_BLOCK
   ],
@@ -107,10 +97,10 @@ module.exports = grammar({
     ),
 
     frontmatter: $ => seq(
-      token(prec(10, '---')),
+      $._FRONTMATTER_DELIM,
       $._NEWLINE,
       alias($.yaml_content, $.yaml),
-      token(prec(10, '---'))
+      $._FRONTMATTER_DELIM
     ),
 
     yaml_content: $ => repeat1(
@@ -120,10 +110,11 @@ module.exports = grammar({
 
     heading: $ => prec.right(2, seq(
       field('heading_marker', $.heading_marker),
-      field('heading_text', optional(alias($._TEXT, $.heading_text)))
+      field('heading_text', optional($.heading_text))
     )),
 
     heading_marker: $ => token(prec(3, /#{1,6}[ \t]/)),  // Require space/tab after #
+    heading_text: $ => token(prec(1, /[^\r\n]+/)),
 
     // Thematic break (horizontal rule)
     thematic_break: $ => prec.dynamic(1, $._THEMATIC_BREAK),
@@ -528,7 +519,7 @@ module.exports = grammar({
       $._inline_line_start,
       repeat($._inline_content),
       repeat(seq(
-        $._PARAGRAPH_CONTINUATION,
+        $._NEWLINE,
         choice(
           $._inline_expression_line,
           seq($._inline_line_start_no_expression, repeat($._inline_content))
@@ -550,19 +541,13 @@ module.exports = grammar({
     )),
 
     emphasis: $ => choice(
-      seq($._EM_OPEN_STAR, token.immediate(/[^*\n]+/), $._EM_CLOSE_STAR),
-      seq($._EM_OPEN_UNDERSCORE, token.immediate(/[^_\n]+/), $._EM_CLOSE_UNDERSCORE)
+      token(prec(2, /\*[^*\n]+\*/)),
+      token(prec(2, /_[^_\n]+_/))
     ),
 
     strong: $ => choice(
-      seq($._STRONG_OPEN_STAR, repeat1(choice(
-        $.emphasis,
-        token.immediate(/[^*\n]+/)
-      )), $._STRONG_CLOSE_STAR),
-      seq($._STRONG_OPEN_UNDERSCORE, repeat1(choice(
-        $.emphasis,
-        token.immediate(/[^_\n]+/)
-      )), $._STRONG_CLOSE_UNDERSCORE)
+      token(prec(3, /\*\*[^*\n]+\*\*/)),
+      token(prec(3, /__[^_\n]+__/))
     ),
 
     inline_code: $ => seq(
@@ -638,10 +623,7 @@ module.exports = grammar({
       alias($.standalone_punct, $.text)
     ),
 
-    text: $ => choice(
-      $._TEXT,
-      $._RAW_DELIM
-    ),
+    text: $ => token(prec(1, /[^\r\n{\[<!`]+/)),
     
     // Fallback for standalone punctuation that doesn't start special syntax
     standalone_punct: $ => token('!'),
