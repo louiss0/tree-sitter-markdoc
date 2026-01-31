@@ -53,12 +53,19 @@ List with items separated by newlines
 --------------------------------------------------------------------------------
 
 (source_file
-  (paragraph
-    (text))
-  (paragraph
-    (text))
-  (paragraph
-    (text)))
+  (list
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))))
 
 ================================================================================
 Code block with newlines preserved

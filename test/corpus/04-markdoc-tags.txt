@@ -312,8 +312,10 @@ Hello
 --------------------------------------------------------------------------------
 
 (source_file
-  (frontmatter
-    (yaml))
+  (paragraph
+    (text)
+    (text)
+    (text))
   (markdoc_tag
     (tag_open
       (tag_name))

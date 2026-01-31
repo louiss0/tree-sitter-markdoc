@@ -9,8 +9,7 @@ Content inside div
 -----------------------------------------------------------------------------
 
 (source_file
-  (paragraph
-    (html_inline)))
+  (html_block))
 
 =============================================================================
 HTML self-closing tag
@@ -21,8 +20,7 @@ HTML self-closing tag
 -----------------------------------------------------------------------------
 
 (source_file
-  (paragraph
-    (html_inline)))
+  (html_block))
 
 =============================================================================
 HTML comment
@@ -76,9 +74,4 @@ Mixed HTML and Markdoc content
 -----------------------------------------------------------------------------
 
 (source_file
-  (ERROR
-    (binary_less_than)
-    (identifier)
-    (identifier)
-    (identifier)
-    (binary_greater_than)))
+  (html_block))

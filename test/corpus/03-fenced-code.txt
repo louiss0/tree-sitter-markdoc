@@ -220,8 +220,10 @@ puts "Hello"
 --------------------------------------------------------------------------------
 
 (source_file
-  (frontmatter
-    (yaml))
+  (paragraph
+    (text)
+    (text)
+    (text))
   (fenced_code_block
     (code_fence_open
       (info_string
