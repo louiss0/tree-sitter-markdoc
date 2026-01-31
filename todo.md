@@ -1,13 +1,21 @@
 # TODO
 
 ## Tests that are failing
-- Not run yet after the latest grammar/scanner changes; run `npx tree-sitter test` to confirm.
+- `01-document-frontmatter` (frontmatter-only and frontmatter+body)
+- `02-headings-paragraphs` (multi-line paragraphs and frontmatter heading case)
+- `03-fenced-code` (frontmatter case)
+- `04-markdoc-tags` (frontmatter case)
+- `06-inline-formatting` (emphasis/strong and mixed inline cases)
+- `08-emphasis-flanking-rules` (most emphasis edge cases)
+- `08-paragraphs-and-lists` (basic paragraphs)
+- `09-newlines-and-blank-lines` (multi-line paragraph continuation)
 
 ## What bugs are present
-- HTML blocks are not recognized: `<div>...` parses as `ERROR` and paragraph text because `HTML_BLOCK` is never returned by the external scanner.
-- Frontmatter takes precedence at file start; a file starting with `---` but without a closing delimiter now errors instead of producing a thematic break (decide if this is acceptable per spec).
+- Frontmatter is not parsed: `---` lines are currently lexed as `text`, so `frontmatter` never matches and related tests fail.
+- Paragraphs no longer span single newlines after removing `_PARAGRAPH_CONTINUATION`, so multi-line paragraph expectations fail.
+- Emphasis/strong are now regex tokens without flanking logic, so many inline formatting expectations are wrong.
 
 ## What to do next
-- Debug `scan_html_block` using `tree-sitter parse --debug` (no custom logs) and fix the external scanner so `HTML_BLOCK` is emitted at column 0.
-- Update corpus tests to match the corrected grammar (frontmatter/thematic break behavior, list markers including `-`, and HTML blocks) and re-run `npx tree-sitter test -u` as needed.
-- Re-run `npx tree-sitter generate` after any grammar edits, then `npx tree-sitter test` to verify.
+- Fix frontmatter vs thematic break: ensure `_FRONTMATTER_DELIM` is emitted by the external scanner at column 0 and update grammar/tests so frontmatter is parsed before regular blocks.
+- Redesign paragraph handling without external `_PARAGRAPH_CONTINUATION` (e.g., allow `_NEWLINE` joins in `paragraph` and `list_paragraph`, and update tests accordingly).
+- Update inline emphasis/strong rules or tests to reflect the new non-scanner implementation; re-run `npx tree-sitter test -u` once behavior is settled.
