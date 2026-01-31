@@ -9,8 +9,7 @@ Content inside
 ---
 
 (source_file
-  (paragraph
-    (html_inline)))
+  (html_block))
 
 =======================================
 HTML block with attributes
@@ -23,8 +22,7 @@ Content
 ---
 
 (source_file
-  (paragraph
-    (html_inline)))
+  (html_block))
 
 =======================================
 Self-closing HTML tag
@@ -35,8 +33,7 @@ Self-closing HTML tag
 ---
 
 (source_file
-  (paragraph
-    (html_inline)))
+  (html_block))
 
 =======================================
 HTML comment block
@@ -90,8 +87,7 @@ Regular paragraph text.
 ---
 
 (source_file
-  (paragraph
-    (html_inline))
+  (html_block)
   (paragraph
     (text)))
 
@@ -111,8 +107,7 @@ Some content
   (heading
     (heading_marker)
     (heading_text))
-  (paragraph
-    (html_inline)))
+  (html_block))
 
 =======================================
 Inline HTML with self-closing tag

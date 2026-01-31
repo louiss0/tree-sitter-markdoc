@@ -103,6 +103,10 @@ static inline bool is_space_ch(int32_t c) {
   return c == ' ' || c == '\t';
 }
 
+static inline bool is_digit_ch(int32_t c) {
+  return c >= '0' && c <= '9';
+}
+
 static inline bool is_word_ch(int32_t c) {
   return iswalnum(c) || c == '_';
 }
@@ -294,13 +298,21 @@ static bool scan_html_comment(TSLexer *lexer) {
   return false;
 }
 
+static inline bool is_html_tag_start(int32_t c) {
+  return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+}
+
+static inline bool is_html_tag_char(int32_t c) {
+  return is_html_tag_start(c) || is_digit_ch(c) || c == '-' || c == ':';
+}
+
 static bool scan_html_tag_name(TSLexer *lexer, char *buffer, size_t buffer_len, size_t *name_len) {
-  if (!iswalpha(lexer->lookahead)) {
+  if (!is_html_tag_start(lexer->lookahead)) {
     return false;
   }
 
   size_t i = 0;
-  while (iswalpha(lexer->lookahead) || iswdigit(lexer->lookahead)) {
+  while (is_html_tag_char(lexer->lookahead)) {
     if (i + 1 >= buffer_len) {
       return false;
     }
@@ -313,7 +325,7 @@ static bool scan_html_tag_name(TSLexer *lexer, char *buffer, size_t buffer_len, 
 }
 
 static bool scan_html_block(TSLexer *lexer) {
-  if (lexer->get_column(lexer) != 0 || lexer->lookahead != '<') {
+  if (lexer->lookahead != '<') {
     return false;
   }
 
@@ -332,6 +344,7 @@ static bool scan_html_block(TSLexer *lexer) {
   }
 
   bool self_closing = false;
+  bool saw_close = false;
   while (lexer->lookahead != 0) {
     if (lexer->lookahead == '"' || lexer->lookahead == '\'') {
       int32_t quote = lexer->lookahead;
@@ -352,6 +365,7 @@ static bool scan_html_block(TSLexer *lexer) {
         lexer->advance(lexer, false);
         lexer->mark_end(lexer);
         self_closing = true;
+        saw_close = true;
         break;
       }
       *lexer = slash_state;
@@ -360,19 +374,20 @@ static bool scan_html_block(TSLexer *lexer) {
     if (lexer->lookahead == '>') {
       lexer->advance(lexer, false);
       lexer->mark_end(lexer);
+      saw_close = true;
       break;
     }
 
     lexer->advance(lexer, false);
   }
 
-  if (self_closing) {
-    return true;
-  }
-
-  if (lexer->lookahead == 0) {
+  if (!saw_close) {
     *lexer = saved_state;
     return false;
+  }
+
+  if (self_closing) {
+    return true;
   }
 
   while (lexer->lookahead != 0) {
@@ -399,11 +414,28 @@ static bool scan_html_block(TSLexer *lexer) {
       *lexer = close_state;
     }
 
+    if (is_newline(lexer->lookahead)) {
+      TSLexer newline_state = *lexer;
+      if (lexer->lookahead == '\r') {
+        lexer->advance(lexer, false);
+        if (lexer->lookahead == '\n') {
+          lexer->advance(lexer, false);
+        }
+      } else {
+        lexer->advance(lexer, false);
+      }
+      if (lexer->lookahead == 0 || is_newline(lexer->lookahead)) {
+        lexer->mark_end(lexer);
+        return true;
+      }
+      *lexer = newline_state;
+    }
+
     lexer->advance(lexer, false);
   }
 
-  *lexer = saved_state;
-  return false;
+  lexer->mark_end(lexer);
+  return true;
 }
 
 static bool is_thematic_break_line(TSLexer *lexer) {
@@ -683,6 +715,42 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
   Scanner *s = (Scanner *)payload;
 
   if (lexer->get_column(lexer) == 0) {
+    int32_t marker = lexer->lookahead;
+    bool wants_unordered = valid_symbols[LIST_MARKER_MINUS] ||
+                           valid_symbols[LIST_MARKER_PLUS] ||
+                           valid_symbols[LIST_MARKER_STAR] ||
+                           valid_symbols[LIST_MARKER_MINUS_DONT_INTERRUPT] ||
+                           valid_symbols[LIST_MARKER_PLUS_DONT_INTERRUPT] ||
+                           valid_symbols[LIST_MARKER_STAR_DONT_INTERRUPT];
+
+    if (wants_unordered && (marker == '-' || marker == '+' || marker == '*')) {
+      TSLexer saved_state = *lexer;
+      lexer->advance(lexer, false);
+      if (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+        while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+          lexer->advance(lexer, false);
+        }
+        lexer->mark_end(lexer);
+        if (marker == '-') {
+          lexer->result_symbol =
+              valid_symbols[LIST_MARKER_MINUS] ? LIST_MARKER_MINUS : LIST_MARKER_MINUS_DONT_INTERRUPT;
+        } else if (marker == '+') {
+          lexer->result_symbol =
+              valid_symbols[LIST_MARKER_PLUS] ? LIST_MARKER_PLUS : LIST_MARKER_PLUS_DONT_INTERRUPT;
+        } else {
+          lexer->result_symbol =
+              valid_symbols[LIST_MARKER_STAR] ? LIST_MARKER_STAR : LIST_MARKER_STAR_DONT_INTERRUPT;
+        }
+        s->prev = ' ';
+        s->in_list = true;
+        s->at_start = false;
+        return true;
+      }
+      *lexer = saved_state;
+    }
+  }
+
+  if (lexer->get_column(lexer) == 0) {
     if (s->at_start && is_frontmatter_delimiter_line(lexer)) {
       return false;
     }
@@ -696,25 +764,15 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
     }
   }
 
-  if (lexer->get_column(lexer) == 0 &&
-      (lexer->lookahead == '*' || lexer->lookahead == '+' || lexer->lookahead == '-')) {
-    TSLexer saved_state = *lexer;
-    int32_t first = lexer->lookahead;
-    lexer->advance(lexer, false);
-    if (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
-      while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
-        lexer->advance(lexer, false);
-      }
-      lexer->mark_end(lexer);
-      lexer->result_symbol = first == '*'
-                                 ? LIST_MARKER_STAR
-                                 : (first == '+' ? LIST_MARKER_PLUS : LIST_MARKER_MINUS);
-      s->prev = ' ';
+  if (lexer->get_column(lexer) == 0 && scan_simple_list_marker(lexer, valid_symbols)) {
+    s->prev = ' ';
+    if (lexer->result_symbol == LIST_MARKER_STAR || lexer->result_symbol == LIST_MARKER_PLUS ||
+        lexer->result_symbol == LIST_MARKER_MINUS || lexer->result_symbol == LIST_MARKER_DOT ||
+        lexer->result_symbol == LIST_MARKER_PARENTHESIS) {
       s->in_list = true;
-      s->at_start = false;
-      return true;
     }
-    *lexer = saved_state;
+    s->at_start = false;
+    return true;
   }
 
   // CODE_CONTENT: consume everything until we see a code fence close pattern
@@ -796,17 +854,6 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
 
     *lexer = start_state;
     return false;
-  }
-
-  if (lexer->get_column(lexer) == 0 && scan_simple_list_marker(lexer, valid_symbols)) {
-    s->prev = ' ';
-    if (lexer->result_symbol == LIST_MARKER_STAR || lexer->result_symbol == LIST_MARKER_PLUS ||
-        lexer->result_symbol == LIST_MARKER_MINUS || lexer->result_symbol == LIST_MARKER_DOT ||
-        lexer->result_symbol == LIST_MARKER_PARENTHESIS) {
-      s->in_list = true;
-    }
-    s->at_start = false;
-    return true;
   }
 
   // LIST_CONTINUATION: newline + indentation inside a list item

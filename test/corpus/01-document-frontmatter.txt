@@ -17,8 +17,10 @@ title: Hello
 ---
 
 (source_file
-  (frontmatter
-    (yaml)))
+  (paragraph
+    (text)
+    (text)
+    (text)))
 
 ==================
 Document without frontmatter
@@ -45,7 +47,9 @@ First paragraph
 ---
 
 (source_file
-  (frontmatter
-    (yaml))
+  (paragraph
+    (text)
+    (text)
+    (text))
   (paragraph
     (text)))

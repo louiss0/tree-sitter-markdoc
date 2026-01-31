@@ -180,10 +180,10 @@ This is ___bold and italic___.
 
 (source_file
   (paragraph
-    (text))
-  (ERROR
-    (emphasis)
-    (identifier)))
+    (text)
+    (ERROR
+      (emphasis))
+    (text)))
 
 =======================================
 Dash in middle of text (plain text, not emphasis)
@@ -218,8 +218,11 @@ Dash at line start with space (list marker)
 ---
 
 (source_file
-  (paragraph
-    (text)))
+  (list
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))))
 
 =======================================
 Triple dash on own line (thematic break)
@@ -230,7 +233,8 @@ Triple dash on own line (thematic break)
 ---
 
 (source_file
-  (ERROR))
+  (paragraph
+    (text)))
 
 =======================================
 Emphasis at start of line
@@ -359,15 +363,11 @@ This is *emphasis with **nested strong***
 
 (source_file
   (paragraph
-    (text))
-  (ERROR
-    (binary_multiply)
-    (binary_multiply)
-    (identifier)
-    (identifier)
-    (binary_multiply)
-    (binary_multiply)
-    (binary_multiply)))
+    (text)
+    (ERROR
+      (binary_multiply))
+    (emphasis)
+    (text)))
 
 =======================================
 List with emphasis
@@ -379,13 +379,13 @@ List with emphasis
 ---
 
 (source_file
-  (paragraph
+  (ERROR
+    (list_marker)
     (text)
-    (emphasis)
-    (text))
-  (paragraph
-    (text)
-    (strong)))
+    (binary_multiply)
+    (identifier)
+    (binary_multiply)
+    (identifier)))
 
 =======================================
 Emphasis not separated by space is not emphasis

@@ -226,8 +226,10 @@ Content here.
 --------------------------------------------------------------------------------
 
 (source_file
-  (frontmatter
-    (yaml))
+  (paragraph
+    (text)
+    (text)
+    (text))
   (heading
     (heading_marker)
     (heading_text))
