@@ -226,10 +226,8 @@ Content here.
 --------------------------------------------------------------------------------
 
 (source_file
-  (paragraph
-    (text)
-    (text)
-    (text))
+  (thematic_break)
+  (thematic_break)
   (heading
     (heading_marker)
     (heading_text))

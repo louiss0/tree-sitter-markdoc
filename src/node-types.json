@@ -989,11 +989,6 @@
     }
   },
   {
-    "type": "text",
-    "named": true,
-    "fields": {}
-  },
-  {
     "type": "thematic_break",
     "named": true,
     "fields": {}
@@ -1033,11 +1028,6 @@
     }
   },
   {
-    "type": "unary_not",
-    "named": true,
-    "fields": {}
-  },
-  {
     "type": "variable",
     "named": true,
     "fields": {},
@@ -1056,10 +1046,6 @@
     "type": "yaml",
     "named": true,
     "fields": {}
-  },
-  {
-    "type": "!",
-    "named": false
   },
   {
     "type": "![",
@@ -1250,11 +1236,19 @@
     "named": true
   },
   {
+    "type": "text",
+    "named": true
+  },
+  {
     "type": "true",
     "named": false
   },
   {
     "type": "unary_minus",
+    "named": true
+  },
+  {
+    "type": "unary_not",
     "named": true
   },
   {

@@ -38,6 +38,7 @@ This is ** a word.
   (paragraph
     (text)
     (text)
+    (text)
     (text)))
 
 =======================================
@@ -50,6 +51,7 @@ This is __ a word.
 
 (source_file
   (paragraph
+    (text)
     (text)
     (text)
     (text)))
@@ -166,7 +168,7 @@ This is ***bold and italic***.
   (paragraph
     (text)
     (text)
-    (emphasis)
+    (strong)
     (text)
     (text)))
 
@@ -181,8 +183,9 @@ This is ___bold and italic___.
 (source_file
   (paragraph
     (text)
-    (ERROR
-      (emphasis))
+    (text)
+    (strong)
+    (text)
     (text)))
 
 =======================================
@@ -233,8 +236,7 @@ Triple dash on own line (thematic break)
 ---
 
 (source_file
-  (paragraph
-    (text)))
+  (thematic_break))
 
 =======================================
 Emphasis at start of line
@@ -272,8 +274,9 @@ This *has only opening.
 
 (source_file
   (paragraph
-    (text))
-  (ERROR))
+    (text)
+    (text)
+    (text)))
 
 =======================================
 Unbalanced emphasis (closing only)
@@ -349,8 +352,7 @@ This is **_bold and italic_** text.
 (source_file
   (paragraph
     (text)
-    (strong
-      (emphasis))
+    (strong)
     (text)))
 
 =======================================
@@ -364,9 +366,9 @@ This is *emphasis with **nested strong***
 (source_file
   (paragraph
     (text)
-    (ERROR
-      (binary_multiply))
-    (emphasis)
+    (text)
+    (text)
+    (strong)
     (text)))
 
 =======================================
@@ -379,13 +381,18 @@ List with emphasis
 ---
 
 (source_file
-  (ERROR
-    (list_marker)
-    (text)
-    (binary_multiply)
-    (identifier)
-    (binary_multiply)
-    (identifier)))
+  (list
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)
+        (emphasis)
+        (text)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)
+        (strong)))))
 
 =======================================
 Emphasis not separated by space is not emphasis
@@ -398,9 +405,7 @@ abc*def*ghi
 (source_file
   (paragraph
     (text)
-    (text)
-    (text)
-    (text)
+    (emphasis)
     (text)))
 
 =======================================
@@ -414,9 +419,7 @@ abc_def_ghi
 (source_file
   (paragraph
     (text)
-    (text)
-    (text)
-    (text)
+    (emphasis)
     (text)))
 
 =======================================
@@ -432,8 +435,14 @@ This *** has **multiple __ delimiters.
     (text)
     (text)
     (text)
-    (text))
-  (ERROR))
+    (text)
+    (text)
+    (text)
+    (text)
+    (text)
+    (text)
+    (text)
+    (text)))
 
 =======================================
 Emphasis with numbers adjacent
@@ -489,7 +498,8 @@ a newline* so no emphasis.
 (source_file
   (paragraph
     (text)
-    (ERROR)
+    (text)
+    (text)
     (text)
     (text)
     (text)))
@@ -521,9 +531,7 @@ Test_123_ end.
 (source_file
   (paragraph
     (text)
-    (text)
-    (text)
-    (text)
+    (emphasis)
     (text)))
 
 =======================================
@@ -556,6 +564,8 @@ This ** and __ are empty.
     (text)
     (text)
     (text)
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -568,6 +578,7 @@ This *** should be text.
 
 (source_file
   (paragraph
+    (text)
     (text)
     (text)
     (text)

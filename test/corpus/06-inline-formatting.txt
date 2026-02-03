@@ -148,9 +148,19 @@ Inline formatting in list
 ---
 
 (source_file
-  (ERROR
-    (list_marker)
-    (text)
-    (binary_multiply)
-    (identifier)
-    (binary_multiply)))
+  (list
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)
+        (emphasis)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)
+        (strong)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)
+        (inline_code)))))

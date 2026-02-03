@@ -220,10 +220,8 @@ puts "Hello"
 --------------------------------------------------------------------------------
 
 (source_file
-  (paragraph
-    (text)
-    (text)
-    (text))
+  (thematic_break)
+  (thematic_break)
   (fenced_code_block
     (code_fence_open
       (info_string

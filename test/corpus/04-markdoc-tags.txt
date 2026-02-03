@@ -312,10 +312,8 @@ Hello
 --------------------------------------------------------------------------------
 
 (source_file
-  (paragraph
-    (text)
-    (text)
-    (text))
+  (thematic_break)
+  (thematic_break)
   (markdoc_tag
     (tag_open
       (tag_name))

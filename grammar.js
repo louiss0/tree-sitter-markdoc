@@ -25,17 +25,8 @@ module.exports = grammar({
     $._CODE_CONTENT,
     $._FRONTMATTER_DELIM,
     $._LIST_CONTINUATION,
+    $._SOFT_LINE_BREAK,
     $._THEMATIC_BREAK,
-    $._LIST_MARKER_MINUS,
-    $._LIST_MARKER_PLUS,
-    $._LIST_MARKER_STAR,
-    $._LIST_MARKER_DOT,
-    $._LIST_MARKER_PARENTHESIS,
-    $._LIST_MARKER_MINUS_DONT_INTERRUPT,
-    $._LIST_MARKER_PLUS_DONT_INTERRUPT,
-    $._LIST_MARKER_STAR_DONT_INTERRUPT,
-    $._LIST_MARKER_DOT_DONT_INTERRUPT,
-    $._LIST_MARKER_PARENTHESIS_DONT_INTERRUPT,
     $._HTML_COMMENT,
     $._HTML_BLOCK
   ],
@@ -469,16 +460,11 @@ module.exports = grammar({
     ),
 
     list_marker: $ => choice(
-      $._LIST_MARKER_MINUS,
-      $._LIST_MARKER_MINUS_DONT_INTERRUPT,
-      $._LIST_MARKER_PLUS,
-      $._LIST_MARKER_PLUS_DONT_INTERRUPT,
-      $._LIST_MARKER_STAR,
-      $._LIST_MARKER_STAR_DONT_INTERRUPT,
-      $._LIST_MARKER_DOT,
-      $._LIST_MARKER_DOT_DONT_INTERRUPT,
-      $._LIST_MARKER_PARENTHESIS,
-      $._LIST_MARKER_PARENTHESIS_DONT_INTERRUPT
+      token(prec(2, LIST_MARKER_MINUS_FALLBACK)),
+      token(prec(2, LIST_MARKER_PLUS_FALLBACK)),
+      token(prec(2, LIST_MARKER_STAR_FALLBACK)),
+      token(prec(2, LIST_MARKER_DOT_FALLBACK)),
+      token(prec(2, LIST_MARKER_PAREN_FALLBACK))
     ),
 
     _block_close: $ => $._NEWLINE,
@@ -519,7 +505,7 @@ module.exports = grammar({
       $._inline_line_start,
       repeat($._inline_content),
       repeat(seq(
-        $._NEWLINE,
+        $._SOFT_LINE_BREAK,
         choice(
           $._inline_expression_line,
           seq($._inline_line_start_no_expression, repeat($._inline_content))
@@ -541,13 +527,17 @@ module.exports = grammar({
     )),
 
     emphasis: $ => choice(
-      token(prec(2, /\*[^*\n]+\*/)),
-      token(prec(2, /_[^_\n]+_/))
+      token(prec(2, /\*[^\s*]\*/)),
+      token(prec(2, /\*[^\s*][^*\n]*[^\s*]\*/)),
+      token(prec(2, /_[^\s_]\_/)),
+      token(prec(2, /_[^\s_][^_\n]*[^\s_]\_/))
     ),
 
     strong: $ => choice(
-      token(prec(3, /\*\*[^*\n]+\*\*/)),
-      token(prec(3, /__[^_\n]+__/))
+      token(prec(3, /\*\*[^\s*]\*\*/)),
+      token(prec(3, /\*\*[^\s*][^*\n]*[^\s*]\*\*/)),
+      token(prec(3, /__[^\s_]\__/)),
+      token(prec(3, /__[^\s_][^_\n]*[^\s_]\__/))
     ),
 
     inline_code: $ => seq(
@@ -623,10 +613,10 @@ module.exports = grammar({
       alias($.standalone_punct, $.text)
     ),
 
-    text: $ => token(prec(1, /[^\r\n{\[<!`]+/)),
+    text: $ => token(prec(1, /[^\r\n{\[<!`*_]+/)),
     
     // Fallback for standalone punctuation that doesn't start special syntax
-    standalone_punct: $ => token('!'),
+    standalone_punct: $ => token(/[!_*]/),
 
     _NEWLINE: $ => token(/\r?\n/),
     _BLANK_LINE: $ => token(/\r?\n[ \t]*\r?\n+/)
