@@ -11,30 +11,36 @@ Complex member access expressions
 (source_file
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (member_expression
           object: (member_expression
             object: (identifier)
             property: (identifier))
-          property: (identifier)))))
+          property: (identifier)))
+      (inline_expression_close)))
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (member_expression
           object: (array_access
             array: (identifier)
             index: (expression
               (number)))
-          property: (identifier)))))
+          property: (identifier)))
+      (inline_expression_close)))
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (member_expression
           object: (array_access
             array: (identifier)
             index: (expression
               (string)))
-          property: (identifier))))))
+          property: (identifier)))
+      (inline_expression_close))))
 
 =============================================================================
 Function call expressions
@@ -49,13 +55,16 @@ Function call expressions
 (source_file
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (call_expression
           (identifier)
           (expression
-            (identifier))))))
+            (identifier))))
+      (inline_expression_close)))
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (call_expression
           (identifier)
@@ -64,9 +73,11 @@ Function call expressions
           (expression
             (number))
           (expression
-            (number))))))
+            (number))))
+      (inline_expression_close)))
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (call_expression
           (identifier)
@@ -78,7 +89,8 @@ Function call expressions
             (array_access
               array: (identifier)
               index: (expression
-                (string)))))))))
+                (string))))))
+      (inline_expression_close))))
 
 =============================================================================
 Object and array expressions
@@ -92,6 +104,7 @@ Object and array expressions
 (source_file
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (object_literal
           (pair
@@ -104,9 +117,11 @@ Object and array expressions
             (identifier)
             (expression
               (number)))
-          (ERROR)))))
+          (object_close)))
+      (inline_expression_close)))
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (array_literal
           (expression
@@ -119,7 +134,9 @@ Object and array expressions
                 object: (identifier)
                 property: (identifier))
               index: (expression
-                (number)))))))))
+                (number))))
+          (array_close)))
+      (inline_expression_close))))
 
 =============================================================================
 Binary and unary expressions
@@ -134,37 +151,43 @@ Binary and unary expressions
 (source_file
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (binary_expression
           left: (expression
             (identifier))
           operator: (binary_greater_than)
           right: (expression
-            (number))))))
+            (number))))
+      (inline_expression_close)))
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (binary_expression
           left: (expression
+            (unary_expression
+              operator: (unary_not)
+              argument: (expression
+                (identifier))))
+          operator: (binary_and)
+          right: (expression
             (binary_expression
               left: (expression
-                (unary_expression
-                  operator: (unary_not)
-                  argument: (expression
-                    (identifier))))
-              operator: (binary_and)
+                (identifier))
+              operator: (binary_less_than)
               right: (expression
-                (identifier))))
-          operator: (binary_less_than)
-          right: (expression
-            (number))))))
+                (number))))))
+      (inline_expression_close)))
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (unary_expression
           operator: (unary_minus)
           argument: (expression
-            (identifier)))))))
+            (identifier))))
+      (inline_expression_close))))
 
 =============================================================================
 Arithmetic operators - addition and subtraction
@@ -179,24 +202,29 @@ Arithmetic operators - addition and subtraction
 (source_file
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (binary_expression
           left: (expression
             (identifier))
           operator: (binary_add)
           right: (expression
-            (identifier))))))
+            (identifier))))
+      (inline_expression_close)))
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (binary_expression
           left: (expression
             (identifier))
           operator: (binary_subtract)
           right: (expression
-            (identifier))))))
+            (identifier))))
+      (inline_expression_close)))
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (binary_expression
           left: (expression
@@ -208,7 +236,8 @@ Arithmetic operators - addition and subtraction
                 (number))))
           operator: (binary_subtract)
           right: (expression
-            (number)))))))
+            (number))))
+      (inline_expression_close))))
 
 =============================================================================
 Arithmetic operators - multiplication, division, modulo
@@ -224,33 +253,40 @@ Arithmetic operators - multiplication, division, modulo
 (source_file
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (binary_expression
           left: (expression
             (identifier))
           operator: (binary_multiply)
           right: (expression
-            (identifier))))))
+            (identifier))))
+      (inline_expression_close)))
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (binary_expression
           left: (expression
             (identifier))
           operator: (binary_divide)
           right: (expression
-            (identifier))))))
+            (identifier))))
+      (inline_expression_close)))
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (binary_expression
           left: (expression
             (identifier))
           operator: (binary_modulo)
           right: (expression
-            (number))))))
+            (number))))
+      (inline_expression_close)))
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (binary_expression
           left: (expression
@@ -262,7 +298,8 @@ Arithmetic operators - multiplication, division, modulo
                 (number))))
           operator: (binary_add)
           right: (expression
-            (number)))))))
+            (number))))
+      (inline_expression_close))))
 
 =============================================================================
 Comparison operators - equality
@@ -277,31 +314,37 @@ Comparison operators - equality
 (source_file
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (binary_expression
           left: (expression
             (identifier))
           operator: (binary_equal)
           right: (expression
-            (identifier))))))
+            (identifier))))
+      (inline_expression_close)))
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (binary_expression
           left: (expression
             (identifier))
           operator: (binary_not_equal)
           right: (expression
-            (identifier))))))
+            (identifier))))
+      (inline_expression_close)))
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (binary_expression
           left: (expression
             (identifier))
           operator: (binary_equal)
           right: (expression
-            (string)))))))
+            (string))))
+      (inline_expression_close))))
 
 =============================================================================
 Comparison operators - relational
@@ -317,40 +360,48 @@ Comparison operators - relational
 (source_file
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (binary_expression
           left: (expression
             (identifier))
           operator: (binary_less_than)
           right: (expression
-            (number))))))
+            (number))))
+      (inline_expression_close)))
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (binary_expression
           left: (expression
             (identifier))
           operator: (binary_greater_than)
           right: (expression
-            (number))))))
+            (number))))
+      (inline_expression_close)))
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (binary_expression
           left: (expression
             (identifier))
           operator: (binary_less_equal)
           right: (expression
-            (identifier))))))
+            (identifier))))
+      (inline_expression_close)))
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (binary_expression
           left: (expression
             (identifier))
           operator: (binary_greater_equal)
           right: (expression
-            (identifier)))))))
+            (identifier))))
+      (inline_expression_close))))
 
 =============================================================================
 Logical operators
@@ -365,19 +416,51 @@ Logical operators
 (source_file
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (binary_expression
           left: (expression
             (identifier))
           operator: (binary_and)
           right: (expression
-            (identifier))))))
-  (ERROR
-    (expression
-      (identifier))
-    (binary_or)
-    (expression
-      (identifier))))
+            (identifier))))
+      (inline_expression_close)))
+  (paragraph
+    (inline_expression
+      (tag_open_delimiter)
+      content: (expression
+        (binary_expression
+          left: (expression
+            (identifier))
+          operator: (binary_or)
+          right: (expression
+            (identifier))))
+      (inline_expression_close)))
+  (paragraph
+    (inline_expression
+      (tag_open_delimiter)
+      content: (expression
+        (binary_expression
+          left: (expression
+            (parenthesized_expression
+              (expression
+                (binary_expression
+                  left: (expression
+                    (identifier))
+                  operator: (binary_greater_than)
+                  right: (expression
+                    (number))))))
+          operator: (binary_and)
+          right: (expression
+            (parenthesized_expression
+              (expression
+                (binary_expression
+                  left: (expression
+                    (identifier))
+                  operator: (binary_less_than)
+                  right: (expression
+                    (number))))))))
+      (inline_expression_close))))
 
 =============================================================================
 Unary operators - all types
@@ -393,42 +476,50 @@ Unary operators - all types
 (source_file
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (unary_expression
           operator: (unary_not)
           argument: (expression
-            (identifier))))))
+            (identifier))))
+      (inline_expression_close)))
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
-        (number))))
+        (number))
+      (inline_expression_close)))
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (unary_expression
           operator: (unary_plus)
           argument: (expression
-            (identifier))))))
+            (identifier))))
+      (inline_expression_close)))
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (binary_expression
           left: (expression
+            (unary_expression
+              operator: (unary_not)
+              argument: (expression
+                (identifier))))
+          operator: (binary_and)
+          right: (expression
             (binary_expression
               left: (expression
                 (unary_expression
-                  operator: (unary_not)
-                  argument: (expression
-                    (identifier))))
-              operator: (binary_and)
-              right: (expression
-                (unary_expression
                   operator: (unary_minus)
                   argument: (expression
-                    (identifier))))))
-          operator: (binary_greater_than)
-          right: (expression
-            (number)))))))
+                    (identifier))))
+              operator: (binary_greater_than)
+              right: (expression
+                (number))))))
+      (inline_expression_close))))
 
 =============================================================================
 Operator precedence test
@@ -443,20 +534,23 @@ Operator precedence test
 (source_file
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (binary_expression
           left: (expression
+            (identifier))
+          operator: (binary_add)
+          right: (expression
             (binary_expression
               left: (expression
                 (identifier))
-              operator: (binary_add)
+              operator: (binary_multiply)
               right: (expression
-                (identifier))))
-          operator: (binary_multiply)
-          right: (expression
-            (identifier))))))
+                (identifier))))))
+      (inline_expression_close)))
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (binary_expression
           left: (expression
@@ -469,9 +563,10 @@ Operator precedence test
               operator: (binary_and)
               right: (expression
                 (identifier))))))
-      (ERROR)))
+      (inline_expression_close)))
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (binary_expression
           left: (expression
@@ -483,7 +578,8 @@ Operator precedence test
                 (number))
               operator: (binary_multiply)
               right: (expression
-                (number)))))))))
+                (number))))))
+      (inline_expression_close))))
 
 =============================================================================
 Operators in tag attributes
@@ -500,6 +596,7 @@ Content
 (source_file
   (markdoc_tag
     (tag_open
+      (tag_open_delimiter)
       (tag_name)
       (attribute
         (attribute_name)
@@ -511,13 +608,17 @@ Content
                   (identifier)))
               operator: (binary_greater_than)
               right: (expression
-                (number)))))))
+                (number))))))
+      (tag_block_close))
     (paragraph
       (text))
     (tag_close
-      (tag_name)))
+      (tag_open_delimiter)
+      (tag_name)
+      (inline_expression_close)))
   (markdoc_tag
     (tag_self_close
+      (tag_open_delimiter)
       (tag_name)
       (attribute
         (attribute_name)
@@ -525,15 +626,16 @@ Content
           (expression
             (binary_expression
               left: (expression
+                (variable
+                  (identifier)))
+              operator: (binary_add)
+              right: (expression
                 (binary_expression
                   left: (expression
                     (variable
                       (identifier)))
-                  operator: (binary_add)
+                  operator: (binary_multiply)
                   right: (expression
                     (variable
-                      (identifier)))))
-              operator: (binary_multiply)
-              right: (expression
-                (variable
-                  (identifier))))))))))
+                      (identifier)))))))))
+      (tag_self_close_delimiter))))

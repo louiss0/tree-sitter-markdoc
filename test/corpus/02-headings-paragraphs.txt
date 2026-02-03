@@ -128,8 +128,10 @@ Line one
   (paragraph
     (text)
     (inline_expression
+      (tag_open_delimiter)
       (expression
-        (identifier)))
+        (identifier))
+      (inline_expression_close))
     (text)))
 
 ================================================================================

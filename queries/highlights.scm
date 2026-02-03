@@ -118,8 +118,10 @@
 ; ============================================================================
 
 ; Tag delimiters: {% and %} and /%}
-("{%" @punctuation.bracket)
-("%}" @punctuation.bracket)
+(tag_open_delimiter) @punctuation.bracket
+(inline_expression_close) @punctuation.bracket
+(tag_block_close) @punctuation.bracket
+(tag_self_close_delimiter) @punctuation.bracket
 
 ; Tag names (e.g., callout, table, partial)
 (tag_name) @tag
@@ -238,12 +240,12 @@
 ; Array literals: [1, 2, 3]
 (array_literal
   "[" @punctuation.bracket
-  "]" @punctuation.bracket)
+  (array_close) @punctuation.bracket)
 
 ; Object literals: { key: value }
 (object_literal
   "{" @punctuation.bracket
-  "}" @punctuation.bracket)
+  (object_close) @punctuation.bracket)
 
 ; ============================================================================
 ; TEXT CONTENT

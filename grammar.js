@@ -39,7 +39,6 @@ module.exports = grammar({
     [$.markdoc_tag, $._inline_line_start],
     [$.tag_self_close, $._primary_expression],
     [$.tag_open, $.tag_self_close, $._primary_expression],
-    [$.binary_expression],
     [$.attribute_value, $._primary_expression]
   ],
 
@@ -176,19 +175,19 @@ module.exports = grammar({
     )),
 
     tag_open: $ => prec.right(seq(
-      token(prec(6, '{%')),
+      $.tag_open_delimiter,
       optional(WS),
       alias($.identifier, $.tag_name),
       repeat(seq(WS1, $.attribute)),
-      token(prec(6, /[ \t]*%}\r?\n/))
+      $.tag_block_close
     )),
 
     tag_close: $ => prec.right(seq(
-      token(prec(6, '{%')),
+      $.tag_open_delimiter,
       optional(WS),
       seq(token('/'), optional(WS)),
       alias($.identifier, $.tag_name),
-      token(prec(6, /[ \t]*%}/))
+      $.inline_expression_close
     )),
 
     // Inline self-closing tag for use in paragraphs/lists
@@ -197,12 +196,17 @@ module.exports = grammar({
     )),
 
     tag_self_close: $ => prec.right(seq(
-      token(prec(6, '{%')),
+      $.tag_open_delimiter,
       optional(WS),
       alias($.identifier, $.tag_name),
       repeat(seq(WS1, $.attribute)),
-      token(prec(6, /[ \t]*\/%}/))
+      $.tag_self_close_delimiter
     )),
+
+    tag_open_delimiter: $ => token(prec(6, '{%')),
+    tag_block_close: $ => token(prec(6, /[ \t]*%}\r?\n/)),
+    inline_expression_close: $ => token(prec(5, /[ \t]*%}/)),
+    tag_self_close_delimiter: $ => token(prec(6, /[ \t]*\/%}/)),
 
     attribute: $ => seq(
       alias(/[a-zA-Z_][a-zA-Z0-9_-]*/, $.attribute_name),
@@ -253,7 +257,6 @@ module.exports = grammar({
       '(',
       optional(WS),
       $.expression,
-      optional(WS),
       ')'
     ),
 
@@ -290,23 +293,23 @@ module.exports = grammar({
 
     // Operator tokens (named for highlighting)
     // Arithmetic operators
-    binary_add: $ => token(prec(5, '+')),
-    binary_subtract: $ => token(prec(5, '-')),
-    binary_multiply: $ => token(prec(5, '*')),
-    binary_divide: $ => token(prec(5, '/')),
+    binary_add: $ => token(prec(5, /[ \t]*\+/)),
+    binary_subtract: $ => token(prec(5, /[ \t]*-/)),
+    binary_multiply: $ => token(prec(5, /[ \t]*\*/)),
+    binary_divide: $ => token(prec(5, /[ \t]*\//)),
     binary_modulo: $ => token(prec(5, '%')),
     
     // Comparison operators
-    binary_equal: $ => token(prec(5, '==')),
-    binary_not_equal: $ => token(prec(5, '!=')),
-    binary_less_than: $ => token(prec(5, '<')),
-    binary_greater_than: $ => token(prec(5, '>')),
-    binary_less_equal: $ => token(prec(5, '<=')),
-    binary_greater_equal: $ => token(prec(5, '>=')),
+    binary_equal: $ => token(prec(5, /[ \t]*==/)),
+    binary_not_equal: $ => token(prec(5, /[ \t]*!=/)),
+    binary_less_equal: $ => token(prec(5, /[ \t]*<=/)),
+    binary_greater_equal: $ => token(prec(5, /[ \t]*>=/)),
+    binary_less_than: $ => token(prec(5, /[ \t]*</)),
+    binary_greater_than: $ => token(prec(5, /[ \t]*>/)),
     
     // Logical operators
-    binary_and: $ => token(prec(5, '&&')),
-    binary_or: $ => token(prec(5, '||')),
+    binary_and: $ => token(prec(5, /[ \t]*&&/)),
+    binary_or: $ => token(prec(5, /[ \t]*\|\|/)),
     
     // Unary operators
     unary_not: $ => '!',
@@ -317,18 +320,18 @@ module.exports = grammar({
     // Use token(prec()) for operators to give them priority over conflicting markdown tokens
     // Add spaces around operators for proper parsing
     binary_expression: $ => choice(
-      prec.left(1, seq(field('left', $.expression), optional(WS), field('operator', $.binary_or), optional(WS), field('right', $.expression))),
-      prec.left(2, seq(field('left', $.expression), optional(WS), field('operator', $.binary_and), optional(WS), field('right', $.expression))),
-      prec.left(3, seq(field('left', $.expression), optional(WS), field('operator', $.binary_equal), optional(WS), field('right', $.expression))),
-      prec.left(3, seq(field('left', $.expression), optional(WS), field('operator', $.binary_not_equal), optional(WS), field('right', $.expression))),
-      prec.left(4, seq(field('left', $.expression), optional(WS), field('operator', $.binary_less_than), optional(WS), field('right', $.expression))),
-      prec.left(4, seq(field('left', $.expression), optional(WS), field('operator', $.binary_greater_than), optional(WS), field('right', $.expression))),
-      prec.left(4, seq(field('left', $.expression), optional(WS), field('operator', $.binary_less_equal), optional(WS), field('right', $.expression))),
-      prec.left(4, seq(field('left', $.expression), optional(WS), field('operator', $.binary_greater_equal), optional(WS), field('right', $.expression))),
-      prec.left(5, seq(field('left', $.expression), optional(WS), field('operator', $.binary_add), optional(WS), field('right', $.expression))),
-      prec.left(5, seq(field('left', $.expression), optional(WS), field('operator', $.binary_subtract), optional(WS), field('right', $.expression))),
-      prec.left(6, seq(field('left', $.expression), optional(WS), field('operator', $.binary_multiply), optional(WS), field('right', $.expression))),
-      prec.left(6, seq(field('left', $.expression), optional(WS), field('operator', $.binary_divide), optional(WS), field('right', $.expression))),
+      prec.left(1, seq(field('left', $.expression), field('operator', $.binary_or), optional(WS), field('right', $.expression))),
+      prec.left(2, seq(field('left', $.expression), field('operator', $.binary_and), optional(WS), field('right', $.expression))),
+      prec.left(3, seq(field('left', $.expression), field('operator', $.binary_equal), optional(WS), field('right', $.expression))),
+      prec.left(3, seq(field('left', $.expression), field('operator', $.binary_not_equal), optional(WS), field('right', $.expression))),
+      prec.left(4, seq(field('left', $.expression), field('operator', $.binary_less_equal), optional(WS), field('right', $.expression))),
+      prec.left(4, seq(field('left', $.expression), field('operator', $.binary_greater_equal), optional(WS), field('right', $.expression))),
+      prec.left(4, seq(field('left', $.expression), field('operator', $.binary_less_than), optional(WS), field('right', $.expression))),
+      prec.left(4, seq(field('left', $.expression), field('operator', $.binary_greater_than), optional(WS), field('right', $.expression))),
+      prec.left(5, seq(field('left', $.expression), field('operator', $.binary_add), optional(WS), field('right', $.expression))),
+      prec.left(5, seq(field('left', $.expression), field('operator', $.binary_subtract), optional(WS), field('right', $.expression))),
+      prec.left(6, seq(field('left', $.expression), field('operator', $.binary_multiply), optional(WS), field('right', $.expression))),
+      prec.left(6, seq(field('left', $.expression), field('operator', $.binary_divide), optional(WS), field('right', $.expression))),
       prec.left(6, seq(field('left', $.expression), WS1, field('operator', $.binary_modulo), WS1, field('right', $.expression)))
     ),
 
@@ -387,10 +390,10 @@ module.exports = grammar({
       optional(seq(
         $.expression,
         repeat(seq(optional(WS), ',', optional(WS), $.expression)),
-        optional(seq(optional(WS), ','))
+        optional(WS),
+        optional(',')
       )),
-      optional(WS),
-      ']'
+      $.array_close
     ),
 
     object_literal: $ => seq(
@@ -399,11 +402,14 @@ module.exports = grammar({
       optional(seq(
         $.pair,
         repeat(seq(optional(WS), ',', optional(WS), $.pair)),
-        optional(seq(optional(WS), ','))
+        optional(WS),
+        optional(',')
       )),
-      optional(WS),
-      '}'
+      $.object_close
     ),
+
+    array_close: $ => token(prec(1, /[ \t]*\]/)),
+    object_close: $ => token(prec(1, /[ \t]*\}/)),
 
     pair: $ => seq(
       $.identifier,
@@ -437,15 +443,14 @@ module.exports = grammar({
     number: $ => /-?[0-9]+(\.[0-9]+)?/,
 
     inline_expression: $ => seq(
-      token(prec(6, '{%')),
+      $.tag_open_delimiter,
       optional(WS),
       field('content', choice(
         $.expression,
         $.emphasis,
         $.strong
       )),
-      optional(WS),
-      token(prec(10, '%}'))
+      $.inline_expression_close
     ),
 
     // Lists

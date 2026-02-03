@@ -484,7 +484,9 @@ Value is {%*emphasized*%}
   (paragraph
     (text)
     (inline_expression
-      (emphasis))))
+      (tag_open_delimiter)
+      (emphasis)
+      (inline_expression_close))))
 
 =======================================
 No emphasis with line break between delimiters

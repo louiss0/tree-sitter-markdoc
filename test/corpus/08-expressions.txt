@@ -10,10 +10,12 @@ Text {% user.name %} here.
   (paragraph
     (text)
     (inline_expression
+      (tag_open_delimiter)
       (expression
         (member_expression
           (identifier)
-          (identifier))))
+          (identifier)))
+      (inline_expression_close))
     (text)))
 
 =======================================
@@ -28,12 +30,14 @@ Value is {% obj.prop.nested %}.
   (paragraph
     (text)
     (inline_expression
+      (tag_open_delimiter)
       (expression
         (member_expression
           (member_expression
             (identifier)
             (identifier))
-          (identifier))))
+          (identifier)))
+      (inline_expression_close))
     (text)))
 
 =======================================
@@ -48,6 +52,7 @@ Items {% [1, 2, 3] %} end.
   (paragraph
     (text)
     (inline_expression
+      (tag_open_delimiter)
       (expression
         (array_literal
           (expression
@@ -55,7 +60,9 @@ Items {% [1, 2, 3] %} end.
           (expression
             (number))
           (expression
-            (number)))))
+            (number))
+          (array_close)))
+      (inline_expression_close))
     (text)))
 
 =======================================
@@ -70,12 +77,15 @@ Tags {% ["one", "two"] %} done.
   (paragraph
     (text)
     (inline_expression
+      (tag_open_delimiter)
       (expression
         (array_literal
           (expression
             (string))
           (expression
-            (string)))))
+            (string))
+          (array_close)))
+      (inline_expression_close))
     (text)))
 
 =======================================
@@ -90,12 +100,15 @@ Data {% {key: "value"} %} text.
   (paragraph
     (text)
     (inline_expression
+      (tag_open_delimiter)
       (expression
         (object_literal
           (pair
             (identifier)
             (expression
-              (string))))))
+              (string)))
+          (object_close)))
+      (inline_expression_close))
     (text)))
 
 =======================================
@@ -110,6 +123,7 @@ Config {% {name: "test", count: 5} %} end.
   (paragraph
     (text)
     (inline_expression
+      (tag_open_delimiter)
       (expression
         (object_literal
           (pair
@@ -119,7 +133,9 @@ Config {% {name: "test", count: 5} %} end.
           (pair
             (identifier)
             (expression
-              (number))))))
+              (number)))
+          (object_close)))
+      (inline_expression_close))
     (text)))
 
 =======================================
@@ -134,9 +150,11 @@ Result {% func() %} here.
   (paragraph
     (text)
     (inline_expression
+      (tag_open_delimiter)
       (expression
         (call_expression
-          (identifier))))
+          (identifier)))
+      (inline_expression_close))
     (text)))
 
 =======================================
@@ -151,13 +169,15 @@ Value {% add(1, 2) %} end.
   (paragraph
     (text)
     (inline_expression
+      (tag_open_delimiter)
       (expression
         (call_expression
           (identifier)
           (expression
             (number))
           (expression
-            (number)))))
+            (number))))
+      (inline_expression_close))
     (text)))
 
 =======================================
@@ -172,11 +192,13 @@ Output {% user.getName() %} text.
   (paragraph
     (text)
     (inline_expression
+      (tag_open_delimiter)
       (expression
         (call_expression
           (member_expression
             (identifier)
-            (identifier)))))
+            (identifier))))
+      (inline_expression_close))
     (text)))
 
 =======================================
@@ -191,6 +213,7 @@ Complex {% obj.method(arr[0]) %} done.
   (paragraph
     (text)
     (inline_expression
+      (tag_open_delimiter)
       (expression
         (call_expression
           (member_expression
@@ -200,5 +223,6 @@ Complex {% obj.method(arr[0]) %} done.
             (array_access
               (identifier)
               (expression
-                (number)))))))
+                (number))))))
+      (inline_expression_close))
     (text)))

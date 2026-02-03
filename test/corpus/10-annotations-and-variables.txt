@@ -11,11 +11,13 @@ Text {% width value="25%" /%} more text.
     (text)
     (inline_tag
       (tag_self_close
+        (tag_open_delimiter)
         (tag_name)
         (attribute
           (attribute_name)
           (attribute_value
-            (string)))))
+            (string)))
+        (tag_self_close_delimiter)))
     (text)))
 
 =============================================================================
@@ -30,13 +32,15 @@ Hello {% $markdoc.frontmatter.title %}.
   (paragraph
     (text)
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (member_expression
           object: (member_expression
             object: (variable
               (identifier))
             property: (identifier))
-          property: (identifier))))
+          property: (identifier)))
+      (inline_expression_close))
     (text)))
 
 =============================================================================
@@ -51,6 +55,7 @@ Title {% titleCase($markdoc.frontmatter.title) %} here.
   (paragraph
     (text)
     (inline_expression
+      (tag_open_delimiter)
       content: (expression
         (call_expression
           (identifier)
@@ -60,5 +65,6 @@ Title {% titleCase($markdoc.frontmatter.title) %} here.
                 object: (variable
                   (identifier))
                 property: (identifier))
-              property: (identifier))))))
+              property: (identifier)))))
+      (inline_expression_close))
     (text)))

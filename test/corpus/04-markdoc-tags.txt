@@ -9,7 +9,9 @@ Self-closing tag
 (source_file
   (markdoc_tag
     (tag_self_close
-      (tag_name))))
+      (tag_open_delimiter)
+      (tag_name)
+      (tag_self_close_delimiter))))
 
 ================================================================================
 Block tag without content
@@ -23,9 +25,13 @@ Block tag without content
 (source_file
   (markdoc_tag
     (tag_open
-      (tag_name))
+      (tag_open_delimiter)
+      (tag_name)
+      (tag_block_close))
     (tag_close
-      (tag_name))))
+      (tag_open_delimiter)
+      (tag_name)
+      (inline_expression_close))))
 
 ================================================================================
 Block tag with paragraph content
@@ -40,11 +46,15 @@ Hello world
 (source_file
   (markdoc_tag
     (tag_open
-      (tag_name))
+      (tag_open_delimiter)
+      (tag_name)
+      (tag_block_close))
     (paragraph
       (text))
     (tag_close
-      (tag_name))))
+      (tag_open_delimiter)
+      (tag_name)
+      (inline_expression_close))))
 
 ================================================================================
 Block tag with multiple paragraphs
@@ -61,13 +71,17 @@ Second paragraph.
 (source_file
   (markdoc_tag
     (tag_open
-      (tag_name))
+      (tag_open_delimiter)
+      (tag_name)
+      (tag_block_close))
     (paragraph
       (text))
     (paragraph
       (text))
     (tag_close
-      (tag_name))))
+      (tag_open_delimiter)
+      (tag_name)
+      (inline_expression_close))))
 
 ================================================================================
 Nested block tags
@@ -84,16 +98,24 @@ Content
 (source_file
   (markdoc_tag
     (tag_open
-      (tag_name))
+      (tag_open_delimiter)
+      (tag_name)
+      (tag_block_close))
     (markdoc_tag
       (tag_open
-        (tag_name))
+        (tag_open_delimiter)
+        (tag_name)
+        (tag_block_close))
       (paragraph
         (text))
       (tag_close
-        (tag_name)))
+        (tag_open_delimiter)
+        (tag_name)
+        (inline_expression_close)))
     (tag_close
-      (tag_name))))
+      (tag_open_delimiter)
+      (tag_name)
+      (inline_expression_close))))
 
 ================================================================================
 Tag with string attribute
@@ -107,13 +129,17 @@ Tag with string attribute
 (source_file
   (markdoc_tag
     (tag_open
+      (tag_open_delimiter)
       (tag_name)
       (attribute
         (attribute_name)
         (attribute_value
-          (string))))
+          (string)))
+      (tag_block_close))
     (tag_close
-      (tag_name))))
+      (tag_open_delimiter)
+      (tag_name)
+      (inline_expression_close))))
 
 ================================================================================
 Tag with multiple attributes
@@ -128,6 +154,7 @@ Click me
 (source_file
   (markdoc_tag
     (tag_open
+      (tag_open_delimiter)
       (tag_name)
       (attribute
         (attribute_name)
@@ -136,11 +163,14 @@ Click me
       (attribute
         (attribute_name)
         (attribute_value
-          (string))))
+          (string)))
+      (tag_block_close))
     (paragraph
       (text))
     (tag_close
-      (tag_name))))
+      (tag_open_delimiter)
+      (tag_name)
+      (inline_expression_close))))
 
 ================================================================================
 Self-closing tag with attributes
@@ -153,6 +183,7 @@ Self-closing tag with attributes
 (source_file
   (markdoc_tag
     (tag_self_close
+      (tag_open_delimiter)
       (tag_name)
       (attribute
         (attribute_name)
@@ -161,7 +192,8 @@ Self-closing tag with attributes
       (attribute
         (attribute_name)
         (attribute_value
-          (string))))))
+          (string)))
+      (tag_self_close_delimiter))))
 
 ================================================================================
 Simple inline expression
@@ -175,8 +207,10 @@ Hello {% name %}
   (paragraph
     (text)
     (inline_expression
+      (tag_open_delimiter)
       (expression
-        (identifier)))))
+        (identifier))
+      (inline_expression_close))))
 
 ================================================================================
 Inline expression with property access
@@ -190,10 +224,12 @@ Hello {% user.name %}
   (paragraph
     (text)
     (inline_expression
+      (tag_open_delimiter)
       (expression
         (member_expression
           (identifier)
-          (identifier))))))
+          (identifier)))
+      (inline_expression_close))))
 
 ================================================================================
 Multiple inline expressions in paragraph
@@ -206,12 +242,16 @@ Multiple inline expressions in paragraph
 (source_file
   (paragraph
     (inline_expression
+      (tag_open_delimiter)
       (expression
-        (identifier)))
+        (identifier))
+      (inline_expression_close))
     (text)
     (inline_expression
+      (tag_open_delimiter)
       (expression
-        (identifier)))
+        (identifier))
+      (inline_expression_close))
     (text)))
 
 ================================================================================
@@ -228,14 +268,18 @@ Content here
 (source_file
   (markdoc_tag
     (tag_open
-      (tag_name))
+      (tag_open_delimiter)
+      (tag_name)
+      (tag_block_close))
     (heading
       (heading_marker)
       (heading_text))
     (paragraph
       (text))
     (tag_close
-      (tag_name))))
+      (tag_open_delimiter)
+      (tag_name)
+      (inline_expression_close))))
 
 ================================================================================
 Tag with code block inside
@@ -252,7 +296,9 @@ code()
 (source_file
   (markdoc_tag
     (tag_open
-      (tag_name))
+      (tag_open_delimiter)
+      (tag_name)
+      (tag_block_close))
     (fenced_code_block
       (code_fence_open
         (info_string
@@ -260,7 +306,9 @@ code()
       (code)
       (code_fence_close))
     (tag_close
-      (tag_name))))
+      (tag_open_delimiter)
+      (tag_name)
+      (inline_expression_close))))
 
 ================================================================================
 Mixed content with tags and expressions
@@ -282,19 +330,27 @@ Regular {% text %} here.
     (heading_text))
   (markdoc_tag
     (tag_open
-      (tag_name))
+      (tag_open_delimiter)
+      (tag_name)
+      (tag_block_close))
     (paragraph
       (text)
       (inline_expression
+        (tag_open_delimiter)
         (expression
-          (identifier))))
+          (identifier))
+        (inline_expression_close)))
     (tag_close
-      (tag_name)))
+      (tag_open_delimiter)
+      (tag_name)
+      (inline_expression_close)))
   (paragraph
     (text)
     (inline_expression
+      (tag_open_delimiter)
       (expression
-        (identifier)))
+        (identifier))
+      (inline_expression_close))
     (text)))
 
 ================================================================================
@@ -316,8 +372,12 @@ Hello
   (thematic_break)
   (markdoc_tag
     (tag_open
-      (tag_name))
+      (tag_open_delimiter)
+      (tag_name)
+      (tag_block_close))
     (paragraph
       (text))
     (tag_close
-      (tag_name))))
+      (tag_open_delimiter)
+      (tag_name)
+      (inline_expression_close))))
