@@ -64,7 +64,7 @@ ATX heading levels 4-6
 Heading with trailing space
 ================================================================================
 
-# Title   
+# Title
 
 --------------------------------------------------------------------------------
 
@@ -228,8 +228,8 @@ Content here.
 --------------------------------------------------------------------------------
 
 (source_file
-  (thematic_break)
-  (thematic_break)
+  (frontmatter
+    (yaml))
   (heading
     (heading_marker)
     (heading_text))

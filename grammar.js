@@ -12,11 +12,6 @@ const WS1 = /[ \t]+/;
 const TAG_WS = /[ \t\r\n]+/;
 const TAG_WS1 = /[ \t\r\n]+/;
 const HTML_TAG_NAME = /[a-zA-Z][a-zA-Z0-9]*/;
-const LIST_MARKER_MINUS_FALLBACK = /[ \t]*-[ \t]+/;
-const LIST_MARKER_PLUS_FALLBACK = /[ \t]*\+[ \t]+/;
-const LIST_MARKER_STAR_FALLBACK = /[ \t]*\*[ \t]+/;
-const LIST_MARKER_DOT_FALLBACK = /[ \t]*[0-9]{1,9}\.[ \t]+/;
-const LIST_MARKER_PAREN_FALLBACK = /[ \t]*[0-9]{1,9}\)[ \t]+/;
 
 module.exports = grammar({
   name: "markdoc",
@@ -25,6 +20,10 @@ module.exports = grammar({
     $._CODE_CONTENT,
     $._FRONTMATTER_DELIM,
     $._LIST_CONTINUATION,
+    $._UNORDERED_LIST_MARKER,
+    $._ORDERED_LIST_MARKER,
+    $._INDENTED_UNORDERED_LIST_MARKER,
+    $._INDENTED_ORDERED_LIST_MARKER,
     $._SOFT_LINE_BREAK,
     $._THEMATIC_BREAK,
     $._HTML_COMMENT,
@@ -49,6 +48,7 @@ module.exports = grammar({
   rules: {
     source_file: $ => choice(
       prec(1, seq(
+        repeat($._NEWLINE),
         $.frontmatter,
         repeat(choice($._BLANK_LINE, $._NEWLINE)),
         optional(seq(
@@ -81,7 +81,8 @@ module.exports = grammar({
       $.thematic_break,
       $.blockquote,
       $.html_block,
-      $.list,
+      $.unordered_list,
+      $.ordered_list,
       $.html_comment,
       $.paragraph
     ),
@@ -454,26 +455,95 @@ module.exports = grammar({
     ),
 
     // Lists
-    list: $ => prec.dynamic(2, seq(
-      $.list_item,
-      repeat($.list_item)
-    )),
-    list_item: $ => seq(
-      field('marker', $.list_marker),
-      $._list_item_content,
-      $._block_close
+    unordered_list: $ => prec.right(
+      field("items", repeat1($.unordered_list_item))
+    ),
+    unordered_list_item: $ => prec.right(
+      1,
+      seq(
+        field("marker", alias($._UNORDERED_LIST_MARKER, $.unordered_list_marker)),
+        field("content", $.list_paragraph),
+        $._NEWLINE,
+        repeat(
+          choice(
+            $.list_item_continuation,
+            alias($._nested_unordered_list, $.unordered_list),
+            alias($._nested_ordered_list, $.ordered_list)
+          )
+        )
+      )
     ),
 
-    list_marker: $ => choice(
-      token(prec(2, LIST_MARKER_MINUS_FALLBACK)),
-      token(prec(2, LIST_MARKER_PLUS_FALLBACK)),
-      token(prec(2, LIST_MARKER_STAR_FALLBACK)),
-      token(prec(2, LIST_MARKER_DOT_FALLBACK)),
-      token(prec(2, LIST_MARKER_PAREN_FALLBACK))
+    ordered_list: $ => prec.right(
+      field("items", repeat1($.ordered_list_item))
+    ),
+    ordered_list_item: $ => prec.right(
+      1,
+      seq(
+        field("marker", alias($._ORDERED_LIST_MARKER, $.ordered_list_marker)),
+        field("content", $.list_paragraph),
+        $._NEWLINE,
+        repeat(
+          choice(
+            $.list_item_continuation,
+            alias($._nested_unordered_list, $.unordered_list),
+            alias($._nested_ordered_list, $.ordered_list)
+          )
+        )
+      )
     ),
 
-    _block_close: $ => $._NEWLINE,
-    _list_item_content: $ => $.list_paragraph,
+    _nested_unordered_list: $ => prec.right(
+      field("items", repeat1($._nested_unordered_list_item))
+    ),
+    _nested_unordered_list_item: $ => prec.right(
+      seq(
+        field("marker", alias($._INDENTED_UNORDERED_LIST_MARKER, $.unordered_list_marker)),
+        field("content", $.list_paragraph),
+        $._NEWLINE,
+        repeat(
+          choice(
+            $.list_item_continuation,
+            alias($._nested_unordered_list, $.unordered_list),
+            alias($._nested_ordered_list, $.ordered_list)
+          )
+        )
+      )
+    ),
+
+    _nested_ordered_list: $ => prec.right(
+      field("items", repeat1($._nested_ordered_list_item))
+    ),
+    _nested_ordered_list_item: $ => prec.right(
+      seq(
+        field("marker", alias($._INDENTED_ORDERED_LIST_MARKER, $.ordered_list_marker)),
+        field("content", $.list_paragraph),
+        $._NEWLINE,
+        repeat(
+          choice(
+            $.list_item_continuation,
+            alias($._nested_unordered_list, $.unordered_list),
+            alias($._nested_ordered_list, $.ordered_list)
+          )
+        )
+      )
+    ),
+
+    list_item_continuation: $ => seq(
+      $._LIST_CONTINUATION,
+      field("block", choice(
+        $.paragraph,
+        $.markdoc_tag,
+        $.fenced_code_block,
+        $.heading,
+        $.thematic_break,
+        $.blockquote,
+        $.html_block,
+        $.html_comment,
+        $.unordered_list,
+        $.ordered_list
+      ))
+    ),
 
     line_break: $ => choice(
       $._BLANK_LINE,

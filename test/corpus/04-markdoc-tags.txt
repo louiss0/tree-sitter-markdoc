@@ -368,8 +368,8 @@ Hello
 --------------------------------------------------------------------------------
 
 (source_file
-  (thematic_break)
-  (thematic_break)
+  (frontmatter
+    (yaml))
   (markdoc_tag
     (tag_open
       (tag_open_delimiter)

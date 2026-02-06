@@ -9,17 +9,17 @@ Simple unordered list
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))
-    (list_item
-      (list_marker)
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))
-    (list_item
-      (list_marker)
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))))
 
@@ -34,17 +34,17 @@ Simple ordered list
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (ordered_list
+    (ordered_list_item
+      (ordered_list_marker)
       (list_paragraph
         (text)))
-    (list_item
-      (list_marker)
+    (ordered_list_item
+      (ordered_list_marker)
       (list_paragraph
         (text)))
-    (list_item
-      (list_marker)
+    (ordered_list_item
+      (ordered_list_marker)
       (list_paragraph
         (text)))))
 
@@ -59,17 +59,17 @@ Mixed unordered markers
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))
-    (list_item
-      (list_marker)
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))
-    (list_item
-      (list_marker)
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))))
 
@@ -84,14 +84,14 @@ List with blank line separation
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text))))
-  (list
-    (list_item
-      (list_marker)
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))))
 
@@ -110,13 +110,13 @@ List after heading
   (heading
     (heading_marker)
     (heading_text))
-  (list
-    (list_item
-      (list_marker)
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))
-    (list_item
-      (list_marker)
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))))
 
@@ -132,13 +132,13 @@ Regular paragraph text.
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))
-    (list_item
-      (list_marker)
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text))))
   (paragraph
@@ -155,9 +155,9 @@ Nested unordered list (simple)
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)
         (text)
@@ -174,18 +174,12 @@ Nested ordered list
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (ordered_list
+    (ordered_list_item
+      (ordered_list_marker)
       (list_paragraph
-        (text)))
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)))
-    (list_item
-      (list_marker)
-      (list_paragraph
+        (text)
+        (text)
         (text)))))
 
 =======================================
@@ -200,9 +194,9 @@ Deeply nested unordered list
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)
         (text)
@@ -222,15 +216,15 @@ Mixed ordered and unordered nesting
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (ordered_list
+    (ordered_list_item
+      (ordered_list_marker)
       (list_paragraph
         (text)
         (text)
         (text)
         (text)))
-    (list_item
-      (list_marker)
+    (ordered_list_item
+      (ordered_list_marker)
       (list_paragraph
         (text)))))

@@ -58,9 +58,9 @@ Nested list indentation
 -----------------------------------------------------------------------------
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)
         (text)

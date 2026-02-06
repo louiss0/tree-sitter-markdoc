@@ -221,9 +221,9 @@ Dash at line start with space (list marker)
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))))
 
@@ -247,9 +247,13 @@ Emphasis at start of line
 ---
 
 (source_file
-  (paragraph
-    (emphasis)
-    (text)))
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
+      (list_paragraph
+        (text)
+        (text)
+        (text)))))
 
 =======================================
 Emphasis at end of line
@@ -335,11 +339,15 @@ Multiple emphasis runs in single line
 ---
 
 (source_file
-  (paragraph
-    (emphasis)
-    (text)
-    (emphasis)
-    (text)))
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
+      (list_paragraph
+        (text)
+        (text)
+        (text)
+        (emphasis)
+        (text)))))
 
 =======================================
 Strong with emphasis nested inside
@@ -381,15 +389,15 @@ List with emphasis
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)
         (emphasis)
         (text)))
-    (list_item
-      (list_marker)
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)
         (strong)))))

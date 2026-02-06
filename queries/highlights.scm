@@ -61,7 +61,8 @@
 ; ============================================================================
 
 ; List markers (-, *, +, 1., 2., etc.)
-(list_marker) @markup.list
+(unordered_list_marker) @markup.list
+(ordered_list_marker) @markup.list
 
 ; ============================================================================
 ; INLINE FORMATTING

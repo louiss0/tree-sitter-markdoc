@@ -1,7 +1,7 @@
 (* Markdoc grammar sketch for this tree-sitter implementation. *)
 
 source_file =
-  frontmatter, { block_separator, block }, { blank_line | newline }
+  { newline }, frontmatter, { block_separator, block }, { blank_line | newline }
   | { newline }, [ block, { block_separator, block } ], { blank_line | newline } ;
 
 block_separator = blank_line | newline ;
@@ -17,7 +17,8 @@ block =
   | thematic_break
   | blockquote
   | html_block
-  | list
+  | unordered_list
+  | ordered_list
   | html_comment
   | paragraph ;
 
@@ -46,9 +47,33 @@ attribute_value = string | expression ;
 
 inline_expression = "{%", ws, (expression | emphasis | strong), ws, "%}" ;
 
-list = list_item, { list_item } ;
-list_item = list_marker, list_paragraph, newline ;
-list_marker = { ws }, ("-" | "*" | "+" | digit, { digit }, ("." | ")")), ws1 ;
+unordered_list = unordered_list_item, { unordered_list_item } ;
+unordered_list_item =
+  unordered_list_marker, list_paragraph, newline,
+  { list_item_continuation | nested_unordered_list | nested_ordered_list } ;
+
+ordered_list = ordered_list_item, { ordered_list_item } ;
+ordered_list_item =
+  ordered_list_marker, list_paragraph, newline,
+  { list_item_continuation | nested_unordered_list | nested_ordered_list } ;
+
+nested_unordered_list = nested_unordered_list_item, { nested_unordered_list_item } ;
+nested_unordered_list_item =
+  indented_unordered_list_marker, list_paragraph, newline,
+  { list_item_continuation | nested_unordered_list | nested_ordered_list } ;
+
+nested_ordered_list = nested_ordered_list_item, { nested_ordered_list_item } ;
+nested_ordered_list_item =
+  indented_ordered_list_marker, list_paragraph, newline,
+  { list_item_continuation | nested_unordered_list | nested_ordered_list } ;
+
+list_item_continuation = list_continuation, block ;
+
+unordered_list_marker = list_marker ;
+ordered_list_marker = list_marker ;
+indented_unordered_list_marker = list_marker ;
+indented_ordered_list_marker = list_marker ;
+list_marker = { ws }, ("-" | "*" | "+" | digit, { digit }, "."), ws1 ;
 
 paragraph = inline_first, { inline_content },
             { newline, inline_first, { inline_content } } ;
