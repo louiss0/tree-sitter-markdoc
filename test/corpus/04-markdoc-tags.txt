@@ -134,7 +134,9 @@ Tag with string attribute
       (attribute
         (attribute_name)
         (attribute_value
-          (string)))
+          (value_expression
+            (json_value
+              (string)))))
       (tag_block_close))
     (tag_close
       (tag_open_delimiter)
@@ -159,11 +161,15 @@ Click me
       (attribute
         (attribute_name)
         (attribute_value
-          (string)))
+          (value_expression
+            (json_value
+              (string)))))
       (attribute
         (attribute_name)
         (attribute_value
-          (string)))
+          (value_expression
+            (json_value
+              (string)))))
       (tag_block_close))
     (paragraph
       (text))
@@ -188,18 +194,22 @@ Self-closing tag with attributes
       (attribute
         (attribute_name)
         (attribute_value
-          (string)))
+          (value_expression
+            (json_value
+              (string)))))
       (attribute
         (attribute_name)
         (attribute_value
-          (string)))
+          (value_expression
+            (json_value
+              (string)))))
       (tag_self_close_delimiter))))
 
 ================================================================================
 Simple inline expression
 ================================================================================
 
-Hello {% name %}
+Hello {% $name %}
 
 --------------------------------------------------------------------------------
 
@@ -208,15 +218,17 @@ Hello {% name %}
     (text)
     (inline_expression
       (tag_open_delimiter)
-      (expression
-        (identifier))
+      (variable_value
+        (variable_reference
+          (variable
+            (identifier))))
       (inline_expression_close))))
 
 ================================================================================
 Inline expression with property access
 ================================================================================
 
-Hello {% user.name %}
+Hello {% $user.name %}
 
 --------------------------------------------------------------------------------
 
@@ -225,9 +237,10 @@ Hello {% user.name %}
     (text)
     (inline_expression
       (tag_open_delimiter)
-      (expression
-        (member_expression
-          (identifier)
+      (variable_value
+        (variable_reference
+          (variable
+            (identifier))
           (identifier)))
       (inline_expression_close))))
 
@@ -235,7 +248,7 @@ Hello {% user.name %}
 Multiple inline expressions in paragraph
 ================================================================================
 
-{% greeting %} {% name %}!
+{% $greeting %} {% $name %}!
 
 --------------------------------------------------------------------------------
 
@@ -243,14 +256,18 @@ Multiple inline expressions in paragraph
   (paragraph
     (inline_expression
       (tag_open_delimiter)
-      (expression
-        (identifier))
+      (variable_value
+        (variable_reference
+          (variable
+            (identifier))))
       (inline_expression_close))
     (text)
     (inline_expression
       (tag_open_delimiter)
-      (expression
-        (identifier))
+      (variable_value
+        (variable_reference
+          (variable
+            (identifier))))
       (inline_expression_close))
     (text)))
 
@@ -317,10 +334,10 @@ Mixed content with tags and expressions
 # Title
 
 {% callout %}
-Important: {% message %}
+Important: {% $message %}
 {% /callout %}
 
-Regular {% text %} here.
+Regular {% $text %} here.
 
 --------------------------------------------------------------------------------
 
@@ -337,8 +354,10 @@ Regular {% text %} here.
       (text)
       (inline_expression
         (tag_open_delimiter)
-        (expression
-          (identifier))
+        (variable_value
+          (variable_reference
+            (variable
+              (identifier))))
         (inline_expression_close)))
     (tag_close
       (tag_open_delimiter)
@@ -348,15 +367,16 @@ Regular {% text %} here.
     (text)
     (inline_expression
       (tag_open_delimiter)
-      (expression
-        (identifier))
+      (variable_value
+        (variable_reference
+          (variable
+            (identifier))))
       (inline_expression_close))
     (text)))
 
 ================================================================================
 Tag with frontmatter
 ================================================================================
-
 ---
 title: Demo
 ---

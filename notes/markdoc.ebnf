@@ -1,7 +1,7 @@
 (* Markdoc grammar sketch for this tree-sitter implementation. *)
 
 source_file =
-  { newline }, frontmatter, { block_separator, block }, { blank_line | newline }
+  frontmatter, { block_separator, block }, { blank_line | newline }
   | { newline }, [ block, { block_separator, block } ], { blank_line | newline } ;
 
 block_separator = blank_line | newline ;
@@ -43,9 +43,9 @@ tag_close = "{%", ws, "/", ws, tag_name, ws, "%}" ;
 tag_self_close = "{%", ws, tag_name, { tag_ws1, attribute }, tag_ws, "/%}" ;
 
 attribute = attribute_name, "=", attribute_value ;
-attribute_value = string | expression ;
+attribute_value = value_expression ;
 
-inline_expression = "{%", ws, (expression | emphasis | strong), ws, "%}" ;
+inline_expression = "{%", ws, (variable_value | call_expression), ws, "%}" ;
 
 unordered_list = unordered_list_item, { unordered_list_item } ;
 unordered_list_item =
@@ -88,26 +88,18 @@ inline_tag = tag_self_close ;
 
 inline_content = inline_first | image | standalone_punct ;
 
-expression = arrow_function | binary_expression | unary_expression
-             | call_expression | member_expression | array_access
-             | primary_expression ;
-
-primary_expression =
-  variable | identifier | string | number | array_literal
-  | object_literal | boolean | null | parenthesized_expression ;
-
-binary_expression = expression, ws, binary_operator, ws, expression ;
-binary_operator = "||" | "&&" | "==" | "!=" | "<" | ">" | "<=" | ">="
-                | "+" | "-" | "*" | "/" | "%" ;
-
-unary_expression = unary_operator, ws, expression ;
-unary_operator = "!" | "-" | "+" ;
-
-call_expression = (identifier | member_expression), "(", [ expression, { ws, ",", ws, expression } ], ")" ;
-member_expression = (member_expression | array_access | primary_expression), ".", identifier ;
-array_access = (member_expression | array_access | primary_expression), "[", ws, expression, ws, "]" ;
+value_expression = variable_value | call_expression | json_value ;
+json_value = string | number | boolean | null | array_literal | object_literal ;
 
 variable = "$", identifier ;
+special_variable = "@", identifier ;
+variable_reference = variable, { ".", identifier } ;
+special_variable_reference = special_variable, { ".", identifier } ;
+array_subscript = "[", ws, (number | string), ws, "]" ;
+subscript_reference = (variable_reference | special_variable_reference), { array_subscript } ;
+variable_value = variable_reference | special_variable_reference | subscript_reference ;
+
+call_expression = identifier, "(", [ value_expression, { ws, ",", ws, value_expression } ], ")" ;
 identifier = letter, { letter | digit | "_" } ;
 string = "\"", { not_quote }, "\"" | "'", { not_single_quote }, "'" ;
 number = [ "-" ], digit, { digit }, [ ".", digit, { digit } ] ;
@@ -118,13 +110,9 @@ tag_name = identifier ;
 attribute_name = identifier ;
 html_tag_name = identifier ;
 
-parenthesized_expression = "(", ws, expression, ws, ")" ;
-arrow_function = "(", ws, [ identifier, { ws, ",", ws, identifier } ],
-                 ws, ")", ws, "=>", ws, expression ;
-
-array_literal = "[", ws, [ expression, { ws, ",", ws, expression }, [ ws, "," ] ], ws, "]" ;
+array_literal = "[", ws, [ json_value, { ws, ",", ws, json_value }, [ ws, "," ] ], ws, "]" ;
 object_literal = "{", ws, [ pair, { ws, ",", ws, pair }, [ ws, "," ] ], ws, "}" ;
-pair = identifier, ws, ":", ws, expression ;
+pair = (identifier | string), ws, ":", ws, json_value ;
 
 inline_code = "`", { not_backtick }, "`" ;
 link = "[", link_text, "]", "(", link_destination, ")" ;

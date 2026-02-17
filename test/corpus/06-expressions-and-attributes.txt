@@ -1,10 +1,8 @@
 =============================================================================
-Complex member access expressions
+Variable references in inline expressions
 =============================================================================
 
-{% user.profile.name %}
-{% items[0].title %}
-{% data['key'].value %}
+{% $user.name %}
 
 -----------------------------------------------------------------------------
 
@@ -12,190 +10,18 @@ Complex member access expressions
   (paragraph
     (inline_expression
       (tag_open_delimiter)
-      content: (expression
-        (member_expression
-          object: (member_expression
-            object: (identifier)
-            property: (identifier))
-          property: (identifier)))
-      (inline_expression_close)))
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (member_expression
-          object: (array_access
-            array: (identifier)
-            index: (expression
-              (number)))
-          property: (identifier)))
-      (inline_expression_close)))
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (member_expression
-          object: (array_access
-            array: (identifier)
-            index: (expression
-              (string)))
-          property: (identifier)))
-      (inline_expression_close))))
-
-=============================================================================
-Function call expressions
-=============================================================================
-
-{% formatDate(date) %}
-{% calculate(1, 2, 3) %}
-{% process(user.name, options['default']) %}
-
------------------------------------------------------------------------------
-
-(source_file
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (call_expression
-          (identifier)
-          (expression
-            (identifier))))
-      (inline_expression_close)))
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (call_expression
-          (identifier)
-          (expression
-            (number))
-          (expression
-            (number))
-          (expression
-            (number))))
-      (inline_expression_close)))
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (call_expression
-          (identifier)
-          (expression
-            (member_expression
-              object: (identifier)
-              property: (identifier)))
-          (expression
-            (array_access
-              array: (identifier)
-              index: (expression
-                (string))))))
-      (inline_expression_close))))
-
-=============================================================================
-Object and array expressions
-=============================================================================
-
-{% { name: user.name, age: 25 } %}
-{% ['first', 2, user.items[0]] %}
-
------------------------------------------------------------------------------
-
-(source_file
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (object_literal
-          (pair
-            (identifier)
-            (expression
-              (member_expression
-                object: (identifier)
-                property: (identifier))))
-          (pair
-            (identifier)
-            (expression
-              (number)))
-          (object_close)))
-      (inline_expression_close)))
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (array_literal
-          (expression
-            (string))
-          (expression
-            (number))
-          (expression
-            (array_access
-              array: (member_expression
-                object: (identifier)
-                property: (identifier))
-              index: (expression
-                (number))))
-          (array_close)))
-      (inline_expression_close))))
-
-=============================================================================
-Binary and unary expressions
-=============================================================================
-
-{% age > 18 %}
-{% !isDone && count < 10 %}
-{% -value %}
-
------------------------------------------------------------------------------
-
-(source_file
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (binary_expression
-          left: (expression
+      (variable_value
+        (variable_reference
+          (variable
             (identifier))
-          operator: (binary_greater_than)
-          right: (expression
-            (number))))
-      (inline_expression_close)))
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (binary_expression
-          left: (expression
-            (unary_expression
-              operator: (unary_not)
-              argument: (expression
-                (identifier))))
-          operator: (binary_and)
-          right: (expression
-            (binary_expression
-              left: (expression
-                (identifier))
-              operator: (binary_less_than)
-              right: (expression
-                (number))))))
-      (inline_expression_close)))
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (unary_expression
-          operator: (unary_minus)
-          argument: (expression
-            (identifier))))
+          (identifier)))
       (inline_expression_close))))
 
 =============================================================================
-Arithmetic operators - addition and subtraction
+Special variables in inline expressions
 =============================================================================
 
-{% a + b %}
-{% x - y %}
-{% 10 + 5 - 3 %}
+{% @index %}
 
 -----------------------------------------------------------------------------
 
@@ -203,50 +29,38 @@ Arithmetic operators - addition and subtraction
   (paragraph
     (inline_expression
       (tag_open_delimiter)
-      content: (expression
-        (binary_expression
-          left: (expression
-            (identifier))
-          operator: (binary_add)
-          right: (expression
+      (variable_value
+        (special_variable_reference
+          (special_variable
             (identifier))))
-      (inline_expression_close)))
+      (inline_expression_close))))
+
+=============================================================================
+Subscript variables in inline expressions
+=============================================================================
+
+{% $items[0] %}
+
+-----------------------------------------------------------------------------
+
+(source_file
   (paragraph
     (inline_expression
       (tag_open_delimiter)
-      content: (expression
-        (binary_expression
-          left: (expression
-            (identifier))
-          operator: (binary_subtract)
-          right: (expression
-            (identifier))))
-      (inline_expression_close)))
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (binary_expression
-          left: (expression
-            (binary_expression
-              left: (expression
-                (number))
-              operator: (binary_add)
-              right: (expression
-                (number))))
-          operator: (binary_subtract)
-          right: (expression
+      (variable_value
+        (subscript_reference
+          (variable_reference
+            (variable
+              (identifier)))
+          (array_subscript
             (number))))
       (inline_expression_close))))
 
 =============================================================================
-Arithmetic operators - multiplication, division, modulo
+Function calls in inline expressions
 =============================================================================
 
-{% a * b %}
-{% x / y %}
-{% n % 10 %}
-{% 2 * 3 + 4 %}
+{% formatDate($date) %}
 
 -----------------------------------------------------------------------------
 
@@ -254,368 +68,24 @@ Arithmetic operators - multiplication, division, modulo
   (paragraph
     (inline_expression
       (tag_open_delimiter)
-      content: (expression
-        (binary_expression
-          left: (expression
-            (identifier))
-          operator: (binary_multiply)
-          right: (expression
-            (identifier))))
-      (inline_expression_close)))
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (binary_expression
-          left: (expression
-            (identifier))
-          operator: (binary_divide)
-          right: (expression
-            (identifier))))
-      (inline_expression_close)))
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (binary_expression
-          left: (expression
-            (identifier))
-          operator: (binary_modulo)
-          right: (expression
-            (number))))
-      (inline_expression_close)))
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (binary_expression
-          left: (expression
-            (binary_expression
-              left: (expression
-                (number))
-              operator: (binary_multiply)
-              right: (expression
-                (number))))
-          operator: (binary_add)
-          right: (expression
-            (number))))
-      (inline_expression_close))))
-
-=============================================================================
-Comparison operators - equality
-=============================================================================
-
-{% x == y %}
-{% a != b %}
-{% status == "active" %}
-
------------------------------------------------------------------------------
-
-(source_file
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (binary_expression
-          left: (expression
-            (identifier))
-          operator: (binary_equal)
-          right: (expression
-            (identifier))))
-      (inline_expression_close)))
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (binary_expression
-          left: (expression
-            (identifier))
-          operator: (binary_not_equal)
-          right: (expression
-            (identifier))))
-      (inline_expression_close)))
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (binary_expression
-          left: (expression
-            (identifier))
-          operator: (binary_equal)
-          right: (expression
-            (string))))
-      (inline_expression_close))))
-
-=============================================================================
-Comparison operators - relational
-=============================================================================
-
-{% age < 18 %}
-{% count > 100 %}
-{% score <= maxScore %}
-{% price >= minPrice %}
-
------------------------------------------------------------------------------
-
-(source_file
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (binary_expression
-          left: (expression
-            (identifier))
-          operator: (binary_less_than)
-          right: (expression
-            (number))))
-      (inline_expression_close)))
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (binary_expression
-          left: (expression
-            (identifier))
-          operator: (binary_greater_than)
-          right: (expression
-            (number))))
-      (inline_expression_close)))
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (binary_expression
-          left: (expression
-            (identifier))
-          operator: (binary_less_equal)
-          right: (expression
-            (identifier))))
-      (inline_expression_close)))
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (binary_expression
-          left: (expression
-            (identifier))
-          operator: (binary_greater_equal)
-          right: (expression
-            (identifier))))
-      (inline_expression_close))))
-
-=============================================================================
-Logical operators
-=============================================================================
-
-{% isActive && isVerified %}
-{% hasError || hasWarning %}
-{% (x > 5) && (y < 10) %}
-
------------------------------------------------------------------------------
-
-(source_file
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (binary_expression
-          left: (expression
-            (identifier))
-          operator: (binary_and)
-          right: (expression
-            (identifier))))
-      (inline_expression_close)))
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (binary_expression
-          left: (expression
-            (identifier))
-          operator: (binary_or)
-          right: (expression
-            (identifier))))
-      (inline_expression_close)))
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (binary_expression
-          left: (expression
-            (parenthesized_expression
-              (expression
-                (binary_expression
-                  left: (expression
-                    (identifier))
-                  operator: (binary_greater_than)
-                  right: (expression
-                    (number))))))
-          operator: (binary_and)
-          right: (expression
-            (parenthesized_expression
-              (expression
-                (binary_expression
-                  left: (expression
-                    (identifier))
-                  operator: (binary_less_than)
-                  right: (expression
-                    (number))))))))
-      (inline_expression_close))))
-
-=============================================================================
-Unary operators - all types
-=============================================================================
-
-{% !condition %}
-{% -10 %}
-{% +value %}
-{% !isActive && -balance > 0 %}
-
------------------------------------------------------------------------------
-
-(source_file
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (unary_expression
-          operator: (unary_not)
-          argument: (expression
-            (identifier))))
-      (inline_expression_close)))
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (number))
-      (inline_expression_close)))
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (unary_expression
-          operator: (unary_plus)
-          argument: (expression
-            (identifier))))
-      (inline_expression_close)))
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (binary_expression
-          left: (expression
-            (unary_expression
-              operator: (unary_not)
-              argument: (expression
-                (identifier))))
-          operator: (binary_and)
-          right: (expression
-            (binary_expression
-              left: (expression
-                (unary_expression
-                  operator: (unary_minus)
-                  argument: (expression
-                    (identifier))))
-              operator: (binary_greater_than)
-              right: (expression
-                (number))))))
-      (inline_expression_close))))
-
-=============================================================================
-Operator precedence test
-=============================================================================
-
-{% a + b * c %}
-{% x || y && z %}
-{% 10 - 5 * 2 %}
-
------------------------------------------------------------------------------
-
-(source_file
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (binary_expression
-          left: (expression
-            (identifier))
-          operator: (binary_add)
-          right: (expression
-            (binary_expression
-              left: (expression
-                (identifier))
-              operator: (binary_multiply)
-              right: (expression
+      (call_expression
+        (identifier)
+        (value_expression
+          (variable_value
+            (variable_reference
+              (variable
                 (identifier))))))
-      (inline_expression_close)))
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (binary_expression
-          left: (expression
-            (identifier))
-          operator: (binary_or)
-          right: (expression
-            (binary_expression
-              left: (expression
-                (identifier))
-              operator: (binary_and)
-              right: (expression
-                (identifier))))))
-      (inline_expression_close)))
-  (paragraph
-    (inline_expression
-      (tag_open_delimiter)
-      content: (expression
-        (binary_expression
-          left: (expression
-            (number))
-          operator: (binary_subtract)
-          right: (expression
-            (binary_expression
-              left: (expression
-                (number))
-              operator: (binary_multiply)
-              right: (expression
-                (number))))))
       (inline_expression_close))))
 
 =============================================================================
-Operators in tag attributes
+Attribute values with literals
 =============================================================================
 
-{% if condition=$x > 5 %}
-Content
-{% /if %}
-
-{% tag value=$a + $b * $c /%}
+{% card title="Welcome" count=5 featured=true /%}
 
 -----------------------------------------------------------------------------
 
 (source_file
-  (markdoc_tag
-    (tag_open
-      (tag_open_delimiter)
-      (tag_name)
-      (attribute
-        (attribute_name)
-        (attribute_value
-          (expression
-            (binary_expression
-              left: (expression
-                (variable
-                  (identifier)))
-              operator: (binary_greater_than)
-              right: (expression
-                (number))))))
-      (tag_block_close))
-    (paragraph
-      (text))
-    (tag_close
-      (tag_open_delimiter)
-      (tag_name)
-      (inline_expression_close)))
   (markdoc_tag
     (tag_self_close
       (tag_open_delimiter)
@@ -623,19 +93,107 @@ Content
       (attribute
         (attribute_name)
         (attribute_value
-          (expression
-            (binary_expression
-              left: (expression
+          (value_expression
+            (json_value
+              (string)))))
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (value_expression
+            (json_value
+              (number)))))
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (value_expression
+            (json_value
+              (boolean)))))
+      (tag_self_close_delimiter))))
+
+=============================================================================
+Attribute values with arrays and objects
+=============================================================================
+
+{% data items=[1, 2] meta={id: "id_123"} /%}
+
+-----------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_self_close
+      (tag_open_delimiter)
+      (tag_name)
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (value_expression
+            (json_value
+              (array_literal
+                (json_value
+                  (number))
+                (json_value
+                  (number)))))))
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (value_expression
+            (json_value
+              (object_literal
+                (pair
+                  (identifier)
+                  (json_value
+                    (string))))))))
+      (tag_self_close_delimiter))))
+
+=============================================================================
+Attribute values with variables and functions
+=============================================================================
+
+{% card title=$title subtitle=titleCase($subtitle) index=@index item=$items[0] /%}
+
+-----------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (tag_self_close
+      (tag_open_delimiter)
+      (tag_name)
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (value_expression
+            (variable_value
+              (variable_reference
                 (variable
-                  (identifier)))
-              operator: (binary_add)
-              right: (expression
-                (binary_expression
-                  left: (expression
-                    (variable
-                      (identifier)))
-                  operator: (binary_multiply)
-                  right: (expression
+                  (identifier)))))))
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (value_expression
+            (call_expression
+              (identifier)
+              (value_expression
+                (variable_value
+                  (variable_reference
                     (variable
                       (identifier)))))))))
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (value_expression
+            (variable_value
+              (special_variable_reference
+                (special_variable
+                  (identifier)))))))
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (value_expression
+            (variable_value
+              (subscript_reference
+                (variable_reference
+                  (variable
+                    (identifier)))
+                (array_subscript
+                  (number)))))))
       (tag_self_close_delimiter))))

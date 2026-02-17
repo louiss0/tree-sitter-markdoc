@@ -481,10 +481,10 @@ This *includes, text, and: punctuation* inside.
     (text)))
 
 =======================================
-Inline expression with emphasis
+Inline expression with variable
 =======================================
 
-Value is {%*emphasized*%}
+Value is {% $value %}
 
 ---
 
@@ -493,7 +493,10 @@ Value is {%*emphasized*%}
     (text)
     (inline_expression
       (tag_open_delimiter)
-      (emphasis)
+      (variable_value
+        (variable_reference
+          (variable
+            (identifier))))
       (inline_expression_close))))
 
 =======================================

@@ -18,6 +18,8 @@ module.exports = grammar({
 
   externals: $ => [
     $._CODE_CONTENT,
+    $._CODE_FENCE_OPEN,
+    $._CODE_FENCE_CLOSE,
     $._FRONTMATTER_DELIM,
     $._LIST_CONTINUATION,
     $._UNORDERED_LIST_MARKER,
@@ -35,10 +37,7 @@ module.exports = grammar({
   conflicts: $ => [
     [$.source_file],
     [$.markdoc_tag],
-    [$.markdoc_tag, $._inline_line_start],
-    [$.tag_self_close, $._primary_expression],
-    [$.tag_open, $.tag_self_close, $._primary_expression],
-    [$.attribute_value, $._primary_expression]
+    [$.markdoc_tag, $._inline_line_start]
   ],
 
   inline: $ => [
@@ -48,7 +47,6 @@ module.exports = grammar({
   rules: {
     source_file: $ => choice(
       prec(1, seq(
-        repeat($._NEWLINE),
         $.frontmatter,
         repeat(choice($._BLANK_LINE, $._NEWLINE)),
         optional(seq(
@@ -115,16 +113,13 @@ module.exports = grammar({
 
     fenced_code_block: $ => seq(
       field('open', $.code_fence_open),
+      $._NEWLINE,
       optional(field('code', $.code)),
-      optional($._NEWLINE),
       field('close', $.code_fence_close)
     ),
 
     code_fence_open: $ => seq(
-      choice(
-        token(prec(3, '```')),
-        token(prec(3, '~~~'))
-      ),
+      $._CODE_FENCE_OPEN,
       optional($.info_string)
     ),
 
@@ -134,12 +129,9 @@ module.exports = grammar({
       optional(alias(/\{[^}\n]*\}/, $.attributes))
     ),
 
-    code: $ => $._CODE_CONTENT,
+    code: $ => repeat1($._CODE_CONTENT),
 
-    code_fence_close: $ => choice(
-      token(prec(3, '```')),
-      token(prec(3, '~~~'))
-    ),
+    code_fence_close: $ => $._CODE_FENCE_CLOSE,
 
     // Markdoc comment block: {% comment %}...{% /comment %}
     comment_block: $ => token(prec(6, /\{%\s*comment\s*%\}(.|\r|\n)*\{%\s*\/comment\s*%\}/)),
@@ -215,209 +207,103 @@ module.exports = grammar({
       $.attribute_value
     ),
 
-    attribute_value: $ => choice(
-      $.string,
-      $.expression
+    attribute_value: $ => $.value_expression,
+
+    value_expression: $ => choice(
+      $.variable_value,
+      $.call_expression,
+      $.json_value
     ),
 
-    // Top-level expressions have highest precedence to contain their
-    // own operations and prevent ambiguity with attribute_value
-    expression: $ => prec.left(choice(
-      $.arrow_function,
-      $.binary_expression,
-      $.unary_expression,
-      $.call_expression,
-      $.member_expression,
-      $.array_access,
-      $._primary_expression
-    )),
-
-    // Atomic expressions
-    _primary_expression: $ => choice(
-      $.variable,
-      $.identifier,
+    json_value: $ => choice(
       $.string,
       $.number,
-      $.array_literal,
-      $.object_literal,
       $.boolean,
       $.null,
-      $.parenthesized_expression
+      $.array_literal,
+      $.object_literal
     ),
 
-    _tag_expression: $ => choice(
-      $.variable,
-      $.call_expression,
-      $.member_expression,
-      $.array_access,
-      $.parenthesized_expression
-    ),
-
-    // Parenthesized expressions for grouping
-    parenthesized_expression: $ => seq(
-      '(',
-      optional(WS),
-      $.expression,
-      ')'
-    ),
-
-    // Boolean literals
-    boolean: $ => choice('true', 'false'),
-
-    // Null literal
-    null: $ => 'null',
-
-    // Alias: object is same as object_literal for test compatibility
-    object: $ => $.object_literal,
-
-    // Alias: array is same as array_literal for test compatibility  
-    array: $ => $.array_literal,
-
-    // Variable prefixed with $
+    // Variables prefixed with $ or @
     variable: $ => seq('$', $.identifier),
+    special_variable: $ => seq('@', $.identifier),
 
-    // Arrow function: () => expr or (params) => expr
-    arrow_function: $ => prec(10, seq(
-      '(',
-      optional(WS),
-      optional(seq(
-        $.identifier,
-        repeat(seq(optional(WS), ',', optional(WS), $.identifier))
-      )),
-      optional(WS),
-      ')',
-      optional(WS),
-      '=>',
-      optional(WS),
-      $.expression
-    )),
-
-    // Operator tokens (named for highlighting)
-    // Arithmetic operators
-    binary_add: $ => token(prec(5, /[ \t]*\+/)),
-    binary_subtract: $ => token(prec(5, /[ \t]*-/)),
-    binary_multiply: $ => token(prec(5, /[ \t]*\*/)),
-    binary_divide: $ => token(prec(5, /[ \t]*\//)),
-    binary_modulo: $ => token(prec(5, '%')),
-    
-    // Comparison operators
-    binary_equal: $ => token(prec(5, /[ \t]*==/)),
-    binary_not_equal: $ => token(prec(5, /[ \t]*!=/)),
-    binary_less_equal: $ => token(prec(5, /[ \t]*<=/)),
-    binary_greater_equal: $ => token(prec(5, /[ \t]*>=/)),
-    binary_less_than: $ => token(prec(5, /[ \t]*</)),
-    binary_greater_than: $ => token(prec(5, /[ \t]*>/)),
-    
-    // Logical operators
-    binary_and: $ => token(prec(5, /[ \t]*&&/)),
-    binary_or: $ => token(prec(5, /[ \t]*\|\|/)),
-    
-    // Unary operators
-    unary_not: $ => '!',
-    unary_minus: $ => '-',
-    unary_plus: $ => '+',
-
-    // Binary operators (in order of precedence)
-    // Use token(prec()) for operators to give them priority over conflicting markdown tokens
-    // Add spaces around operators for proper parsing
-    binary_expression: $ => choice(
-      prec.left(1, seq(field('left', $.expression), field('operator', $.binary_or), optional(WS), field('right', $.expression))),
-      prec.left(2, seq(field('left', $.expression), field('operator', $.binary_and), optional(WS), field('right', $.expression))),
-      prec.left(3, seq(field('left', $.expression), field('operator', $.binary_equal), optional(WS), field('right', $.expression))),
-      prec.left(3, seq(field('left', $.expression), field('operator', $.binary_not_equal), optional(WS), field('right', $.expression))),
-      prec.left(4, seq(field('left', $.expression), field('operator', $.binary_less_equal), optional(WS), field('right', $.expression))),
-      prec.left(4, seq(field('left', $.expression), field('operator', $.binary_greater_equal), optional(WS), field('right', $.expression))),
-      prec.left(4, seq(field('left', $.expression), field('operator', $.binary_less_than), optional(WS), field('right', $.expression))),
-      prec.left(4, seq(field('left', $.expression), field('operator', $.binary_greater_than), optional(WS), field('right', $.expression))),
-      prec.left(5, seq(field('left', $.expression), field('operator', $.binary_add), optional(WS), field('right', $.expression))),
-      prec.left(5, seq(field('left', $.expression), field('operator', $.binary_subtract), optional(WS), field('right', $.expression))),
-      prec.left(6, seq(field('left', $.expression), field('operator', $.binary_multiply), optional(WS), field('right', $.expression))),
-      prec.left(6, seq(field('left', $.expression), field('operator', $.binary_divide), optional(WS), field('right', $.expression))),
-      prec.left(6, seq(field('left', $.expression), WS1, field('operator', $.binary_modulo), WS1, field('right', $.expression)))
+    variable_reference: $ => seq(
+      $.variable,
+      repeat(seq('.', $.identifier))
     ),
 
-    // Unary operators
-    unary_expression: $ => choice(
-      prec.right(7, seq(field('operator', $.unary_not), optional(WS), field('argument', $.expression))),
-      prec.right(7, seq(field('operator', $.unary_minus), optional(WS), field('argument', $.expression))),
-      prec.right(7, seq(field('operator', $.unary_plus), optional(WS), field('argument', $.expression)))
+    special_variable_reference: $ => seq(
+      $.special_variable,
+      repeat(seq('.', $.identifier))
     ),
 
-    // Ordered by precedence - call > member > array access 
-    call_expression: $ => prec.left(4, seq(
-      choice(
-        $.member_expression,
-        $.identifier
-      ),
-      '(',
-      optional(WS),
-      optional(seq(
-        $.expression,
-        repeat(seq(optional(WS), ',', optional(WS), $.expression))
-      )),
-      optional(WS),
-      ')'
-    )),
-
-    member_expression: $ => prec.right(3, seq(
-      field('object', choice(
-        $.member_expression,
-        $.array_access,
-        $._primary_expression
-      )),
-      '.',
-      field('property', $.identifier)
-    )),
-
-    array_access: $ => prec.right(2, seq(
-      field('array', choice(
-        $.member_expression,
-        $.array_access,
-        $._primary_expression
-      )),
+    array_subscript: $ => seq(
       '[',
       optional(WS),
-      field('index', $.expression),
+      choice($.number, $.string),
+      optional(WS),
+      ']'
+    ),
+
+    subscript_reference: $ => seq(
+      choice($.variable_reference, $.special_variable_reference),
+      repeat1($.array_subscript)
+    ),
+
+    variable_value: $ => choice(
+      $.variable_reference,
+      $.special_variable_reference,
+      $.subscript_reference
+    ),
+
+    call_expression: $ => prec.left(seq(
+      field('function', $.identifier),
+      '(',
+      optional(WS),
+      optional(seq(
+        $.value_expression,
+        repeat(seq(optional(WS), ',', optional(WS), $.value_expression))
+      )),
+      optional(WS),
+      ')'
+    )),
+
+    // JSON-like literals
+    boolean: $ => choice('true', 'false'),
+
+    null: $ => 'null',
+
+    array_literal: $ => prec.right(seq(
+      '[',
+      optional(WS),
+      optional(seq(
+        $.json_value,
+        repeat(seq(optional(WS), ',', optional(WS), $.json_value)),
+        optional(seq(optional(WS), ','))
+      )),
       optional(WS),
       ']'
     )),
 
-    // Alias for backward compatibility with tests
-    subscript_expression: $ => $.array_access,
-
-    array_literal: $ => seq(
-      '[',
-      optional(WS),
-      optional(seq(
-        $.expression,
-        repeat(seq(optional(WS), ',', optional(WS), $.expression)),
-        optional(WS),
-        optional(',')
-      )),
-      $.array_close
-    ),
-
-    object_literal: $ => seq(
+    object_literal: $ => prec.right(seq(
       '{',
       optional(WS),
       optional(seq(
         $.pair,
         repeat(seq(optional(WS), ',', optional(WS), $.pair)),
-        optional(WS),
-        optional(',')
+        optional(seq(optional(WS), ','))
       )),
-      $.object_close
-    ),
-
-    array_close: $ => token(prec(1, /[ \t]*\]/)),
-    object_close: $ => token(prec(1, /[ \t]*\}/)),
+      optional(WS),
+      '}'
+    )),
 
     pair: $ => seq(
-      $.identifier,
+      field('key', choice($.identifier, $.string)),
       optional(WS),
       ':',
       optional(WS),
-      $.expression
+      field('value', $.json_value)
     ),
 
     identifier: $ => /[a-zA-Z_][a-zA-Z0-9_]*/,
@@ -447,9 +333,8 @@ module.exports = grammar({
       $.tag_open_delimiter,
       optional(WS),
       field('content', choice(
-        $.expression,
-        $.emphasis,
-        $.strong
+        $.variable_value,
+        $.call_expression
       )),
       $.inline_expression_close
     ),

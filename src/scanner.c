@@ -5,6 +5,8 @@
 
 enum TokenType {
   CODE_CONTENT,
+  CODE_FENCE_OPEN,
+  CODE_FENCE_CLOSE,
   FRONTMATTER_DELIM,
   LIST_CONTINUATION,
   UNORDERED_LIST_MARKER,
@@ -20,12 +22,18 @@ enum TokenType {
 typedef struct {
   bool at_start;
   bool in_frontmatter;
+  bool in_fenced_code;
+  char fence_char;
+  uint8_t fence_length;
 } Scanner;
 
 void *tree_sitter_markdoc_external_scanner_create() {
   Scanner *scanner = (Scanner *)malloc(sizeof(Scanner));
   scanner->at_start = true;
   scanner->in_frontmatter = false;
+  scanner->in_fenced_code = false;
+  scanner->fence_char = 0;
+  scanner->fence_length = 0;
   return scanner;
 }
 
@@ -39,6 +47,9 @@ unsigned tree_sitter_markdoc_external_scanner_serialize(void *payload, char *buf
   if (i < 255) {
     buffer[i++] = (char)(s->at_start ? 1 : 0);
     buffer[i++] = (char)(s->in_frontmatter ? 1 : 0);
+    buffer[i++] = (char)(s->in_fenced_code ? 1 : 0);
+    buffer[i++] = (char)s->fence_char;
+    buffer[i++] = (char)s->fence_length;
   }
   return i;
 }
@@ -47,6 +58,9 @@ void tree_sitter_markdoc_external_scanner_deserialize(void *payload, const char 
   Scanner *s = (Scanner *)payload;
   s->at_start = true;
   s->in_frontmatter = false;
+  s->in_fenced_code = false;
+  s->fence_char = 0;
+  s->fence_length = 0;
 
   unsigned i = 0;
   if (i < length) {
@@ -54,6 +68,15 @@ void tree_sitter_markdoc_external_scanner_deserialize(void *payload, const char 
   }
   if (i < length) {
     s->in_frontmatter = buffer[i++] != 0;
+  }
+  if (i < length) {
+    s->in_fenced_code = buffer[i++] != 0;
+  }
+  if (i < length) {
+    s->fence_char = buffer[i++];
+  }
+  if (i < length) {
+    s->fence_length = (uint8_t)buffer[i++];
   }
 }
 
@@ -70,6 +93,7 @@ static inline bool is_digit_ch(int32_t c) {
 }
 
 static bool scan_frontmatter_closing_delimiter(TSLexer *lexer, int32_t marker);
+static bool scan_fence_close_line(Scanner *s, TSLexer *lexer);
 
 static bool scan_unordered_or_thematic(Scanner *s, TSLexer *lexer, const bool *valid_symbols, unsigned indent) {
   bool wants_list = valid_symbols[UNORDERED_LIST_MARKER] || valid_symbols[INDENTED_UNORDERED_LIST_MARKER];
@@ -333,6 +357,41 @@ static bool scan_frontmatter_closing_delimiter(TSLexer *lexer, int32_t marker) {
       lexer->advance(lexer, false);
     }
   }
+}
+
+static bool scan_fence_close_line(Scanner *s, TSLexer *lexer) {
+  TSLexer saved_state = *lexer;
+
+  if (lexer->get_column(lexer) != 0) {
+    return false;
+  }
+
+  uint8_t count = 0;
+  while (lexer->lookahead == s->fence_char && count < 255) {
+    lexer->advance(lexer, false);
+    count++;
+  }
+
+  if (count < s->fence_length) {
+    *lexer = saved_state;
+    return false;
+  }
+
+  while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+    lexer->advance(lexer, false);
+  }
+
+  if (lexer->lookahead == '\r') {
+    lexer->advance(lexer, false);
+    if (lexer->lookahead == '\n') {
+      lexer->advance(lexer, false);
+    }
+  } else if (lexer->lookahead == '\n') {
+    lexer->advance(lexer, false);
+  }
+
+  lexer->mark_end(lexer);
+  return true;
 }
 
 static bool is_heading_marker_line(TSLexer *lexer) {
@@ -786,75 +845,100 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
     *lexer = list_state;
   }
 
-  // CODE_CONTENT: consume everything until we see a code fence close pattern
-  // The grammar will handle detecting code_fence_open and code_fence_close
-  if (valid_symbols[CODE_CONTENT] && is_newline(lexer->lookahead)) {
-    // Only match CODE_CONTENT if we are immediately after the fence line newline
-    TSLexer start_state = *lexer;
-    lexer->mark_end(lexer);
-    bool has_content = false;
-
-    // Skip the newline after the opening fence
-    if (lexer->lookahead == '\n') {
-      lexer->advance(lexer, false);
-    }
-
-    // Check if the very next thing is a closing fence (empty block)
+  if (valid_symbols[CODE_FENCE_OPEN] && !s->in_fenced_code) {
     if (lexer->lookahead == '`' || lexer->lookahead == '~') {
-      TSLexer fence_state = *lexer;
-      char fence_char = lexer->lookahead;
-      int count = 0;
-      while (lexer->lookahead == fence_char && count < 5) {
-        count++;
+      char fence_char = (char)lexer->lookahead;
+      uint8_t count = 0;
+      while (lexer->lookahead == fence_char && count < 255) {
         lexer->advance(lexer, false);
+        count++;
       }
+
       if (count >= 3) {
-        *lexer = start_state;
-        return false;
+        lexer->mark_end(lexer);
+        s->in_fenced_code = true;
+        s->fence_char = fence_char;
+        s->fence_length = count;
+        lexer->result_symbol = CODE_FENCE_OPEN;
+        s->at_start = false;
+        return true;
       }
-      *lexer = fence_state;
+    }
+  }
+
+  if (valid_symbols[CODE_FENCE_CLOSE] && s->in_fenced_code) {
+    if (lexer->lookahead == s->fence_char) {
+      TSLexer close_state = *lexer;
+      if (scan_fence_close_line(s, lexer)) {
+        lexer->mark_end(lexer);
+        s->in_fenced_code = false;
+        s->fence_char = 0;
+        s->fence_length = 0;
+        lexer->result_symbol = CODE_FENCE_CLOSE;
+        s->at_start = false;
+        return true;
+      }
+      *lexer = close_state;
+    }
+  }
+
+  // CODE_CONTENT: consume a single line inside a fenced code block,
+  if (valid_symbols[CODE_CONTENT] && s->in_fenced_code) {
+    if (lexer->lookahead == 0) {
+      return false;
     }
 
-    // Consume content until we find ``` or ~~~ at start of line
-    bool at_line_start = true;
+    bool has_content = false;
+    bool at_line_start = lexer->get_column(lexer) == 0;
+
     while (lexer->lookahead != 0) {
-      // Check for fence close pattern at start of line
-      if (at_line_start && (lexer->lookahead == '`' || lexer->lookahead == '~')) {
-        // Peek ahead to see if this is a fence (3+ chars)
-        char fence_char = lexer->lookahead;
-        int32_t next = lexer->lookahead;
-        int count = 0;
-
-        // Save position
-        TSLexer saved_state = *lexer;
-
-        // Count fence chars
-        while (next == fence_char && count < 5) {  // limit lookahead
-          count++;
+      if (at_line_start && lexer->lookahead == s->fence_char) {
+        TSLexer close_state = *lexer;
+        uint8_t count = 0;
+        while (lexer->lookahead == s->fence_char && count < 255) {
           lexer->advance(lexer, false);
-          next = lexer->lookahead;
+          count++;
         }
 
-        if (count >= 3) {
-          // This looks like a closing fence, stop consuming content
-          *lexer = saved_state;  // restore position
+        bool is_close = false;
+        if (count >= s->fence_length) {
+          while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+            lexer->advance(lexer, false);
+          }
+          if (lexer->lookahead == 0 || lexer->lookahead == '\r' || lexer->lookahead == '\n') {
+            is_close = true;
+          }
+        }
+
+        *lexer = close_state;
+        if (is_close) {
           break;
         }
-
-        // Not a fence, restore and continue
-        *lexer = saved_state;
       }
 
-      // Track line starts
-      if (lexer->lookahead == '\n') {
+      if (lexer->lookahead == '\r') {
+        lexer->advance(lexer, false);
+        if (lexer->lookahead == '\n') {
+          lexer->advance(lexer, false);
+        }
+        lexer->mark_end(lexer);
+        has_content = true;
         at_line_start = true;
-      } else if (lexer->lookahead != ' ' && lexer->lookahead != '\t') {
-        at_line_start = false;
+        continue;
       }
 
-      has_content = true;
+      if (lexer->lookahead == '\n') {
+        lexer->advance(lexer, false);
+        lexer->mark_end(lexer);
+        has_content = true;
+        at_line_start = true;
+        continue;
+      }
+
       lexer->advance(lexer, false);
       lexer->mark_end(lexer);
+      has_content = true;
+      at_line_start = false;
     }
 
     if (has_content) {
@@ -862,9 +946,6 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
       s->at_start = false;
       return true;
     }
-
-    *lexer = start_state;
-    return false;
   }
 
   // LIST_CONTINUATION: newline + indentation inside a list item

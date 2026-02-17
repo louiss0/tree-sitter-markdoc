@@ -158,65 +158,48 @@
 (variable "$" @punctuation.special)
 (variable (identifier) @variable)
 
+; Variables with @ prefix
+(special_variable "@" @punctuation.special)
+(special_variable (identifier) @variable)
+
+; Variable references: $var and $var.path
+(variable_reference
+  (variable (identifier) @variable)
+  (identifier) @variable.member)
+
+; Special variable references: @var and @var.path
+(special_variable_reference
+  (special_variable (identifier) @variable)
+  (identifier) @variable.member)
+
+; Subscript references: $items[0]
+(subscript_reference
+  (variable_reference (variable (identifier) @variable))
+  (array_subscript (number) @number))
+
+(subscript_reference
+  (variable_reference (variable (identifier) @variable))
+  (array_subscript (string) @string))
+
+(subscript_reference
+  (special_variable_reference (special_variable (identifier) @variable))
+  (array_subscript (number) @number))
+
+(subscript_reference
+  (special_variable_reference (special_variable (identifier) @variable))
+  (array_subscript (string) @string))
+
 ; Identifiers (function names, object keys, etc.)
 (identifier) @variable
 
-; Member expressions: object.property
-(member_expression
-  "." @punctuation.delimiter
-  property: (identifier) @property)
+; Function calls: func(...)
+(call_expression
+  function: (identifier) @function)
 
-; Array access: array[index]
-(array_access
+; Subscript references
+(array_subscript
   "[" @punctuation.bracket
   "]" @punctuation.bracket)
-
-; Function calls: func() or obj.method()
-; Highlight identifier as function in direct calls
-(call_expression
-  (identifier) @function)
-
-; Highlight property as function in member expression calls
-(call_expression
-  (member_expression
-    property: (identifier) @function))
-
-; Arrow functions: () => expr
-(arrow_function
-  "(" @punctuation.bracket
-  ")" @punctuation.bracket
-  "=>" @keyword.operator)
-
-; Arrow function parameters
-(arrow_function (identifier) @variable.parameter)
-
-; ============================================================================
-; OPERATORS
-; ============================================================================
-
-; Binary arithmetic operators
-(binary_add) @operator
-(binary_subtract) @operator
-(binary_multiply) @operator
-(binary_divide) @operator
-(binary_modulo) @operator
-
-; Binary comparison operators
-(binary_equal) @operator
-(binary_not_equal) @operator
-(binary_less_than) @operator
-(binary_greater_than) @operator
-(binary_less_equal) @operator
-(binary_greater_equal) @operator
-
-; Binary logical operators
-(binary_and) @operator
-(binary_or) @operator
-
-; Unary operators
-(unary_not) @operator
-(unary_minus) @operator
-(unary_plus) @operator
 
 ; ============================================================================
 ; LITERALS
@@ -241,12 +224,12 @@
 ; Array literals: [1, 2, 3]
 (array_literal
   "[" @punctuation.bracket
-  (array_close) @punctuation.bracket)
+  "]" @punctuation.bracket)
 
 ; Object literals: { key: value }
 (object_literal
   "{" @punctuation.bracket
-  (object_close) @punctuation.bracket)
+  "}" @punctuation.bracket)
 
 ; ============================================================================
 ; TEXT CONTENT
