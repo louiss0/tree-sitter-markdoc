@@ -449,13 +449,8 @@
       "type": "CHOICE",
       "members": [
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_NESTED_CODE_BLOCK"
-          },
-          "named": true,
-          "value": "nested_code_block"
+          "type": "SYMBOL",
+          "name": "fenced_code_block"
         },
         {
           "type": "SYMBOL",
@@ -2713,10 +2708,6 @@
   "externals": [
     {
       "type": "SYMBOL",
-      "name": "_CODE_CONTENT"
-    },
-    {
-      "type": "SYMBOL",
       "name": "_CODE_FENCE_OPEN"
     },
     {
@@ -2725,7 +2716,7 @@
     },
     {
       "type": "SYMBOL",
-      "name": "_NESTED_CODE_BLOCK"
+      "name": "_CODE_CONTENT"
     },
     {
       "type": "SYMBOL",

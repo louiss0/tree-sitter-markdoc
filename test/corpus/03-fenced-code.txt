@@ -147,7 +147,12 @@ print("inner")
       (info_string
         (language)))
     (code
-      (nested_code_block))
+      (fenced_code_block
+        (code_fence_open
+          (info_string
+            (language)))
+        (code)
+        (code_fence_close)))
     (code_fence_close)))
 
 ================================================================================
@@ -170,7 +175,12 @@ function inner() {
       (info_string
         (language)))
     (code
-      (nested_code_block))
+      (fenced_code_block
+        (code_fence_open
+          (info_string
+            (language)))
+        (code)
+        (code_fence_close)))
     (code_fence_close)))
 
 ================================================================================
@@ -195,7 +205,12 @@ function doSomething() {
       (info_string
         (language)))
     (code
-      (nested_code_block))
+      (fenced_code_block
+        (code_fence_open
+          (info_string
+            (language)))
+        (code)
+        (code_fence_close)))
     (code_fence_close)))
 
 ================================================================================
@@ -260,7 +275,30 @@ console.log("deep");
       (info_string
         (language)))
     (code
-      (nested_code_block))
+      (fenced_code_block
+        (code_fence_open
+          (info_string
+            (language)))
+        (code
+          (fenced_code_block
+            (code_fence_open
+              (info_string
+                (language)))
+            (code
+              (fenced_code_block
+                (code_fence_open
+                  (info_string
+                    (language)))
+                (code
+                  (fenced_code_block
+                    (code_fence_open
+                      (info_string
+                        (language)))
+                    (code)
+                    (code_fence_close)))
+                (code_fence_close)))
+            (code_fence_close)))
+        (code_fence_close)))
     (code_fence_close)))
 
 ================================================================================
@@ -284,8 +322,18 @@ fn main() {}
       (info_string
         (language)))
     (code
-      (nested_code_block)
-      (nested_code_block))
+      (fenced_code_block
+        (code_fence_open
+          (info_string
+            (language)))
+        (code)
+        (code_fence_close))
+      (fenced_code_block
+        (code_fence_open
+          (info_string
+            (language)))
+        (code)
+        (code_fence_close)))
     (code_fence_close)))
 
 ================================================================================
@@ -306,7 +354,176 @@ puts "mixed"
       (info_string
         (language)))
     (code
-      (nested_code_block))
+      (fenced_code_block
+        (code_fence_open
+          (info_string
+            (language)))
+        (code)
+        (code_fence_close)))
+    (code_fence_close)))
+
+================================================================================
+Nested fences with siblings and text
+================================================================================
+
+````markdown
+Intro line.
+
+`````go
+package main
+`````
+
+Between siblings.
+
+`````rust
+fn main() {}
+`````
+````
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (fenced_code_block
+    (code_fence_open
+      (info_string
+        (language)))
+    (code
+      (fenced_code_block
+        (code_fence_open
+          (info_string
+            (language)))
+        (code)
+        (code_fence_close))
+      (fenced_code_block
+        (code_fence_open
+          (info_string
+            (language)))
+        (code)
+        (code_fence_close)))
+    (code_fence_close)))
+
+================================================================================
+Nested fences with mixed markers to five levels
+================================================================================
+
+````txt
+~~~~~go
+``````rust
+~~~~~~~crystal
+````````python
+print("deep")
+````````
+~~~~~~~
+``````
+~~~~~
+````
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (fenced_code_block
+    (code_fence_open
+      (info_string
+        (language)))
+    (code
+      (fenced_code_block
+        (code_fence_open
+          (info_string
+            (language)))
+        (code
+          (fenced_code_block
+            (code_fence_open
+              (info_string
+                (language)))
+            (code
+              (fenced_code_block
+                (code_fence_open
+                  (info_string
+                    (language)))
+                (code
+                  (fenced_code_block
+                    (code_fence_open
+                      (info_string
+                        (language)))
+                    (code)
+                    (code_fence_close)))
+                (code_fence_close)))
+            (code_fence_close)))
+        (code_fence_close)))
+    (code_fence_close)))
+
+================================================================================
+Nested fences with sibling and nested mix
+================================================================================
+
+````markdown
+`````go
+package main
+`````
+
+`````rust
+``````crystal
+puts "nested"
+``````
+`````
+````
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (fenced_code_block
+    (code_fence_open
+      (info_string
+        (language)))
+    (code
+      (fenced_code_block
+        (code_fence_open
+          (info_string
+            (language)))
+        (code)
+        (code_fence_close))
+      (fenced_code_block
+        (code_fence_open
+          (info_string
+            (language)))
+        (code
+          (fenced_code_block
+            (code_fence_open
+              (info_string
+                (language)))
+            (code)
+            (code_fence_close)))
+        (code_fence_close)))
+    (code_fence_close)))
+
+================================================================================
+Nested fences with text and language mix
+================================================================================
+
+````markdown
+Intro line.
+
+`````go
+package main
+`````
+
+Trailing line.
+````
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (fenced_code_block
+    (code_fence_open
+      (info_string
+        (language)))
+    (code
+      (fenced_code_block
+        (code_fence_open
+          (info_string
+            (language)))
+        (code)
+        (code_fence_close)))
     (code_fence_close)))
 
 ================================================================================
@@ -314,6 +531,7 @@ Empty code block
 ================================================================================
 
 ```
+
 ```
 
 --------------------------------------------------------------------------------
@@ -321,6 +539,7 @@ Empty code block
 (source_file
   (fenced_code_block
     (code_fence_open)
+    (code)
     (code_fence_close)))
 
 ================================================================================

@@ -4,10 +4,9 @@
 #include <string.h>
 
 enum TokenType {
-  CODE_CONTENT,
   CODE_FENCE_OPEN,
   CODE_FENCE_CLOSE,
-  NESTED_CODE_BLOCK,
+  CODE_CONTENT,
   FRONTMATTER_DELIM,
   LIST_CONTINUATION,
   UNORDERED_LIST_MARKER,
@@ -97,6 +96,7 @@ static inline bool is_digit_ch(int32_t c) {
 
 static bool scan_frontmatter_closing_delimiter(TSLexer *lexer, int32_t marker);
 static bool scan_fence_close_line(TSLexer *lexer, char fence_char, uint8_t fence_length);
+static bool scan_fence_marker(TSLexer *lexer, char *fence_char, uint8_t *fence_length);
 
 static bool scan_unordered_or_thematic(Scanner *s, TSLexer *lexer, const bool *valid_symbols, unsigned indent) {
   bool wants_list = valid_symbols[UNORDERED_LIST_MARKER] || valid_symbols[INDENTED_UNORDERED_LIST_MARKER];
@@ -362,20 +362,40 @@ static bool scan_frontmatter_closing_delimiter(TSLexer *lexer, int32_t marker) {
   }
 }
 
-static bool scan_fence_close_line(TSLexer *lexer, char fence_char, uint8_t fence_length) {
-  TSLexer saved_state = *lexer;
-
-  if (lexer->get_column(lexer) != 0) {
+static bool scan_fence_marker(TSLexer *lexer, char *fence_char, uint8_t *fence_length) {
+  if (lexer->lookahead != '`' && lexer->lookahead != '~') {
     return false;
   }
 
+  char marker = (char)lexer->lookahead;
   uint8_t count = 0;
-  while (lexer->lookahead == fence_char && count < 255) {
+  while (lexer->lookahead == marker && count < 255) {
     lexer->advance(lexer, false);
     count++;
   }
 
-  if (count != fence_length) {
+  if (count < 3) {
+    return false;
+  }
+
+  *fence_char = marker;
+  *fence_length = count;
+  return true;
+}
+
+static bool scan_fence_close_line(TSLexer *lexer, char fence_char, uint8_t fence_length) {
+  if (lexer->get_column(lexer) != 0) {
+    return false;
+  }
+
+  TSLexer saved_state = *lexer;
+  char marker = 0;
+  uint8_t count = 0;
+  if (!scan_fence_marker(lexer, &marker, &count)) {
+    *lexer = saved_state;
+    return false;
+  }
+  if (marker != fence_char || count != fence_length) {
     *lexer = saved_state;
     return false;
   }
@@ -393,40 +413,6 @@ static bool scan_fence_close_line(TSLexer *lexer, char fence_char, uint8_t fence
   return true;
 }
 
-static bool scan_nested_code_block(TSLexer *lexer, char outer_fence_char, uint8_t outer_fence_length) {
-  int32_t marker = lexer->lookahead;
-  if (marker != '`' && marker != '~') {
-    return false;
-  }
-
-  TSLexer saved_state = *lexer;
-  uint8_t count = 0;
-  while (lexer->lookahead == marker && count < 255) {
-    lexer->advance(lexer, false);
-    count++;
-  }
-
-  if (count < 4) {
-    *lexer = saved_state;
-    return false;
-  }
-
-  while (lexer->lookahead != 0 && !is_newline(lexer->lookahead)) {
-    lexer->advance(lexer, false);
-  }
-
-  if (lexer->lookahead == '\r') {
-    lexer->advance(lexer, false);
-    if (lexer->lookahead == '\n') {
-      lexer->advance(lexer, false);
-    }
-  } else if (lexer->lookahead == '\n') {
-    lexer->advance(lexer, false);
-  }
-
-  lexer->mark_end(lexer);
-  return true;
-}
 
 static bool is_heading_marker_line(TSLexer *lexer) {
   if (lexer->get_column(lexer) != 0) {
@@ -458,19 +444,10 @@ static bool is_fenced_code_line(TSLexer *lexer) {
     return false;
   }
 
-  int32_t marker = lexer->lookahead;
-  if (marker != '`' && marker != '~') {
-    return false;
-  }
-
   TSLexer saved_state = *lexer;
-  unsigned count = 0;
-  while (lexer->lookahead == marker && count < 3) {
-    lexer->advance(lexer, false);
-    count++;
-  }
-
-  bool ok = count >= 3;
+  char marker = 0;
+  uint8_t count = 0;
+  bool ok = scan_fence_marker(lexer, &marker, &count);
   *lexer = saved_state;
   return ok;
 }
@@ -838,8 +815,9 @@ static bool is_thematic_break_line(TSLexer *lexer) {
 }
 
 bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
-                                              const bool *valid_symbols) {
+                                               const bool *valid_symbols) {
   Scanner *s = (Scanner *)payload;
+
   uint8_t fence_depth = s->fence_depth;
   char current_fence_char = fence_depth > 0 ? s->fence_chars[fence_depth - 1] : 0;
   uint8_t current_fence_length = fence_depth > 0 ? s->fence_lengths[fence_depth - 1] : 0;
@@ -883,19 +861,14 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
   }
 
   if (valid_symbols[CODE_FENCE_OPEN] && fence_depth == 0) {
-    if (lexer->lookahead == '`' || lexer->lookahead == '~') {
+    if (lexer->get_column(lexer) == 0) {
       TSLexer open_state = *lexer;
-      char fence_char = (char)lexer->lookahead;
-      uint8_t count = 0;
-      while (lexer->lookahead == fence_char && count < 255) {
-        lexer->advance(lexer, false);
-        count++;
-      }
-
-      if (count >= 3) {
+      char fence_char = 0;
+      uint8_t fence_length = 0;
+      if (scan_fence_marker(lexer, &fence_char, &fence_length)) {
         if (s->fence_depth < MAX_FENCE_DEPTH) {
           s->fence_chars[s->fence_depth] = fence_char;
-          s->fence_lengths[s->fence_depth] = count;
+          s->fence_lengths[s->fence_depth] = fence_length;
           s->fence_depth++;
         }
         lexer->mark_end(lexer);
@@ -903,63 +876,56 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
         s->at_start = false;
         return true;
       }
-
       *lexer = open_state;
     }
   }
 
-  if (valid_symbols[CODE_FENCE_CLOSE] && fence_depth > 0) {
-    if (lexer->lookahead == current_fence_char) {
-      TSLexer close_state = *lexer;
-      if (scan_fence_close_line(lexer, current_fence_char, current_fence_length)) {
-        lexer->mark_end(lexer);
-        s->fence_depth--;
-        lexer->result_symbol = CODE_FENCE_CLOSE;
-        s->at_start = false;
-        return true;
-      }
-      *lexer = close_state;
-    }
-  }
-
-  if (fence_depth > 0) {
-    if (lexer->get_column(lexer) == 0
-        && scan_nested_code_block(lexer, current_fence_char, current_fence_length)) {
-      lexer->result_symbol = NESTED_CODE_BLOCK;
-      s->at_start = false;
-      return true;
-    }
-  }
-
-  // CODE_CONTENT: consume a single line inside a fenced code block,
   if (valid_symbols[CODE_CONTENT] && fence_depth > 0) {
     if (lexer->lookahead == 0) {
       return false;
     }
 
-    if (lexer->get_column(lexer) == 0) {
-      if (lexer->lookahead == current_fence_char) {
-        TSLexer close_state = *lexer;
-        uint8_t count = 0;
-        while (lexer->lookahead == current_fence_char && count < 255) {
-          lexer->advance(lexer, false);
-          count++;
-        }
-        bool is_close = false;
-        if (count == current_fence_length) {
+    if (lexer->get_column(lexer) == 0 && (lexer->lookahead == '`' || lexer->lookahead == '~')) {
+      TSLexer fence_state = *lexer;
+      char marker = (char)lexer->lookahead;
+      uint8_t count = 0;
+      while (lexer->lookahead == marker && count < 255) {
+        lexer->advance(lexer, false);
+        count++;
+      }
+
+      if (count >= 3) {
+        if (marker == current_fence_char && count == current_fence_length) {
           while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
             lexer->advance(lexer, false);
           }
           if (lexer->lookahead == 0 || is_newline(lexer->lookahead)) {
-            is_close = true;
+            if (valid_symbols[CODE_FENCE_CLOSE]) {
+              if (s->fence_depth > 0) {
+                s->fence_depth--;
+              }
+              lexer->mark_end(lexer);
+              lexer->result_symbol = CODE_FENCE_CLOSE;
+              s->at_start = false;
+              return true;
+            }
           }
-        }
-        *lexer = close_state;
-        if (is_close) {
-          return false;
+        } else if (count > current_fence_length) {
+          if (valid_symbols[CODE_FENCE_OPEN]) {
+            if (s->fence_depth < MAX_FENCE_DEPTH) {
+              s->fence_chars[s->fence_depth] = marker;
+              s->fence_lengths[s->fence_depth] = count;
+              s->fence_depth++;
+            }
+            lexer->mark_end(lexer);
+            lexer->result_symbol = CODE_FENCE_OPEN;
+            s->at_start = false;
+            return true;
+          }
         }
       }
 
+      *lexer = fence_state;
     }
 
     while (lexer->lookahead != 0 && !is_newline(lexer->lookahead)) {

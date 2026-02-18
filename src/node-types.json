@@ -107,7 +107,7 @@
       "required": false,
       "types": [
         {
-          "type": "nested_code_block",
+          "type": "fenced_code_block",
           "named": true
         }
       ]
@@ -1254,10 +1254,6 @@
   },
   {
     "type": "link_text",
-    "named": true
-  },
-  {
-    "type": "nested_code_block",
     "named": true
   },
   {
