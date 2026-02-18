@@ -146,9 +146,9 @@ print("inner")
     (code_fence_open
       (info_string
         (language)))
-    (code)
-    (code_fence_close
-      (MISSING _CODE_FENCE_CLOSE))))
+    (code
+      (nested_code_block))
+    (code_fence_close)))
 
 ================================================================================
 Nested fences with minimum inner length
@@ -169,9 +169,9 @@ function inner() {
     (code_fence_open
       (info_string
         (language)))
-    (code)
-    (code_fence_close
-      (MISSING _CODE_FENCE_CLOSE))))
+    (code
+      (nested_code_block))
+    (code_fence_close)))
 
 ================================================================================
 Nested fences with text and deeper nesting
@@ -194,9 +194,120 @@ function doSomething() {
     (code_fence_open
       (info_string
         (language)))
+    (code
+      (nested_code_block))
+    (code_fence_close)))
+
+================================================================================
+Adjacent fenced blocks with multiple languages
+================================================================================
+
+```go
+package main
+```
+
+```rust
+fn main() {}
+```
+
+```crystal
+puts "hi"
+```
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (fenced_code_block
+    (code_fence_open
+      (info_string
+        (language)))
     (code)
-    (code_fence_close
-      (MISSING _CODE_FENCE_CLOSE))))
+    (code_fence_close))
+  (fenced_code_block
+    (code_fence_open
+      (info_string
+        (language)))
+    (code)
+    (code_fence_close))
+  (fenced_code_block
+    (code_fence_open
+      (info_string
+        (language)))
+    (code)
+    (code_fence_close)))
+
+================================================================================
+Nested fences up to five levels
+================================================================================
+
+````go
+`````rust
+``````crystal
+```````python
+````````js
+console.log("deep");
+````````
+```````
+``````
+`````
+````
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (fenced_code_block
+    (code_fence_open
+      (info_string
+        (language)))
+    (code
+      (nested_code_block))
+    (code_fence_close)))
+
+================================================================================
+Nested fences with sibling blocks
+================================================================================
+
+````markdown
+`````go
+package main
+`````
+`````rust
+fn main() {}
+`````
+````
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (fenced_code_block
+    (code_fence_open
+      (info_string
+        (language)))
+    (code
+      (nested_code_block)
+      (nested_code_block))
+    (code_fence_close)))
+
+================================================================================
+Nested fences with mixed markers
+================================================================================
+
+````txt
+~~~~~crystal
+puts "mixed"
+~~~~~
+````
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (fenced_code_block
+    (code_fence_open
+      (info_string
+        (language)))
+    (code
+      (nested_code_block))
+    (code_fence_close)))
 
 ================================================================================
 Empty code block

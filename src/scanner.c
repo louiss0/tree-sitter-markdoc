@@ -406,7 +406,7 @@ static bool scan_nested_code_block(TSLexer *lexer, char outer_fence_char, uint8_
     count++;
   }
 
-  if (count < 4 || count <= outer_fence_length) {
+  if (count < 4) {
     *lexer = saved_state;
     return false;
   }
@@ -424,67 +424,6 @@ static bool scan_nested_code_block(TSLexer *lexer, char outer_fence_char, uint8_
     lexer->advance(lexer, false);
   }
 
-  bool at_line_start = true;
-  while (lexer->lookahead != 0) {
-    if (at_line_start && lexer->lookahead == marker) {
-      TSLexer close_state = *lexer;
-      uint8_t close_count = 0;
-      while (lexer->lookahead == marker && close_count < 255) {
-        lexer->advance(lexer, false);
-        close_count++;
-      }
-
-      if (close_count == count) {
-        while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
-          lexer->advance(lexer, false);
-        }
-        if (lexer->lookahead == 0 || is_newline(lexer->lookahead)) {
-          if (lexer->lookahead == '\r') {
-            lexer->advance(lexer, false);
-            if (lexer->lookahead == '\n') {
-              lexer->advance(lexer, false);
-            }
-          } else if (lexer->lookahead == '\n') {
-            lexer->advance(lexer, false);
-          }
-          lexer->mark_end(lexer);
-          return true;
-        }
-      }
-
-      *lexer = close_state;
-    }
-
-    while (lexer->lookahead != 0 && !is_newline(lexer->lookahead)) {
-      lexer->advance(lexer, false);
-      at_line_start = false;
-    }
-
-    if (lexer->lookahead == '\r') {
-      lexer->advance(lexer, false);
-      at_line_start = true;
-      if (lexer->lookahead == '\n') {
-        lexer->advance(lexer, false);
-        at_line_start = true;
-      }
-    } else if (lexer->lookahead == '\n') {
-      lexer->advance(lexer, false);
-      at_line_start = true;
-    }
-  }
-
-  *lexer = saved_state;
-  while (lexer->lookahead != 0 && !is_newline(lexer->lookahead)) {
-    lexer->advance(lexer, false);
-  }
-  if (lexer->lookahead == '\r') {
-    lexer->advance(lexer, false);
-    if (lexer->lookahead == '\n') {
-      lexer->advance(lexer, false);
-    }
-  } else if (lexer->lookahead == '\n') {
-    lexer->advance(lexer, false);
-  }
   lexer->mark_end(lexer);
   return true;
 }
