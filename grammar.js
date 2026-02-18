@@ -20,6 +20,7 @@ module.exports = grammar({
     $._CODE_CONTENT,
     $._CODE_FENCE_OPEN,
     $._CODE_FENCE_CLOSE,
+    $._NESTED_CODE_BLOCK,
     $._FRONTMATTER_DELIM,
     $._LIST_CONTINUATION,
     $._UNORDERED_LIST_MARKER,
@@ -129,9 +130,17 @@ module.exports = grammar({
       optional(alias(/\{[^}\n]*\}/, $.attributes))
     ),
 
-    code: $ => repeat1($._CODE_CONTENT),
+    code: $ => repeat1($._code_item),
+
+    _code_item: $ => choice(
+      alias($._NESTED_CODE_BLOCK, $.nested_code_block),
+      $._CODE_CONTENT
+    ),
 
     code_fence_close: $ => $._CODE_FENCE_CLOSE,
+
+    // Nested code blocks are handled by the external scanner and aliased in `code`.
+
 
     // Markdoc comment block: {% comment %}...{% /comment %}
     comment_block: $ => token(prec(6, /\{%\s*comment\s*%\}(.|\r|\n)*\{%\s*\/comment\s*%\}/)),

@@ -442,8 +442,26 @@
       "type": "REPEAT1",
       "content": {
         "type": "SYMBOL",
-        "name": "_CODE_CONTENT"
+        "name": "_code_item"
       }
+    },
+    "_code_item": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_NESTED_CODE_BLOCK"
+          },
+          "named": true,
+          "value": "nested_code_block"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_CODE_CONTENT"
+        }
+      ]
     },
     "code_fence_close": {
       "type": "SYMBOL",
@@ -2704,6 +2722,10 @@
     {
       "type": "SYMBOL",
       "name": "_CODE_FENCE_CLOSE"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_NESTED_CODE_BLOCK"
     },
     {
       "type": "SYMBOL",

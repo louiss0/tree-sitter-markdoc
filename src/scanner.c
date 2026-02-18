@@ -7,6 +7,7 @@ enum TokenType {
   CODE_CONTENT,
   CODE_FENCE_OPEN,
   CODE_FENCE_CLOSE,
+  NESTED_CODE_BLOCK,
   FRONTMATTER_DELIM,
   LIST_CONTINUATION,
   UNORDERED_LIST_MARKER,
@@ -19,21 +20,23 @@ enum TokenType {
   HTML_BLOCK
 };
 
+#define MAX_FENCE_DEPTH 8
+
 typedef struct {
   bool at_start;
   bool in_frontmatter;
-  bool in_fenced_code;
-  char fence_char;
-  uint8_t fence_length;
+  uint8_t fence_depth;
+  char fence_chars[MAX_FENCE_DEPTH];
+  uint8_t fence_lengths[MAX_FENCE_DEPTH];
 } Scanner;
 
 void *tree_sitter_markdoc_external_scanner_create() {
   Scanner *scanner = (Scanner *)malloc(sizeof(Scanner));
   scanner->at_start = true;
   scanner->in_frontmatter = false;
-  scanner->in_fenced_code = false;
-  scanner->fence_char = 0;
-  scanner->fence_length = 0;
+  scanner->fence_depth = 0;
+  memset(scanner->fence_chars, 0, sizeof(scanner->fence_chars));
+  memset(scanner->fence_lengths, 0, sizeof(scanner->fence_lengths));
   return scanner;
 }
 
@@ -47,9 +50,11 @@ unsigned tree_sitter_markdoc_external_scanner_serialize(void *payload, char *buf
   if (i < 255) {
     buffer[i++] = (char)(s->at_start ? 1 : 0);
     buffer[i++] = (char)(s->in_frontmatter ? 1 : 0);
-    buffer[i++] = (char)(s->in_fenced_code ? 1 : 0);
-    buffer[i++] = (char)s->fence_char;
-    buffer[i++] = (char)s->fence_length;
+    buffer[i++] = (char)s->fence_depth;
+    for (uint8_t depth = 0; depth < s->fence_depth && i + 1 < 255; depth++) {
+      buffer[i++] = (char)s->fence_chars[depth];
+      buffer[i++] = (char)s->fence_lengths[depth];
+    }
   }
   return i;
 }
@@ -58,9 +63,9 @@ void tree_sitter_markdoc_external_scanner_deserialize(void *payload, const char 
   Scanner *s = (Scanner *)payload;
   s->at_start = true;
   s->in_frontmatter = false;
-  s->in_fenced_code = false;
-  s->fence_char = 0;
-  s->fence_length = 0;
+  s->fence_depth = 0;
+  memset(s->fence_chars, 0, sizeof(s->fence_chars));
+  memset(s->fence_lengths, 0, sizeof(s->fence_lengths));
 
   unsigned i = 0;
   if (i < length) {
@@ -70,13 +75,11 @@ void tree_sitter_markdoc_external_scanner_deserialize(void *payload, const char 
     s->in_frontmatter = buffer[i++] != 0;
   }
   if (i < length) {
-    s->in_fenced_code = buffer[i++] != 0;
+    s->fence_depth = (uint8_t)buffer[i++];
   }
-  if (i < length) {
-    s->fence_char = buffer[i++];
-  }
-  if (i < length) {
-    s->fence_length = (uint8_t)buffer[i++];
+  for (uint8_t depth = 0; depth < s->fence_depth && i + 1 < length; depth++) {
+    s->fence_chars[depth] = buffer[i++];
+    s->fence_lengths[depth] = (uint8_t)buffer[i++];
   }
 }
 
@@ -93,7 +96,7 @@ static inline bool is_digit_ch(int32_t c) {
 }
 
 static bool scan_frontmatter_closing_delimiter(TSLexer *lexer, int32_t marker);
-static bool scan_fence_close_line(Scanner *s, TSLexer *lexer);
+static bool scan_fence_close_line(TSLexer *lexer, char fence_char, uint8_t fence_length);
 
 static bool scan_unordered_or_thematic(Scanner *s, TSLexer *lexer, const bool *valid_symbols, unsigned indent) {
   bool wants_list = valid_symbols[UNORDERED_LIST_MARKER] || valid_symbols[INDENTED_UNORDERED_LIST_MARKER];
@@ -359,7 +362,7 @@ static bool scan_frontmatter_closing_delimiter(TSLexer *lexer, int32_t marker) {
   }
 }
 
-static bool scan_fence_close_line(Scanner *s, TSLexer *lexer) {
+static bool scan_fence_close_line(TSLexer *lexer, char fence_char, uint8_t fence_length) {
   TSLexer saved_state = *lexer;
 
   if (lexer->get_column(lexer) != 0) {
@@ -367,17 +370,48 @@ static bool scan_fence_close_line(Scanner *s, TSLexer *lexer) {
   }
 
   uint8_t count = 0;
-  while (lexer->lookahead == s->fence_char && count < 255) {
+  while (lexer->lookahead == fence_char && count < 255) {
     lexer->advance(lexer, false);
     count++;
   }
 
-  if (count < s->fence_length) {
+  if (count != fence_length) {
     *lexer = saved_state;
     return false;
   }
 
   while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+    lexer->advance(lexer, false);
+  }
+
+  if (lexer->lookahead != 0 && !is_newline(lexer->lookahead)) {
+    *lexer = saved_state;
+    return false;
+  }
+
+  lexer->mark_end(lexer);
+  return true;
+}
+
+static bool scan_nested_code_block(TSLexer *lexer, char outer_fence_char, uint8_t outer_fence_length) {
+  int32_t marker = lexer->lookahead;
+  if (marker != '`' && marker != '~') {
+    return false;
+  }
+
+  TSLexer saved_state = *lexer;
+  uint8_t count = 0;
+  while (lexer->lookahead == marker && count < 255) {
+    lexer->advance(lexer, false);
+    count++;
+  }
+
+  if (count < 4 || count <= outer_fence_length) {
+    *lexer = saved_state;
+    return false;
+  }
+
+  while (lexer->lookahead != 0 && !is_newline(lexer->lookahead)) {
     lexer->advance(lexer, false);
   }
 
@@ -390,6 +424,67 @@ static bool scan_fence_close_line(Scanner *s, TSLexer *lexer) {
     lexer->advance(lexer, false);
   }
 
+  bool at_line_start = true;
+  while (lexer->lookahead != 0) {
+    if (at_line_start && lexer->lookahead == marker) {
+      TSLexer close_state = *lexer;
+      uint8_t close_count = 0;
+      while (lexer->lookahead == marker && close_count < 255) {
+        lexer->advance(lexer, false);
+        close_count++;
+      }
+
+      if (close_count == count) {
+        while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+          lexer->advance(lexer, false);
+        }
+        if (lexer->lookahead == 0 || is_newline(lexer->lookahead)) {
+          if (lexer->lookahead == '\r') {
+            lexer->advance(lexer, false);
+            if (lexer->lookahead == '\n') {
+              lexer->advance(lexer, false);
+            }
+          } else if (lexer->lookahead == '\n') {
+            lexer->advance(lexer, false);
+          }
+          lexer->mark_end(lexer);
+          return true;
+        }
+      }
+
+      *lexer = close_state;
+    }
+
+    while (lexer->lookahead != 0 && !is_newline(lexer->lookahead)) {
+      lexer->advance(lexer, false);
+      at_line_start = false;
+    }
+
+    if (lexer->lookahead == '\r') {
+      lexer->advance(lexer, false);
+      at_line_start = true;
+      if (lexer->lookahead == '\n') {
+        lexer->advance(lexer, false);
+        at_line_start = true;
+      }
+    } else if (lexer->lookahead == '\n') {
+      lexer->advance(lexer, false);
+      at_line_start = true;
+    }
+  }
+
+  *lexer = saved_state;
+  while (lexer->lookahead != 0 && !is_newline(lexer->lookahead)) {
+    lexer->advance(lexer, false);
+  }
+  if (lexer->lookahead == '\r') {
+    lexer->advance(lexer, false);
+    if (lexer->lookahead == '\n') {
+      lexer->advance(lexer, false);
+    }
+  } else if (lexer->lookahead == '\n') {
+    lexer->advance(lexer, false);
+  }
   lexer->mark_end(lexer);
   return true;
 }
@@ -806,6 +901,9 @@ static bool is_thematic_break_line(TSLexer *lexer) {
 bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
                                               const bool *valid_symbols) {
   Scanner *s = (Scanner *)payload;
+  uint8_t fence_depth = s->fence_depth;
+  char current_fence_char = fence_depth > 0 ? s->fence_chars[fence_depth - 1] : 0;
+  uint8_t current_fence_length = fence_depth > 0 ? s->fence_lengths[fence_depth - 1] : 0;
 
   if (lexer->get_column(lexer) == 0) {
     if (valid_symbols[FRONTMATTER_DELIM] && s->in_frontmatter) {
@@ -845,8 +943,9 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
     *lexer = list_state;
   }
 
-  if (valid_symbols[CODE_FENCE_OPEN] && !s->in_fenced_code) {
+  if (valid_symbols[CODE_FENCE_OPEN] && fence_depth == 0) {
     if (lexer->lookahead == '`' || lexer->lookahead == '~') {
+      TSLexer open_state = *lexer;
       char fence_char = (char)lexer->lookahead;
       uint8_t count = 0;
       while (lexer->lookahead == fence_char && count < 255) {
@@ -855,25 +954,27 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
       }
 
       if (count >= 3) {
+        if (s->fence_depth < MAX_FENCE_DEPTH) {
+          s->fence_chars[s->fence_depth] = fence_char;
+          s->fence_lengths[s->fence_depth] = count;
+          s->fence_depth++;
+        }
         lexer->mark_end(lexer);
-        s->in_fenced_code = true;
-        s->fence_char = fence_char;
-        s->fence_length = count;
         lexer->result_symbol = CODE_FENCE_OPEN;
         s->at_start = false;
         return true;
       }
+
+      *lexer = open_state;
     }
   }
 
-  if (valid_symbols[CODE_FENCE_CLOSE] && s->in_fenced_code) {
-    if (lexer->lookahead == s->fence_char) {
+  if (valid_symbols[CODE_FENCE_CLOSE] && fence_depth > 0) {
+    if (lexer->lookahead == current_fence_char) {
       TSLexer close_state = *lexer;
-      if (scan_fence_close_line(s, lexer)) {
+      if (scan_fence_close_line(lexer, current_fence_char, current_fence_length)) {
         lexer->mark_end(lexer);
-        s->in_fenced_code = false;
-        s->fence_char = 0;
-        s->fence_length = 0;
+        s->fence_depth--;
         lexer->result_symbol = CODE_FENCE_CLOSE;
         s->at_start = false;
         return true;
@@ -882,70 +983,65 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
     }
   }
 
+  if (fence_depth > 0) {
+    if (lexer->get_column(lexer) == 0
+        && scan_nested_code_block(lexer, current_fence_char, current_fence_length)) {
+      lexer->result_symbol = NESTED_CODE_BLOCK;
+      s->at_start = false;
+      return true;
+    }
+  }
+
   // CODE_CONTENT: consume a single line inside a fenced code block,
-  if (valid_symbols[CODE_CONTENT] && s->in_fenced_code) {
+  if (valid_symbols[CODE_CONTENT] && fence_depth > 0) {
     if (lexer->lookahead == 0) {
       return false;
     }
 
-    bool has_content = false;
-    bool at_line_start = lexer->get_column(lexer) == 0;
-
-    while (lexer->lookahead != 0) {
-      if (at_line_start && lexer->lookahead == s->fence_char) {
+    if (lexer->get_column(lexer) == 0) {
+      if (lexer->lookahead == current_fence_char) {
         TSLexer close_state = *lexer;
         uint8_t count = 0;
-        while (lexer->lookahead == s->fence_char && count < 255) {
+        while (lexer->lookahead == current_fence_char && count < 255) {
           lexer->advance(lexer, false);
           count++;
         }
-
         bool is_close = false;
-        if (count >= s->fence_length) {
+        if (count == current_fence_length) {
           while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
             lexer->advance(lexer, false);
           }
-          if (lexer->lookahead == 0 || lexer->lookahead == '\r' || lexer->lookahead == '\n') {
+          if (lexer->lookahead == 0 || is_newline(lexer->lookahead)) {
             is_close = true;
           }
         }
-
         *lexer = close_state;
         if (is_close) {
-          break;
+          return false;
         }
       }
 
-      if (lexer->lookahead == '\r') {
-        lexer->advance(lexer, false);
-        if (lexer->lookahead == '\n') {
-          lexer->advance(lexer, false);
-        }
-        lexer->mark_end(lexer);
-        has_content = true;
-        at_line_start = true;
-        continue;
-      }
+    }
 
-      if (lexer->lookahead == '\n') {
-        lexer->advance(lexer, false);
-        lexer->mark_end(lexer);
-        has_content = true;
-        at_line_start = true;
-        continue;
-      }
-
+    while (lexer->lookahead != 0 && !is_newline(lexer->lookahead)) {
       lexer->advance(lexer, false);
       lexer->mark_end(lexer);
-      has_content = true;
-      at_line_start = false;
     }
 
-    if (has_content) {
-      lexer->result_symbol = CODE_CONTENT;
-      s->at_start = false;
-      return true;
+    if (lexer->lookahead == '\r') {
+      lexer->advance(lexer, false);
+      if (lexer->lookahead == '\n') {
+        lexer->advance(lexer, false);
+      }
+      lexer->mark_end(lexer);
+    } else if (lexer->lookahead == '\n') {
+      lexer->advance(lexer, false);
+      lexer->mark_end(lexer);
     }
+
+    lexer->result_symbol = CODE_CONTENT;
+    s->at_start = false;
+    return true;
   }
 
   // LIST_CONTINUATION: newline + indentation inside a list item

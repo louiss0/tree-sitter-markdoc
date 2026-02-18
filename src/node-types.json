@@ -101,7 +101,17 @@
   {
     "type": "code",
     "named": true,
-    "fields": {}
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "nested_code_block",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "code_fence_close",
@@ -1244,6 +1254,10 @@
   },
   {
     "type": "link_text",
+    "named": true
+  },
+  {
+    "type": "nested_code_block",
     "named": true
   },
   {

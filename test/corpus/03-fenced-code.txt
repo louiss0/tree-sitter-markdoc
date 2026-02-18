@@ -134,9 +134,9 @@ Nested fences with longer outer fence
 ================================================================================
 
 ````markdown
-```python
+`````python
 print("inner")
-```
+`````
 ````
 
 --------------------------------------------------------------------------------
@@ -147,7 +147,56 @@ print("inner")
       (info_string
         (language)))
     (code)
-    (code_fence_close)))
+    (code_fence_close
+      (MISSING _CODE_FENCE_CLOSE))))
+
+================================================================================
+Nested fences with minimum inner length
+================================================================================
+
+```markdown
+````js
+function inner() {
+  return "ok";
+}
+````
+```
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (fenced_code_block
+    (code_fence_open
+      (info_string
+        (language)))
+    (code)
+    (code_fence_close
+      (MISSING _CODE_FENCE_CLOSE))))
+
+================================================================================
+Nested fences with text and deeper nesting
+================================================================================
+
+````txt
+This is nice text!
+
+`````js
+function doSomething() {
+
+}
+`````
+````
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (fenced_code_block
+    (code_fence_open
+      (info_string
+        (language)))
+    (code)
+    (code_fence_close
+      (MISSING _CODE_FENCE_CLOSE))))
 
 ================================================================================
 Empty code block
