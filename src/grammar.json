@@ -3,165 +3,90 @@
   "name": "markdoc",
   "rules": {
     "source_file": {
-      "type": "CHOICE",
+      "type": "SEQ",
       "members": [
         {
-          "type": "PREC",
-          "value": 1,
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "frontmatter"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "REPEAT",
           "content": {
-            "type": "SEQ",
+            "type": "CHOICE",
             "members": [
               {
                 "type": "SYMBOL",
-                "name": "frontmatter"
+                "name": "_BLANK_LINE"
               },
               {
-                "type": "REPEAT",
-                "content": {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "SYMBOL",
-                      "name": "_BLANK_LINE"
-                    },
-                    {
-                      "type": "SYMBOL",
-                      "name": "_NEWLINE"
-                    }
-                  ]
-                }
-              },
-              {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "SEQ",
-                    "members": [
-                      {
-                        "type": "SYMBOL",
-                        "name": "_block"
-                      },
-                      {
-                        "type": "REPEAT",
-                        "content": {
-                          "type": "SEQ",
-                          "members": [
-                            {
-                              "type": "CHOICE",
-                              "members": [
-                                {
-                                  "type": "SYMBOL",
-                                  "name": "_BLANK_LINE"
-                                },
-                                {
-                                  "type": "SYMBOL",
-                                  "name": "_NEWLINE"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "SYMBOL",
-                              "name": "_block"
-                            }
-                          ]
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "type": "BLANK"
-                  }
-                ]
-              },
-              {
-                "type": "REPEAT",
-                "content": {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "SYMBOL",
-                      "name": "_BLANK_LINE"
-                    },
-                    {
-                      "type": "SYMBOL",
-                      "name": "_NEWLINE"
-                    }
-                  ]
-                }
+                "type": "SYMBOL",
+                "name": "_NEWLINE"
               }
             ]
           }
         },
         {
-          "type": "PREC_RIGHT",
-          "value": 0,
-          "content": {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "REPEAT",
-                "content": {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
                   "type": "SYMBOL",
-                  "name": "_NEWLINE"
-                }
-              },
-              {
-                "type": "CHOICE",
-                "members": [
-                  {
+                  "name": "_block"
+                },
+                {
+                  "type": "REPEAT",
+                  "content": {
                     "type": "SEQ",
                     "members": [
                       {
-                        "type": "SYMBOL",
-                        "name": "_block"
+                        "type": "CHOICE",
+                        "members": [
+                          {
+                            "type": "SYMBOL",
+                            "name": "_BLANK_LINE"
+                          },
+                          {
+                            "type": "SYMBOL",
+                            "name": "_NEWLINE"
+                          }
+                        ]
                       },
                       {
-                        "type": "REPEAT",
-                        "content": {
-                          "type": "SEQ",
-                          "members": [
-                            {
-                              "type": "CHOICE",
-                              "members": [
-                                {
-                                  "type": "SYMBOL",
-                                  "name": "_BLANK_LINE"
-                                },
-                                {
-                                  "type": "SYMBOL",
-                                  "name": "_NEWLINE"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "SYMBOL",
-                              "name": "_block"
-                            }
-                          ]
-                        }
+                        "type": "SYMBOL",
+                        "name": "_block"
                       }
                     ]
-                  },
-                  {
-                    "type": "BLANK"
                   }
-                ]
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_BLANK_LINE"
               },
               {
-                "type": "REPEAT",
-                "content": {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "SYMBOL",
-                      "name": "_BLANK_LINE"
-                    },
-                    {
-                      "type": "SYMBOL",
-                      "name": "_NEWLINE"
-                    }
-                  ]
-                }
+                "type": "SYMBOL",
+                "name": "_NEWLINE"
               }
             ]
           }

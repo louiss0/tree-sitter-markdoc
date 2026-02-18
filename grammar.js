@@ -40,25 +40,12 @@ module.exports = grammar({
 
   rules: {
     source_file: ($) =>
-      choice(
-        prec(
-          1,
-          seq(
-            $.frontmatter,
-            repeat(choice($._BLANK_LINE, $._NEWLINE)),
-            optional(seq($._block, repeat(seq(choice($._BLANK_LINE, $._NEWLINE), $._block)))),
-            repeat(choice($._BLANK_LINE, $._NEWLINE)),
-          ),
-        ),
-        prec.right(
-          seq(
-            repeat($._NEWLINE),
-            optional(seq($._block, repeat(seq(choice($._BLANK_LINE, $._NEWLINE), $._block)))),
-            repeat(choice($._BLANK_LINE, $._NEWLINE)),
-          ),
-        ),
+      seq(
+        optional($.frontmatter),
+        repeat(choice($._BLANK_LINE, $._NEWLINE)),
+        optional(seq($._block, repeat(seq(choice($._BLANK_LINE, $._NEWLINE), $._block)))),
+        repeat(choice($._BLANK_LINE, $._NEWLINE)),
       ),
-
     _block: ($) =>
       choice(
         $.comment_block, // Must come before markdoc_tag to match {% comment %}
