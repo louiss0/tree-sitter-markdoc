@@ -1,21 +1,25 @@
 =============================================================================
-Alternative tag closing syntax (without slash)
+Tag closing syntax (with slash)
 =============================================================================
 
 {% tag %}
 Content here
-{% tag %}
+{% /tag %}
 
 -----------------------------------------------------------------------------
 
 (source_file
   (markdoc_tag
     (tag_open
-      (tag_name))
+      (tag_open_delimiter)
+      (tag_name)
+      (tag_block_close))
     (paragraph
       (text))
     (tag_close
-      (tag_name))))
+      (tag_open_delimiter)
+      (tag_name)
+      (inline_expression_close))))
 
 =============================================================================
 Tag with extra whitespace
@@ -30,11 +34,15 @@ Text with space
 (source_file
   (markdoc_tag
     (tag_open
-      (tag_name))
+      (tag_open_delimiter)
+      (tag_name)
+      (tag_block_close))
     (paragraph
       (text))
     (tag_close
-      (tag_name))))
+      (tag_open_delimiter)
+      (tag_name)
+      (inline_expression_close))))
 
 =============================================================================
 Nested list indentation
@@ -50,26 +58,16 @@ Nested list indentation
 -----------------------------------------------------------------------------
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)))
-    (list_item
-      (list_marker)
-      (list_paragraph
-        (text)))
-    (list_item
-      (list_marker)
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)
-        (text)))
-    (list_item
-      (list_marker)
-      (list_paragraph
+        (text)
+        (text)
+        (text)
         (text)
         (text)))))
-
 
 =============================================================================
 Tag with blank lines in content
@@ -88,11 +86,14 @@ Second paragraph with blank line between
 (source_file
   (markdoc_tag
     (tag_open
-      (tag_name))
+      (tag_open_delimiter)
+      (tag_name)
+      (tag_block_close))
     (paragraph
       (text))
     (paragraph
       (text))
     (tag_close
-      (tag_name))))
-
+      (tag_open_delimiter)
+      (tag_name)
+      (inline_expression_close))))

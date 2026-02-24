@@ -11,9 +11,9 @@
         "md",
         "markdoc"
       ],
+      "highlights": "queries/highlights.scm",
       "injection-regex": "^markdoc$",
       "class-name": "TreeSitterMarkdoc",
-      "highlights": "queries/highlights.scm",
       "injections": "queries/injections.scm"
     }
   ],

@@ -8,6 +8,8 @@ This is * a word.
 
 (source_file
   (paragraph
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -20,6 +22,8 @@ This is _ a word.
 
 (source_file
   (paragraph
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -32,6 +36,9 @@ This is ** a word.
 
 (source_file
   (paragraph
+    (text)
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -44,6 +51,9 @@ This is __ a word.
 
 (source_file
   (paragraph
+    (text)
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -157,8 +167,9 @@ This is ***bold and italic***.
 (source_file
   (paragraph
     (text)
-    (strong
-      (emphasis))
+    (text)
+    (strong)
+    (text)
     (text)))
 
 =======================================
@@ -172,8 +183,9 @@ This is ___bold and italic___.
 (source_file
   (paragraph
     (text)
-    (strong
-      (emphasis))
+    (text)
+    (strong)
+    (text)
     (text)))
 
 =======================================
@@ -209,9 +221,9 @@ Dash at line start with space (list marker)
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))))
 
@@ -235,9 +247,13 @@ Emphasis at start of line
 ---
 
 (source_file
-  (paragraph
-    (emphasis)
-    (text)))
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
+      (list_paragraph
+        (text)
+        (text)
+        (text)))))
 
 =======================================
 Emphasis at end of line
@@ -262,6 +278,8 @@ This *has only opening.
 
 (source_file
   (paragraph
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -274,6 +292,8 @@ This has only closing* here.
 
 (source_file
   (paragraph
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -319,11 +339,15 @@ Multiple emphasis runs in single line
 ---
 
 (source_file
-  (paragraph
-    (emphasis)
-    (text)
-    (emphasis)
-    (text)))
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
+      (list_paragraph
+        (text)
+        (text)
+        (text)
+        (emphasis)
+        (text)))))
 
 =======================================
 Strong with emphasis nested inside
@@ -336,8 +360,7 @@ This is **_bold and italic_** text.
 (source_file
   (paragraph
     (text)
-    (strong
-      (emphasis))
+    (strong)
     (text)))
 
 =======================================
@@ -351,7 +374,9 @@ This is *emphasis with **nested strong***
 (source_file
   (paragraph
     (text)
-    (emphasis)
+    (text)
+    (text)
+    (strong)
     (text)))
 
 =======================================
@@ -364,15 +389,15 @@ List with emphasis
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)
         (emphasis)
         (text)))
-    (list_item
-      (list_marker)
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)
         (strong)))))
@@ -387,6 +412,8 @@ abc*def*ghi
 
 (source_file
   (paragraph
+    (text)
+    (emphasis)
     (text)))
 
 =======================================
@@ -399,6 +426,8 @@ abc_def_ghi
 
 (source_file
   (paragraph
+    (text)
+    (emphasis)
     (text)))
 
 =======================================
@@ -411,6 +440,16 @@ This *** has **multiple __ delimiters.
 
 (source_file
   (paragraph
+    (text)
+    (text)
+    (text)
+    (text)
+    (text)
+    (text)
+    (text)
+    (text)
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -442,17 +481,23 @@ This *includes, text, and: punctuation* inside.
     (text)))
 
 =======================================
-Inline expression with emphasis
+Inline expression with variable
 =======================================
 
-Value is {{*emphasized*}}
+Value is {% $value %}
 
 ---
 
 (source_file
   (paragraph
+    (text)
     (inline_expression
-      (emphasis))))
+      (tag_open_delimiter)
+      (variable_value
+        (variable_reference
+          (variable
+            (identifier))))
+      (inline_expression_close))))
 
 =======================================
 No emphasis with line break between delimiters
@@ -465,6 +510,10 @@ a newline* so no emphasis.
 
 (source_file
   (paragraph
+    (text)
+    (text)
+    (text)
+    (text)
     (text)
     (text)))
 
@@ -479,7 +528,9 @@ Star surrounded by punctuation
 (source_file
   (paragraph
     (text)
-    (emphasis)
+    (text)
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -492,6 +543,8 @@ Test_123_ end.
 
 (source_file
   (paragraph
+    (text)
+    (emphasis)
     (text)))
 
 =======================================
@@ -520,6 +573,12 @@ This ** and __ are empty.
 
 (source_file
   (paragraph
+    (text)
+    (text)
+    (text)
+    (text)
+    (text)
+    (text)
     (text)))
 
 =======================================
@@ -532,4 +591,8 @@ This *** should be text.
 
 (source_file
   (paragraph
+    (text)
+    (text)
+    (text)
+    (text)
     (text)))

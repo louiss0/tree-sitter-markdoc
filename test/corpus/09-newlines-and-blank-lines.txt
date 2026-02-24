@@ -53,17 +53,17 @@ List with items separated by newlines
 --------------------------------------------------------------------------------
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))
-    (list_item
-      (list_marker)
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))
-    (list_item
-      (list_marker)
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))))
 
@@ -97,6 +97,6 @@ Paragraph two
 
 (source_file
   (paragraph
-    (text)
-    (text)
+    (text))
+  (paragraph
     (text)))

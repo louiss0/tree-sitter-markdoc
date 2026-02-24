@@ -1,8 +1,8 @@
 =======================================
-Simple member expression
+Variable reference
 =======================================
 
-Text {{ user.name }} here.
+Text {% $user.name %} here.
 
 ---
 
@@ -10,37 +10,20 @@ Text {{ user.name }} here.
   (paragraph
     (text)
     (inline_expression
-      (expression
-        (member_expression
-          (identifier)
-          (identifier))))
-    (text)))
-
-=======================================
-Nested member expression
-=======================================
-
-Value is {{ obj.prop.nested }}.
-
----
-
-(source_file
-  (paragraph
-    (text)
-    (inline_expression
-      (expression
-        (member_expression
-          (member_expression
-            (identifier)
+      (tag_open_delimiter)
+      (variable_value
+        (variable_reference
+          (variable
             (identifier))
-          (identifier))))
+          (identifier)))
+      (inline_expression_close))
     (text)))
 
 =======================================
-Array literal with numbers
+Nested variable reference
 =======================================
 
-Items {{ [1, 2, 3] }} end.
+Value is {% $obj.prop.nested %}.
 
 ---
 
@@ -48,157 +31,100 @@ Items {{ [1, 2, 3] }} end.
   (paragraph
     (text)
     (inline_expression
-      (expression
-        (array_literal
-          (expression
-            (number))
-          (expression
-            (number))
-          (expression
-            (number)))))
-    (text)))
-
-=======================================
-Array literal with strings
-=======================================
-
-Tags {{ ["one", "two"] }} done.
-
----
-
-(source_file
-  (paragraph
-    (text)
-    (inline_expression
-      (expression
-        (array_literal
-          (expression
-            (string))
-          (expression
-            (string)))))
-    (text)))
-
-=======================================
-Object literal simple
-=======================================
-
-Data {{ {key: "value"} }} text.
-
----
-
-(source_file
-  (paragraph
-    (text)
-    (inline_expression
-      (expression
-        (object_literal
-          (pair
-            (identifier)
-            (expression
-              (string))))))
-    (text)))
-
-=======================================
-Object literal multiple pairs
-=======================================
-
-Config {{ {name: "test", count: 5} }} end.
-
----
-
-(source_file
-  (paragraph
-    (text)
-    (inline_expression
-      (expression
-        (object_literal
-          (pair
-            (identifier)
-            (expression
-              (string)))
-          (pair
-            (identifier)
-            (expression
-              (number))))))
-    (text)))
-
-=======================================
-Call expression simple
-=======================================
-
-Result {{ func() }} here.
-
----
-
-(source_file
-  (paragraph
-    (text)
-    (inline_expression
-      (expression
-        (call_expression
-          (identifier))))
-    (text)))
-
-=======================================
-Call expression with arguments
-=======================================
-
-Value {{ add(1, 2) }} end.
-
----
-
-(source_file
-  (paragraph
-    (text)
-    (inline_expression
-      (expression
-        (call_expression
-          (identifier)
-          (expression
-            (number))
-          (expression
-            (number)))))
-    (text)))
-
-=======================================
-Member call expression
-=======================================
-
-Output {{ user.getName() }} text.
-
----
-
-(source_file
-  (paragraph
-    (text)
-    (inline_expression
-      (expression
-        (call_expression
-          (member_expression
-            (identifier)
-            (identifier)))))
-    (text)))
-
-=======================================
-Nested expressions
-=======================================
-
-Complex {{ obj.method(arr[0]) }} done.
-
----
-
-(source_file
-  (paragraph
-    (text)
-    (inline_expression
-      (expression
-        (call_expression
-          (member_expression
-            (identifier)
+      (tag_open_delimiter)
+      (variable_value
+        (variable_reference
+          (variable
             (identifier))
-          (expression
-            (array_access
-              (identifier)
-              (expression
-                (number)))))))
+          (identifier)
+          (identifier)))
+      (inline_expression_close))
+    (text)))
+
+=======================================
+Special variable reference
+=======================================
+
+Index {% @index %} here.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (inline_expression
+      (tag_open_delimiter)
+      (variable_value
+        (special_variable_reference
+          (special_variable
+            (identifier))))
+      (inline_expression_close))
+    (text)))
+
+=======================================
+Subscript reference
+=======================================
+
+Item {% $items[0] %} end.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (inline_expression
+      (tag_open_delimiter)
+      (variable_value
+        (subscript_reference
+          (variable_reference
+            (variable
+              (identifier)))
+          (array_subscript
+            (number))))
+      (inline_expression_close))
+    (text)))
+
+=======================================
+Function call with literal argument
+=======================================
+
+Value {% formatDate("2024-01-01") %} end.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (inline_expression
+      (tag_open_delimiter)
+      (call_expression
+        (identifier)
+        (value_expression
+          (json_value
+            (string))))
+      (inline_expression_close))
+    (text)))
+
+=======================================
+Function call with variable argument
+=======================================
+
+Output {% titleCase($user.name) %} text.
+
+---
+
+(source_file
+  (paragraph
+    (text)
+    (inline_expression
+      (tag_open_delimiter)
+      (call_expression
+        (identifier)
+        (value_expression
+          (variable_value
+            (variable_reference
+              (variable
+                (identifier))
+              (identifier)))))
+      (inline_expression_close))
     (text)))

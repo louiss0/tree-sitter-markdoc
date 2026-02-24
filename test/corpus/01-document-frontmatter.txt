@@ -9,7 +9,6 @@ Empty document
 ==================
 Frontmatter only
 ==================
-
 ---
 title: Hello
 ---
@@ -35,7 +34,6 @@ Hello world
 ==================
 Frontmatter and body
 ==================
-
 ---
 title: Doc
 ---

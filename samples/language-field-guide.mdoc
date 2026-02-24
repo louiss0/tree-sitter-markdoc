@@ -1,0 +1,70 @@
+---
+title: "Language Field Guide"
+author: "Markdoc Samples"
+---
+
+# Language Field Guide
+
+<!--
+This document showcases programming languages and formatting.
+It uses thematic breaks, sections, and nested code blocks.
+-->
+
+---
+## Overview
+
+A quick tour of languages with code samples and structured sections.
+
+---
+## Python
+
+Python is known for readability and rapid iteration.
+
+```python
+def greet(name):
+    return f"Hello, {name}!"
+
+print(greet("Markdoc"))
+```
+
+---
+## JavaScript
+
+```javascript
+const slugify = (value) => value.toLowerCase().replace(/\s+/g, "-");
+console.log(slugify("Markdoc Samples"));
+```
+
+---
+## Nested Code Blocks
+
+Sometimes documentation needs to show code fences inside another code block.
+This section demonstrates a nested code block example using tildes.
+
+```markdown
+
+ ````python
+    print("nested inside a fenced example")
+ ````
+
+```
+
+---
+## Rust
+
+```rust
+fn main() {
+    let name = "markdoc";
+    println!("Hello, {}!", name);
+}
+```
+
+---
+## SQL
+
+```sql
+SELECT title, author
+FROM articles
+WHERE published = true
+ORDER BY created_at DESC;
+```
