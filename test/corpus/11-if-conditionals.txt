@@ -1,0 +1,180 @@
+================================================================================
+Simple if with block content
+================================================================================
+
+{% if $user %}
+Hello, {% $user.name %}!
+{% /if %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (if_tag
+    (if_tag_open
+      (expression
+        (variable
+          (identifier))))
+    (paragraph
+      (text)
+      (inline_expression
+        (expression
+          (member_expression
+            (variable
+              (identifier))
+            (identifier))))
+      (text))
+    (if_tag_close)))
+
+================================================================================
+If with else clause
+================================================================================
+
+{% if $user %}
+Hello, {% $user.name %}!
+{% else /%}
+Please sign in.
+{% /if %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (if_tag
+    (if_tag_open
+      (expression
+        (variable
+          (identifier))))
+    (paragraph
+      (text)
+      (inline_expression
+        (expression
+          (member_expression
+            (variable
+              (identifier))
+            (identifier))))
+      (text))
+    (else_tag)
+    (paragraph
+      (text))
+    (if_tag_close)))
+
+================================================================================
+If with else if clause (condition)
+================================================================================
+
+{% if $user %}
+Hello, {% $user.name %}!
+{% else equals($role, "guest") /%}
+Welcome guest!
+{% /if %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (if_tag
+    (if_tag_open
+      (expression
+        (variable
+          (identifier))))
+    (paragraph
+      (text)
+      (inline_expression
+        (expression
+          (member_expression
+            (variable
+              (identifier))
+            (identifier))))
+      (text))
+    (else_tag
+      (expression
+        (call_expression
+          (identifier)
+          (expression
+            (variable
+              (identifier)))
+          (expression
+            (string)))))
+    (paragraph
+      (text))
+    (if_tag_close)))
+
+================================================================================
+If with multiple else clauses
+================================================================================
+
+{% if $user %}
+Hello, {% $user.name %}!
+{% else equals($role, "guest") /%}
+Welcome guest!
+{% else /%}
+Please sign in.
+{% /if %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (if_tag
+    (if_tag_open
+      (expression
+        (variable
+          (identifier))))
+    (paragraph
+      (text)
+      (inline_expression
+        (expression
+          (member_expression
+            (variable
+              (identifier))
+            (identifier))))
+      (text))
+    (else_tag
+      (expression
+        (call_expression
+          (identifier)
+          (expression
+            (variable
+              (identifier)))
+          (expression
+            (string)))))
+    (paragraph
+      (text))
+    (else_tag)
+    (paragraph
+      (text))
+    (if_tag_close)))
+
+================================================================================
+If with nested content blocks
+================================================================================
+
+{% if $showContent %}
+# Section Title
+
+Some paragraph content here.
+
+- List item 1
+- List item 2
+{% /if %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (if_tag
+    (if_tag_open
+      (expression
+        (variable
+          (identifier))))
+    (heading
+      (heading_marker)
+      (heading_text))
+    (paragraph
+      (text))
+    (list
+      (list_item
+        (list_marker)
+        (list_paragraph
+          (text)))
+      (list_item
+        (list_marker)
+        (list_paragraph
+          (text))))
+    (if_tag_close)))

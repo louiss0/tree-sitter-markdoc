@@ -1,0 +1,305 @@
+=======================================
+Unordered list with simple annotation
+=======================================
+
+- Item one {% important %}
+- Item two
+- Item three
+
+---
+
+(source_file
+  (list
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text))
+      (list_item_annotation
+        (annotation_type)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))))
+
+=======================================
+Ordered list with simple annotation
+=======================================
+
+1. First item {% note %}
+2. Second item
+3. Third item
+
+---
+
+(source_file
+  (list
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text))
+      (list_item_annotation
+        (annotation_type)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))))
+
+=======================================
+List with multiple annotations
+=======================================
+
+- Item one {% important %}
+- Item two {% warning %}
+- Item three {% info %}
+
+---
+
+(source_file
+  (list
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text))
+      (list_item_annotation
+        (annotation_type)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text))
+      (list_item_annotation
+        (annotation_type)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text))
+      (list_item_annotation
+        (annotation_type)))))
+
+=======================================
+List with multiple words and annotation
+=======================================
+
+- This is important content {% highlight %}
+- Normal item
+
+---
+
+(source_file
+  (list
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text))
+      (list_item_annotation
+        (annotation_type)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))))
+
+=======================================
+Nested list with annotations
+=======================================
+
+- Parent item {% important %}
+- Child item {% note %}
+- Another child
+- Another parent {% warning %}
+
+---
+
+(source_file
+  (list
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text))
+      (list_item_annotation
+        (annotation_type)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text))
+      (list_item_annotation
+        (annotation_type)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text))
+      (list_item_annotation
+        (annotation_type)))))
+
+=======================================
+List item annotation with attributes
+=======================================
+
+- Item one {% custom type="primary" %}
+- Item two
+
+---
+
+(source_file
+  (list
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text))
+      (list_item_annotation
+        (annotation_type)
+        (attribute
+          (attribute_name)
+          (attribute_value
+            (string)))))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))))
+
+=======================================
+List annotation with expression attribute
+=======================================
+
+- Item one {% tag value=$variable %}
+- Item two
+
+---
+
+(source_file
+  (list
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text))
+      (list_item_annotation
+        (annotation_type)
+        (attribute
+          (attribute_name)
+          (attribute_value
+            (expression
+              (variable
+                (identifier)))))))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))))
+
+=======================================
+Ordered list with all items annotated
+=======================================
+
+1. First {% important %}
+2. Second {% important %}
+3. Third {% important %}
+
+---
+
+(source_file
+  (list
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text))
+      (list_item_annotation
+        (annotation_type)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text))
+      (list_item_annotation
+        (annotation_type)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text))
+      (list_item_annotation
+        (annotation_type)))))
+
+=======================================
+List with simple text and annotation
+=======================================
+
+- Simple text item {% highlight %}
+- Normal item
+
+---
+
+(source_file
+  (list
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text))
+      (list_item_annotation
+        (annotation_type)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))))
+
+=======================================
+List with text and another word annotation
+=======================================
+
+- Item content here {% info %}
+- Normal item
+
+---
+
+(source_file
+  (list
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text))
+      (list_item_annotation
+        (annotation_type)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))))
+
+=======================================
+Mixed list with and without annotations
+=======================================
+
+- Item one {% important %}
+- Item two
+- Item three {% warning %}
+- Item four
+
+---
+
+(source_file
+  (list
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text))
+      (list_item_annotation
+        (annotation_type)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text))
+      (list_item_annotation
+        (annotation_type)))
+    (list_item
+      (list_marker)
+      (list_paragraph
+        (text)))))

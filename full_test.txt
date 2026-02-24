@@ -1,0 +1,383 @@
+
+> tree-sitter-markdoc@0.2.0 test
+> tree-sitter test
+
+  01-document-frontmatter:
+      1. ✓ [32mEmpty document[0m
+      2. ✓ [32mFrontmatter only[0m
+      3. ✓ [32mDocument without frontmatter[0m
+      4. ✓ [32mFrontmatter and body[0m
+  02-headings-paragraphs:
+      5. ✓ [32mATX heading level 1[0m
+      6. ✓ [32mATX heading level 2[0m
+      7. ✓ [32mATX heading level 3[0m
+      8. ✓ [32mATX heading levels 4-6[0m
+      9. ✓ [32mHeading with trailing space[0m
+     10. ✓ [32mHeading without space after marker (invalid)[0m
+     11. ✓ [32mSimple paragraph[0m
+     12. ✓ [32mParagraph with multiple lines[0m
+     13. ✓ [32mTwo paragraphs separated by blank line[0m
+     14. ✓ [32mHeading followed by paragraph[0m
+     15. ✓ [32mMixed headings and paragraphs[0m
+     16. ✓ [32mHeading with frontmatter[0m
+  03-fenced-code:
+     17. ✓ [32mBacktick fence without info string[0m
+     18. ✓ [32mBacktick fence with language[0m
+     19. ✓ [32mBacktick fence with language and attributes[0m
+     20. ✓ [32mTilde fence without info string[0m
+     21. ✓ [32mTilde fence with language[0m
+     22. ✓ [32mTilde fence with language and attributes[0m
+     23. ✓ [32mMulti-line code content[0m
+     24. ✓ [32mEmpty code block[0m
+     25. ✓ [32mCode block with heading after[0m
+     26. ✓ [32mCode block with paragraph after[0m
+     27. ✓ [32mMixed backticks and content[0m
+     28. ✓ [32mCode block with frontmatter[0m
+  04-markdoc-tags:
+     29. ✓ [32mSelf-closing tag[0m
+     30. ✓ [32mBlock tag without content[0m
+     31. ✓ [32mBlock tag with paragraph content[0m
+     32. ✓ [32mBlock tag with multiple paragraphs[0m
+     33. ✓ [32mNested block tags[0m
+     34. ✓ [32mTag with string attribute[0m
+     35. ✓ [32mTag with multiple attributes[0m
+     36. ✓ [32mSelf-closing tag with attributes[0m
+     37. ✓ [32mSimple inline expression[0m
+     38. ✓ [32mInline expression with property access[0m
+     39. ✓ [32mMultiple inline expressions in paragraph[0m
+     40. ✗ [31mTag with heading inside[0m
+     41. ✓ [32mTag with code block inside[0m
+     42. ✗ [31mMixed content with tags and expressions[0m
+     43. ✓ [32mTag with frontmatter[0m
+  05-html-tags-and-comments:
+     44. ✓ [32mHTML block tag[0m
+     45. ✓ [32mHTML self-closing tag[0m
+     46. ✓ [32mHTML comment[0m
+     47. ✓ [32mMulti-line HTML comment[0m
+     48. ✓ [32mMarkdoc comment block[0m
+     49. ✓ [32mMixed HTML and Markdoc content[0m
+  05-lists:
+     50. ✓ [32mSimple unordered list[0m
+     51. ✓ [32mSimple ordered list[0m
+     52. ✓ [32mMixed unordered markers[0m
+     53. ✓ [32mList with blank line separation[0m
+     54. ✓ [32mList after heading[0m
+     55. ✓ [32mList before paragraph[0m
+     56. ✓ [32mNested unordered list (simple)[0m
+     57. ✓ [32mNested ordered list[0m
+  06-expressions-and-attributes:
+     58. ✓ [32mComplex member access expressions[0m
+     59. ✓ [32mFunction call expressions[0m
+     60. ✓ [32mObject and array expressions[0m
+     61. ✓ [32mBinary and unary expressions[0m
+     62. ✗ [31mTag with complex attribute expressions[0m
+  06-inline-formatting:
+     63. ✓ [32mEmphasis with asterisks[0m
+     64. ✓ [32mEmphasis with underscores[0m
+     65. ✓ [32mStrong with double asterisks[0m
+     66. ✓ [32mStrong with double underscores[0m
+     67. ✓ [32mMixed emphasis and strong[0m
+     68. ✓ [32mInline code[0m
+     69. ✓ [32mLink with text and URL[0m
+     70. ✓ [32mImage with alt text[0m
+     71. ✓ [32mMultiple inline elements[0m
+     72. ✓ [32mInline formatting in list[0m
+  07-html:
+     73. ✓ [32mHTML block - simple div[0m
+     74. ✓ [32mHTML block with attributes[0m
+     75. ✓ [32mSelf-closing HTML tag[0m
+     76. ✓ [32mHTML comment block[0m
+     77. ✓ [32mInline HTML in paragraph[0m
+     78. ✓ [32mMultiple inline HTML elements[0m
+     79. ✓ [32mHTML block before paragraph[0m
+     80. ✓ [32mHTML block after heading[0m
+     81. ✓ [32mInline HTML with self-closing tag[0m
+  07-tag-closing-and-whitespace:
+     82. ✓ [32mAlternative tag closing syntax (without slash)[0m
+     83. ✓ [32mTag with extra whitespace[0m
+     84. ✓ [32mNested list indentation[0m
+     85. ✗ [31mMixed list and tag indentation[0m
+     86. ✗ [31mTag with blank lines in content[0m
+     87. ✗ [31mIndented code block in tag[0m
+  08-expressions:
+     88. ✓ [32mSimple member expression[0m
+     89. ✓ [32mNested member expression[0m
+     90. ✓ [32mArray literal with numbers[0m
+     91. ✓ [32mArray literal with strings[0m
+     92. ✓ [32mObject literal simple[0m
+     93. ✓ [32mObject literal multiple pairs[0m
+     94. ✓ [32mCall expression simple[0m
+     95. ✓ [32mCall expression with arguments[0m
+     96. ✓ [32mMember call expression[0m
+     97. ✓ [32mNested expressions[0m
+  08-paragraphs-and-lists:
+     98. ✓ [32mBasic paragraphs[0m
+     99. ✓ [32mList with paragraphs[0m
+    100. ✓ [32mMixed blocks and lists[0m
+  09-newlines-and-blank-lines:
+    101. ✓ [32mSimple paragraph (no newlines)[0m
+    102. ✓ [32mMulti-line paragraph with line continuation[0m
+    103. ✓ [32mTwo paragraphs separated by blank line[0m
+    104. ✓ [32mList with items separated by newlines[0m
+    105. ✓ [32mCode block with newlines preserved[0m
+    106. ✓ [32mBlank line with only whitespace[0m
+  13-paragraph-punctuations:
+    107. ✓ [32mHyphens in paragraph[0m
+    108. ✗ [31mUnderscores in paragraph[0m
+    109. ✗ [31mAsterisks in paragraph[0m
+    110. ✗ [31mLeading punctuation in paragraph[0m
+    111. ✗ [31mEnd-of-word punctuation[0m
+    112. ✓ [32mEnd-of-line punctuation[0m
+    113. ✓ [32mHyphen within a word[0m
+
+10 failures:
+
+correct / [32mexpected[0m / [31munexpected[0m
+
+  1. Tag with heading inside:
+
+    (source_file
+[31m      (ERROR
+[0m[32m      (markdoc_tag
+[0m        (tag_open
+          (tag_name))
+        (heading
+          (heading_marker)
+          (heading_text))
+[31m        (identifier)
+[0m[31m        (UNEXPECTED 'h')))[0m
+[32m        (paragraph
+[0m[32m          (text))
+[0m[32m        (tag_close
+[0m[32m          (tag_name))))[0m
+
+
+  2. Mixed content with tags and expressions:
+
+    (source_file
+      (heading
+        (heading_marker)
+        (heading_text))
+      (markdoc_tag
+        (tag_open
+          (tag_name))
+        (paragraph
+[31m          (text))
+[0m[31m        (paragraph
+[0m[32m          (text)
+[0m          (inline_expression
+            (expression
+              (identifier))))
+        (tag_close
+          (tag_name)))
+      (paragraph
+        (text)
+        (inline_expression
+          (expression
+            (identifier)))
+        (text)))
+
+
+  3. Tag with complex attribute expressions:
+
+    (source_file
+[31m      (ERROR
+[0m[31m        (tag_name)
+[0m[31m        (attribute
+[0m[31m          (attribute_name)
+[0m[31m          (attribute_value
+[0m[31m            (expression
+[0m[31m              (array_literal
+[0m[31m                (expression
+[0m[31m                  (number))
+[0m[31m                (expression
+[0m[31m                  (number))
+[0m[31m                (expression
+[0m[31m                  (number))))))
+[0m[31m        (attribute
+[0m[31m          (attribute_name)
+[0m[31m          (attribute_value
+[0m[31m            (expression
+[0m[31m              (object_literal
+[0m[31m                (pair
+[0m[31m                  (identifier)
+[0m[32m      (markdoc_tag
+[0m[32m        (tag_open
+[0m[32m          (tag_name)
+[0m[32m          (attribute
+[0m[32m            (attribute_name)
+[0m[32m            (attribute_value
+[0m[32m              (expression
+[0m[32m                (array
+[0m[32m                  (expression
+[0m[32m                    (number))
+[0m                  (expression
+[31m                    (boolean)))
+[0m[31m                (pair
+[0m[31m                  (identifier)
+[0m[32m                    (number))
+[0m                  (expression
+[31m                    (member_expression
+[0m[31m                      (identifier)
+[0m[31m                      (identifier))))))))
+[0m[31m        (attribute
+[0m[31m          (attribute_name)
+[0m[31m          (ERROR)
+[0m[31m          (attribute_value
+[0m[31m            (expression
+[0m[31m              (arrow_function
+[0m[31m                (expression
+[0m[31m                  (call_expression
+[0m[32m                    (number))))))
+[0m[32m          (attribute
+[0m[32m            (attribute_name)
+[0m[32m            (attribute_value
+[0m[32m              (expression
+[0m[32m                (object
+[0m[32m                  (pair
+[0m                    (identifier)
+                    (expression
+[31m                      (identifier))))))))))[0m
+[32m                      (boolean)))
+[0m[32m                  (pair
+[0m[32m                    (identifier)
+[0m[32m                    (expression
+[0m[32m                      (member_expression
+[0m[32m                        (identifier)
+[0m[32m                        (identifier))))))))
+[0m[32m          (attribute
+[0m[32m            (attribute_name)
+[0m[32m            (attribute_value
+[0m[32m              (expression
+[0m[32m                (arrow_function
+[0m[32m                  (expression
+[0m[32m                    (call_expression
+[0m[32m                      (identifier)
+[0m[32m                      (expression
+[0m[32m                        (identifier)))))))))
+[0m[32m        (paragraph
+[0m[32m          (text))
+[0m[32m        (tag_close
+[0m[32m          (tag_name))))[0m
+
+
+  4. Mixed list and tag indentation:
+
+    (source_file
+      (list
+        (list_item
+[31m          (list_marker)
+[0m[31m          (list_paragraph
+[0m[31m            (text)
+[0m[31m            (text))))
+[0m[31m      (ERROR
+[0m[31m        (tag_name)))[0m
+[32m          (paragraph
+[0m[32m            (text))
+[0m[32m          (markdoc_tag
+[0m[32m            (tag_open
+[0m[32m              (tag_name))
+[0m[32m            (list
+[0m[32m              (list_item
+[0m[32m                (paragraph
+[0m[32m                  (text))
+[0m[32m                (list
+[0m[32m                  (list_item
+[0m[32m                    (paragraph
+[0m[32m                      (text))))))
+[0m[32m            (tag_close
+[0m[32m              (tag_name)))
+[0m[32m          (list
+[0m[32m            (list_item
+[0m[32m              (paragraph
+[0m[32m                (text)))))))[0m
+
+
+  5. Tag with blank lines in content:
+
+    (source_file
+[31m      (ERROR
+[0m[32m      (markdoc_tag
+[0m        (tag_open
+          (tag_name))
+        (paragraph
+          (text))
+        (paragraph
+          (text))
+[31m        (UNEXPECTED 's')))[0m
+[32m        (tag_close
+[0m[32m          (tag_name))))[0m
+
+
+  6. Indented code block in tag:
+
+    (source_file
+      (markdoc_tag
+        (tag_open
+          (tag_name))
+[31m        (paragraph
+[0m[31m          (text))
+[0m[31m        (paragraph
+[0m[31m          (text))
+[0m[31m        (paragraph
+[0m[31m          (text))
+[0m[32m        (code_block
+[0m[32m          (code))
+[0m        (tag_close
+          (tag_name))))
+
+
+  7. Underscores in paragraph:
+
+    (source_file
+      (paragraph
+        (text)
+[31m        (text))
+[0m[31m      (ERROR))[0m
+[32m        (text)
+[0m[32m        (text)))[0m
+
+
+  8. Asterisks in paragraph:
+
+    (source_file
+      (paragraph
+        (text)
+[31m        (text))
+[0m[31m      (ERROR))[0m
+[32m        (text)
+[0m[32m        (text)))[0m
+
+
+  9. Leading punctuation in paragraph:
+
+    (source_file
+      (paragraph
+        (text)
+        (text))
+      (paragraph
+[32m        (text)
+[0m        (text))
+[31m      (ERROR))[0m
+[32m      (paragraph
+[0m[32m        (text)
+[0m[32m        (text)))[0m
+
+
+  10. End-of-word punctuation:
+
+    (source_file
+      (paragraph
+        (text)
+        (text)
+        (text))
+      (paragraph
+        (text)
+[32m        (text)
+[0m        (text))
+[31m      (ERROR))[0m
+[32m      (paragraph
+[0m[32m        (text)
+[0m[32m        (text)
+[0m[32m        (text)))[0m
+
