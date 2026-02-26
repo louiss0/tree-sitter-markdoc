@@ -172,6 +172,10 @@ static bool scan_unordered_or_thematic(Scanner *s, TSLexer *lexer, const bool *v
     return false;
   }
 
+  if (!has_space) {
+    return false;
+  }
+
   if (marker == '-' && marker_count > 1) {
     return false;
   }
@@ -204,7 +208,7 @@ static bool scan_unordered_list_plus(TSLexer *lexer, const bool *valid_symbols, 
     lexer->advance(lexer, false);
   }
   bool has_content = lexer->lookahead != '\n' && lexer->lookahead != '\r' && lexer->lookahead != 0;
-  if (!has_space && !has_content) {
+  if (!has_space) {
     return false;
   }
 
@@ -250,7 +254,7 @@ static bool scan_ordered_list_marker(TSLexer *lexer, const bool *valid_symbols, 
     lexer->advance(lexer, false);
   }
   bool has_content = lexer->lookahead != '\n' && lexer->lookahead != '\r' && lexer->lookahead != 0;
-  if (!has_space && !has_content) {
+  if (!has_space) {
     return false;
   }
 
@@ -549,8 +553,55 @@ static bool is_markdoc_block_tag_line(TSLexer *lexer) {
     lexer->advance(lexer, false);
   }
 
+  bool is_else_tag = false;
+  if (lexer->lookahead == '/') {
+    lexer->advance(lexer, false);
+    while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+      lexer->advance(lexer, false);
+    }
+  }
+
+  if ((lexer->lookahead >= 'a' && lexer->lookahead <= 'z') ||
+      (lexer->lookahead >= 'A' && lexer->lookahead <= 'Z')) {
+    char name_buffer[5] = {0};
+    size_t name_length = 0;
+    while ((lexer->lookahead >= 'a' && lexer->lookahead <= 'z') ||
+           (lexer->lookahead >= 'A' && lexer->lookahead <= 'Z') ||
+           (lexer->lookahead >= '0' && lexer->lookahead <= '9') ||
+           lexer->lookahead == '_' || lexer->lookahead == '-') {
+      if (name_length + 1 < sizeof(name_buffer)) {
+        name_buffer[name_length++] = (char)lexer->lookahead;
+      }
+      lexer->advance(lexer, false);
+    }
+    if (name_length == 4 &&
+        name_buffer[0] == 'e' && name_buffer[1] == 'l' &&
+        name_buffer[2] == 's' && name_buffer[3] == 'e') {
+      is_else_tag = true;
+    }
+  }
+
   bool found_close = false;
+  bool is_self_closing = false;
   while (lexer->lookahead != 0 && !is_newline(lexer->lookahead)) {
+    if (lexer->lookahead == '/') {
+      TSLexer slash_state = *lexer;
+      lexer->advance(lexer, false);
+      if (lexer->lookahead == '%') {
+        lexer->advance(lexer, false);
+        if (lexer->lookahead == '}') {
+          lexer->advance(lexer, false);
+          while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+            lexer->advance(lexer, false);
+          }
+          found_close = true;
+          is_self_closing = true;
+          break;
+        }
+      }
+      *lexer = slash_state;
+    }
+
     if (lexer->lookahead == '%') {
       TSLexer percent_state = *lexer;
       lexer->advance(lexer, false);
@@ -569,6 +620,9 @@ static bool is_markdoc_block_tag_line(TSLexer *lexer) {
 
   bool ok = found_close && (lexer->lookahead == 0 || is_newline(lexer->lookahead));
   *lexer = saved_state;
+  if (is_self_closing && !is_else_tag) {
+    return false;
+  }
   return ok;
 }
 

@@ -7,11 +7,14 @@ Self-closing tag with id shorthand
 --------------------------------------------------------------------------------
 
 (source_file
-  (markdoc_tag
-    (tag_self_close
-      (tag_name)
-      (id_shorthand
-        (shorthand_id)))))
+  (paragraph
+    (inline_tag
+      (tag_self_close
+        (tag_open_delimiter)
+        (tag_name)
+        (id_shorthand
+          (shorthand_id))
+        (tag_self_close_delimiter)))))
 
 ================================================================================
 Self-closing tag with class shorthand
@@ -22,11 +25,14 @@ Self-closing tag with class shorthand
 --------------------------------------------------------------------------------
 
 (source_file
-  (markdoc_tag
-    (tag_self_close
-      (tag_name)
-      (class_shorthand
-        (shorthand_class)))))
+  (paragraph
+    (inline_tag
+      (tag_self_close
+        (tag_open_delimiter)
+        (tag_name)
+        (class_shorthand
+          (shorthand_class))
+        (tag_self_close_delimiter)))))
 
 ================================================================================
 Self-closing tag with id and class shorthands
@@ -37,13 +43,16 @@ Self-closing tag with id and class shorthands
 --------------------------------------------------------------------------------
 
 (source_file
-  (markdoc_tag
-    (tag_self_close
-      (tag_name)
-      (id_shorthand
-        (shorthand_id))
-      (class_shorthand
-        (shorthand_class)))))
+  (paragraph
+    (inline_tag
+      (tag_self_close
+        (tag_open_delimiter)
+        (tag_name)
+        (id_shorthand
+          (shorthand_id))
+        (class_shorthand
+          (shorthand_class))
+        (tag_self_close_delimiter)))))
 
 ================================================================================
 Block tag with id shorthand
@@ -58,13 +67,18 @@ Hello world
 (source_file
   (markdoc_tag
     (tag_open
+      (tag_open_delimiter)
       (tag_name)
       (id_shorthand
-        (shorthand_id)))
+        (shorthand_id))
+      (tag_block_close
+        (inline_expression_close)))
     (paragraph
       (text))
     (tag_close
-      (tag_name))))
+      (tag_open_delimiter)
+      (tag_name)
+      (inline_expression_close))))
 
 ================================================================================
 Block tag with class shorthand
@@ -79,13 +93,18 @@ Content here
 (source_file
   (markdoc_tag
     (tag_open
+      (tag_open_delimiter)
       (tag_name)
       (class_shorthand
-        (shorthand_class)))
+        (shorthand_class))
+      (tag_block_close
+        (inline_expression_close)))
     (paragraph
       (text))
     (tag_close
-      (tag_name))))
+      (tag_open_delimiter)
+      (tag_name)
+      (inline_expression_close))))
 
 ================================================================================
 Block tag with multiple class shorthands
@@ -100,17 +119,22 @@ Content here
 (source_file
   (markdoc_tag
     (tag_open
+      (tag_open_delimiter)
       (tag_name)
       (class_shorthand
         (shorthand_class))
       (class_shorthand
         (shorthand_class))
       (class_shorthand
-        (shorthand_class)))
+        (shorthand_class))
+      (tag_block_close
+        (inline_expression_close)))
     (paragraph
       (text))
     (tag_close
-      (tag_name))))
+      (tag_open_delimiter)
+      (tag_name)
+      (inline_expression_close))))
 
 ================================================================================
 Block tag with id, classes, and traditional attributes
@@ -125,6 +149,7 @@ Content here
 (source_file
   (markdoc_tag
     (tag_open
+      (tag_open_delimiter)
       (tag_name)
       (id_shorthand
         (shorthand_id))
@@ -133,11 +158,17 @@ Content here
       (attribute
         (attribute_name)
         (attribute_value
-          (string))))
+          (value_expression
+            (json_value
+              (string)))))
+      (tag_block_close
+        (inline_expression_close)))
     (paragraph
       (text))
     (tag_close
-      (tag_name))))
+      (tag_open_delimiter)
+      (tag_name)
+      (inline_expression_close))))
 
 ================================================================================
 Inline tag with shorthands
@@ -151,9 +182,12 @@ Hello {% image .inline-icon /%} world
   (paragraph
     (text)
     (inline_tag
-      (tag_name)
-      (class_shorthand
-        (shorthand_class)))
+      (tag_self_close
+        (tag_open_delimiter)
+        (tag_name)
+        (class_shorthand
+          (shorthand_class))
+        (tag_self_close_delimiter)))
     (text)))
 
 ================================================================================
@@ -169,17 +203,22 @@ Content
 (source_file
   (markdoc_tag
     (tag_open
+      (tag_open_delimiter)
       (tag_name)
       (id_shorthand
         (shorthand_id))
       (class_shorthand
         (shorthand_class))
       (class_shorthand
-        (shorthand_class)))
+        (shorthand_class))
+      (tag_block_close
+        (inline_expression_close)))
     (paragraph
       (text))
     (tag_close
-      (tag_name))))
+      (tag_open_delimiter)
+      (tag_name)
+      (inline_expression_close))))
 
 ================================================================================
 Shorthand with hyphenated identifiers
@@ -194,14 +233,19 @@ Content
 (source_file
   (markdoc_tag
     (tag_open
+      (tag_open_delimiter)
       (tag_name)
       (id_shorthand
         (shorthand_id))
       (class_shorthand
         (shorthand_class))
       (class_shorthand
-        (shorthand_class)))
+        (shorthand_class))
+      (tag_block_close
+        (inline_expression_close)))
     (paragraph
       (text))
     (tag_close
-      (tag_name))))
+      (tag_open_delimiter)
+      (tag_name)
+      (inline_expression_close))))

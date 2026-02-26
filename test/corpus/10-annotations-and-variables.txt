@@ -23,6 +23,32 @@ Text {% width value="25%" /%} more text.
     (text)))
 
 =============================================================================
+Inline annotation on its own line
+=============================================================================
+
+Line one
+{% width value="25%" /%}
+Line three
+
+-----------------------------------------------------------------------------
+
+(source_file
+  (paragraph
+    (text)
+    (inline_tag
+      (tag_self_close
+        (tag_open_delimiter)
+        (tag_name)
+        (attribute
+          (attribute_name)
+          (attribute_value
+            (value_expression
+              (json_value
+                (string)))))
+        (tag_self_close_delimiter)))
+    (text)))
+
+=============================================================================
 Inline variable tag
 =============================================================================
 
@@ -48,7 +74,7 @@ Hello {% $markdoc.frontmatter.title %}.
 Inline function tag
 =============================================================================
 
-Title {% titleCase($markdoc.frontmatter.title) %} here.
+Title {% $titleCase($markdoc.frontmatter.title) %} here.
 
 -----------------------------------------------------------------------------
 
@@ -57,8 +83,9 @@ Title {% titleCase($markdoc.frontmatter.title) %} here.
     (text)
     (inline_expression
       (tag_open_delimiter)
-      content: (call_expression
-        function: (identifier)
+      content: (inline_call_expression
+        function: (variable
+          (identifier))
         (value_expression
           (variable_value
             (variable_reference

@@ -60,7 +60,7 @@ Subscript variables in inline expressions
 Function calls in inline expressions
 =============================================================================
 
-{% formatDate($date) %}
+{% $formatDate($date) %}
 
 -----------------------------------------------------------------------------
 
@@ -68,8 +68,9 @@ Function calls in inline expressions
   (paragraph
     (inline_expression
       (tag_open_delimiter)
-      (call_expression
-        (identifier)
+      (inline_call_expression
+        (variable
+          (identifier))
         (value_expression
           (variable_value
             (variable_reference
@@ -86,29 +87,30 @@ Attribute values with literals
 -----------------------------------------------------------------------------
 
 (source_file
-  (markdoc_tag
-    (tag_self_close
-      (tag_open_delimiter)
-      (tag_name)
-      (attribute
-        (attribute_name)
-        (attribute_value
-          (value_expression
-            (json_value
-              (string)))))
-      (attribute
-        (attribute_name)
-        (attribute_value
-          (value_expression
-            (json_value
-              (number)))))
-      (attribute
-        (attribute_name)
-        (attribute_value
-          (value_expression
-            (json_value
-              (boolean)))))
-      (tag_self_close_delimiter))))
+  (paragraph
+    (inline_tag
+      (tag_self_close
+        (tag_open_delimiter)
+        (tag_name)
+        (attribute
+          (attribute_name)
+          (attribute_value
+            (value_expression
+              (json_value
+                (string)))))
+        (attribute
+          (attribute_name)
+          (attribute_value
+            (value_expression
+              (json_value
+                (number)))))
+        (attribute
+          (attribute_name)
+          (attribute_value
+            (value_expression
+              (json_value
+                (boolean)))))
+        (tag_self_close_delimiter)))))
 
 =============================================================================
 Attribute values with arrays and objects
@@ -119,31 +121,32 @@ Attribute values with arrays and objects
 -----------------------------------------------------------------------------
 
 (source_file
-  (markdoc_tag
-    (tag_self_close
-      (tag_open_delimiter)
-      (tag_name)
-      (attribute
-        (attribute_name)
-        (attribute_value
-          (value_expression
-            (json_value
-              (array_literal
-                (json_value
-                  (number))
-                (json_value
-                  (number)))))))
-      (attribute
-        (attribute_name)
-        (attribute_value
-          (value_expression
-            (json_value
-              (object_literal
-                (pair
-                  (identifier)
+  (paragraph
+    (inline_tag
+      (tag_self_close
+        (tag_open_delimiter)
+        (tag_name)
+        (attribute
+          (attribute_name)
+          (attribute_value
+            (value_expression
+              (json_value
+                (array_literal
                   (json_value
-                    (string))))))))
-      (tag_self_close_delimiter))))
+                    (number))
+                  (json_value
+                    (number)))))))
+        (attribute
+          (attribute_name)
+          (attribute_value
+            (value_expression
+              (json_value
+                (object_literal
+                  (pair
+                    (identifier)
+                    (json_value
+                      (string))))))))
+        (tag_self_close_delimiter)))))
 
 =============================================================================
 Attribute values with variables and functions
@@ -154,46 +157,47 @@ Attribute values with variables and functions
 -----------------------------------------------------------------------------
 
 (source_file
-  (markdoc_tag
-    (tag_self_close
-      (tag_open_delimiter)
-      (tag_name)
-      (attribute
-        (attribute_name)
-        (attribute_value
-          (value_expression
-            (variable_value
-              (variable_reference
-                (variable
-                  (identifier)))))))
-      (attribute
-        (attribute_name)
-        (attribute_value
-          (value_expression
-            (call_expression
-              (identifier)
-              (value_expression
-                (variable_value
-                  (variable_reference
-                    (variable
-                      (identifier)))))))))
-      (attribute
-        (attribute_name)
-        (attribute_value
-          (value_expression
-            (variable_value
-              (special_variable_reference
-                (special_variable
-                  (identifier)))))))
-      (attribute
-        (attribute_name)
-        (attribute_value
-          (value_expression
-            (variable_value
-              (subscript_reference
+  (paragraph
+    (inline_tag
+      (tag_self_close
+        (tag_open_delimiter)
+        (tag_name)
+        (attribute
+          (attribute_name)
+          (attribute_value
+            (value_expression
+              (variable_value
                 (variable_reference
                   (variable
-                    (identifier)))
-                (array_subscript
-                  (number)))))))
-      (tag_self_close_delimiter))))
+                    (identifier)))))))
+        (attribute
+          (attribute_name)
+          (attribute_value
+            (value_expression
+              (call_expression
+                (identifier)
+                (value_expression
+                  (variable_value
+                    (variable_reference
+                      (variable
+                        (identifier)))))))))
+        (attribute
+          (attribute_name)
+          (attribute_value
+            (value_expression
+              (variable_value
+                (special_variable_reference
+                  (special_variable
+                    (identifier)))))))
+        (attribute
+          (attribute_name)
+          (attribute_value
+            (value_expression
+              (variable_value
+                (subscript_reference
+                  (variable_reference
+                    (variable
+                      (identifier)))
+                  (array_subscript
+                    (number)))))))
+        (tag_self_close_delimiter)))))

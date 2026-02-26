@@ -63,13 +63,14 @@
 (unordered_list_marker) @markup.list
 (ordered_list_marker) @markup.list
 
-; List item annotations: {% type %} after list content
+; List item annotations: {% type=value %} after list content
 (list_item_annotation
-  "{%" @punctuation.bracket
-  "%}" @punctuation.bracket)
+  (tag_open_delimiter) @punctuation.bracket
+  (inline_expression_close) @punctuation.bracket)
 
-; Annotation type name (e.g., important, warning, note)
-(annotation_type) @tag.attribute
+; Annotation key/value (e.g., type=important)
+(annotation_name) @tag.attribute
+(annotation_value) @constant
 
 ; ============================================================================
 ; INLINE FORMATTING
@@ -138,11 +139,9 @@
 
 ; Table cell annotations: {% colspan=2 %}
 (markdoc_table_cell_annotation
-  "{%" @punctuation.bracket
   (annotation_name) @attribute
   "=" @operator
-  (annotation_value) @number
-  "%}" @punctuation.bracket)
+  (annotation_value) @constant)
 
 ; ============================================================================
 ; MARKDOC TAGS

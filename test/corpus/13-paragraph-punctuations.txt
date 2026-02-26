@@ -8,8 +8,6 @@ foo - bar
 
 (source_file
   (paragraph
-    (text)
-    (text)
     (text)))
 
 ===================
@@ -54,7 +52,6 @@ _foo bar
 
 (source_file
   (paragraph
-    (text)
     (text))
   (paragraph
     (text)
@@ -77,8 +74,6 @@ foo* bar
 
 (source_file
   (paragraph
-    (text)
-    (text)
     (text))
   (paragraph
     (text)
@@ -103,7 +98,6 @@ foo*
 
 (source_file
   (paragraph
-    (text)
     (text))
   (paragraph
     (text)
@@ -122,7 +116,4 @@ A well-known fact
 
 (source_file
   (paragraph
-    (text)
-    (text)
     (text)))
-

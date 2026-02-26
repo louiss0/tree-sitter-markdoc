@@ -88,7 +88,7 @@ Item {% $items[0] %} end.
 Function call with literal argument
 =======================================
 
-Value {% formatDate("2024-01-01") %} end.
+Value {% $formatDate("2024-01-01") %} end.
 
 ---
 
@@ -97,8 +97,9 @@ Value {% formatDate("2024-01-01") %} end.
     (text)
     (inline_expression
       (tag_open_delimiter)
-      (call_expression
-        (identifier)
+      (inline_call_expression
+        (variable
+          (identifier))
         (value_expression
           (json_value
             (string))))
@@ -109,7 +110,7 @@ Value {% formatDate("2024-01-01") %} end.
 Function call with variable argument
 =======================================
 
-Output {% titleCase($user.name) %} text.
+Output {% $titleCase($user.name) %} text.
 
 ---
 
@@ -118,8 +119,9 @@ Output {% titleCase($user.name) %} text.
     (text)
     (inline_expression
       (tag_open_delimiter)
-      (call_expression
-        (identifier)
+      (inline_call_expression
+        (variable
+          (identifier))
         (value_expression
           (variable_value
             (variable_reference

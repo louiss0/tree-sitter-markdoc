@@ -13,7 +13,8 @@ Content here
     (tag_open
       (tag_open_delimiter)
       (tag_name)
-      (tag_block_close))
+      (tag_block_close
+        (inline_expression_close)))
     (paragraph
       (text))
     (tag_close
@@ -36,7 +37,8 @@ Text with space
     (tag_open
       (tag_open_delimiter)
       (tag_name)
-      (tag_block_close))
+      (tag_block_close
+        (inline_expression_close)))
     (paragraph
       (text))
     (tag_close
@@ -88,7 +90,8 @@ Second paragraph with blank line between
     (tag_open
       (tag_open_delimiter)
       (tag_name)
-      (tag_block_close))
+      (tag_block_close
+        (inline_expression_close)))
     (paragraph
       (text))
     (paragraph

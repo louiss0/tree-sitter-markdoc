@@ -3,7 +3,8 @@ Simple if with block content
 ================================================================================
 
 {% if $user %}
-Hello, {% $user.name %}!
+Hello,
+{% $user.name %}!
 {% /if %}
 
 --------------------------------------------------------------------------------
@@ -11,26 +12,39 @@ Hello, {% $user.name %}!
 (source_file
   (if_tag
     (if_tag_open
-      (expression
-        (variable
-          (identifier))))
-    (paragraph
-      (text)
-      (inline_expression
-        (expression
-          (member_expression
+      (tag_open_delimiter)
+      (if_keyword)
+      (value_expression
+        (variable_value
+          (variable_reference
             (variable
-              (identifier))
-            (identifier))))
-      (text))
-    (if_tag_close)))
+              (identifier)))))
+      (tag_block_close
+        (inline_expression_close)))
+    (if_tag_body
+      (paragraph
+        (text)
+        (inline_expression
+          (tag_open_delimiter)
+          (variable_value
+            (variable_reference
+              (variable
+                (identifier))
+              (identifier)))
+          (inline_expression_close))
+        (text)))
+    (if_tag_close
+      (tag_open_delimiter)
+      (if_keyword)
+      (inline_expression_close))))
 
 ================================================================================
 If with else clause
 ================================================================================
 
 {% if $user %}
-Hello, {% $user.name %}!
+Hello,
+{% $user.name %}!
 {% else /%}
 Please sign in.
 {% /if %}
@@ -40,29 +54,46 @@ Please sign in.
 (source_file
   (if_tag
     (if_tag_open
-      (expression
-        (variable
-          (identifier))))
-    (paragraph
-      (text)
-      (inline_expression
-        (expression
-          (member_expression
+      (tag_open_delimiter)
+      (if_keyword)
+      (value_expression
+        (variable_value
+          (variable_reference
             (variable
-              (identifier))
-            (identifier))))
-      (text))
-    (else_tag)
-    (paragraph
-      (text))
-    (if_tag_close)))
+              (identifier)))))
+      (tag_block_close
+        (inline_expression_close)))
+    (if_tag_body
+      (paragraph
+        (text)
+        (inline_expression
+          (tag_open_delimiter)
+          (variable_value
+            (variable_reference
+              (variable
+                (identifier))
+              (identifier)))
+          (inline_expression_close))
+        (text))
+      (if_tag_else_clause
+        (else_tag
+          (tag_open_delimiter)
+          (else_keyword)
+          (tag_self_close_delimiter))
+        (paragraph
+          (text))))
+    (if_tag_close
+      (tag_open_delimiter)
+      (if_keyword)
+      (inline_expression_close))))
 
 ================================================================================
 If with else if clause (condition)
 ================================================================================
 
 {% if $user %}
-Hello, {% $user.name %}!
+Hello,
+{% $user.name %}!
 {% else equals($role, "guest") /%}
 Welcome guest!
 {% /if %}
@@ -72,37 +103,58 @@ Welcome guest!
 (source_file
   (if_tag
     (if_tag_open
-      (expression
-        (variable
-          (identifier))))
-    (paragraph
-      (text)
-      (inline_expression
-        (expression
-          (member_expression
+      (tag_open_delimiter)
+      (if_keyword)
+      (value_expression
+        (variable_value
+          (variable_reference
             (variable
-              (identifier))
-            (identifier))))
-      (text))
-    (else_tag
-      (expression
-        (call_expression
-          (identifier)
-          (expression
-            (variable
+              (identifier)))))
+      (tag_block_close
+        (inline_expression_close)))
+    (if_tag_body
+      (paragraph
+        (text)
+        (inline_expression
+          (tag_open_delimiter)
+          (variable_value
+            (variable_reference
+              (variable
+                (identifier))
               (identifier)))
-          (expression
-            (string)))))
-    (paragraph
-      (text))
-    (if_tag_close)))
+          (inline_expression_close))
+        (text))
+      (if_tag_else_clause
+        (else_tag
+          (tag_open_delimiter)
+          (else_keyword)
+          (value_expression
+            (call_expression
+              (identifier)
+              (value_expression
+                (variable_value
+                  (variable_reference
+                    (variable
+                      (identifier)))))
+              (value_expression
+                (json_value
+                  (string)))))
+          (tag_self_close_delimiter))
+        (paragraph
+          (text)
+          (text))))
+    (if_tag_close
+      (tag_open_delimiter)
+      (if_keyword)
+      (inline_expression_close))))
 
 ================================================================================
 If with multiple else clauses
 ================================================================================
 
 {% if $user %}
-Hello, {% $user.name %}!
+Hello,
+{% $user.name %}!
 {% else equals($role, "guest") /%}
 Welcome guest!
 {% else /%}
@@ -114,33 +166,57 @@ Please sign in.
 (source_file
   (if_tag
     (if_tag_open
-      (expression
-        (variable
-          (identifier))))
-    (paragraph
-      (text)
-      (inline_expression
-        (expression
-          (member_expression
+      (tag_open_delimiter)
+      (if_keyword)
+      (value_expression
+        (variable_value
+          (variable_reference
             (variable
-              (identifier))
-            (identifier))))
-      (text))
-    (else_tag
-      (expression
-        (call_expression
-          (identifier)
-          (expression
-            (variable
+              (identifier)))))
+      (tag_block_close
+        (inline_expression_close)))
+    (if_tag_body
+      (paragraph
+        (text)
+        (inline_expression
+          (tag_open_delimiter)
+          (variable_value
+            (variable_reference
+              (variable
+                (identifier))
               (identifier)))
-          (expression
-            (string)))))
-    (paragraph
-      (text))
-    (else_tag)
-    (paragraph
-      (text))
-    (if_tag_close)))
+          (inline_expression_close))
+        (text))
+      (if_tag_else_clause
+        (else_tag
+          (tag_open_delimiter)
+          (else_keyword)
+          (value_expression
+            (call_expression
+              (identifier)
+              (value_expression
+                (variable_value
+                  (variable_reference
+                    (variable
+                      (identifier)))))
+              (value_expression
+                (json_value
+                  (string)))))
+          (tag_self_close_delimiter))
+        (paragraph
+          (text)
+          (text))
+        (paragraph
+          (inline_tag
+            (tag_self_close
+              (tag_open_delimiter)
+              (tag_name)
+              (tag_self_close_delimiter)))
+          (text))))
+    (if_tag_close
+      (tag_open_delimiter)
+      (if_keyword)
+      (inline_expression_close))))
 
 ================================================================================
 If with nested content blocks
@@ -160,21 +236,31 @@ Some paragraph content here.
 (source_file
   (if_tag
     (if_tag_open
-      (expression
-        (variable
-          (identifier))))
-    (heading
-      (heading_marker)
-      (heading_text))
-    (paragraph
-      (text))
-    (list
-      (list_item
-        (list_marker)
-        (list_paragraph
-          (text)))
-      (list_item
-        (list_marker)
-        (list_paragraph
-          (text))))
-    (if_tag_close)))
+      (tag_open_delimiter)
+      (if_keyword)
+      (value_expression
+        (variable_value
+          (variable_reference
+            (variable
+              (identifier)))))
+      (tag_block_close
+        (inline_expression_close)))
+    (if_tag_body
+      (heading
+        (heading_marker)
+        (heading_text))
+      (paragraph
+        (text))
+      (unordered_list
+        (unordered_list_item
+          (unordered_list_marker)
+          (list_paragraph
+            (text)))
+        (unordered_list_item
+          (unordered_list_marker)
+          (list_paragraph
+            (text)))))
+    (if_tag_close
+      (tag_open_delimiter)
+      (if_keyword)
+      (inline_expression_close))))

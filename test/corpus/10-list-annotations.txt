@@ -2,26 +2,31 @@
 Unordered list with simple annotation
 =======================================
 
-- Item one {% important %}
+- Item one {% type=important %}
 - Item two
 - Item three
 
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
-        (text))
-      (list_item_annotation
-        (annotation_type)))
-    (list_item
-      (list_marker)
+        (text)
+        (list_item_annotation
+          (tag_open_delimiter)
+          (annotation_name
+            (tag_identifier))
+          (annotation_value
+            (identifier))
+          (inline_expression_close))))
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))
-    (list_item
-      (list_marker)
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))))
 
@@ -29,26 +34,31 @@ Unordered list with simple annotation
 Ordered list with simple annotation
 =======================================
 
-1. First item {% note %}
+1. First item {% type=note %}
 2. Second item
 3. Third item
 
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (ordered_list
+    (ordered_list_item
+      (ordered_list_marker)
       (list_paragraph
-        (text))
-      (list_item_annotation
-        (annotation_type)))
-    (list_item
-      (list_marker)
+        (text)
+        (list_item_annotation
+          (tag_open_delimiter)
+          (annotation_name
+            (tag_identifier))
+          (annotation_value
+            (identifier))
+          (inline_expression_close))))
+    (ordered_list_item
+      (ordered_list_marker)
       (list_paragraph
         (text)))
-    (list_item
-      (list_marker)
+    (ordered_list_item
+      (ordered_list_marker)
       (list_paragraph
         (text)))))
 
@@ -56,52 +66,72 @@ Ordered list with simple annotation
 List with multiple annotations
 =======================================
 
-- Item one {% important %}
-- Item two {% warning %}
-- Item three {% info %}
+- Item one {% type=important %}
+- Item two {% type=warning %}
+- Item three {% type=info %}
 
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
-        (text))
-      (list_item_annotation
-        (annotation_type)))
-    (list_item
-      (list_marker)
+        (text)
+        (list_item_annotation
+          (tag_open_delimiter)
+          (annotation_name
+            (tag_identifier))
+          (annotation_value
+            (identifier))
+          (inline_expression_close))))
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
-        (text))
-      (list_item_annotation
-        (annotation_type)))
-    (list_item
-      (list_marker)
+        (text)
+        (list_item_annotation
+          (tag_open_delimiter)
+          (annotation_name
+            (tag_identifier))
+          (annotation_value
+            (identifier))
+          (inline_expression_close))))
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
-        (text))
-      (list_item_annotation
-        (annotation_type)))))
+        (text)
+        (list_item_annotation
+          (tag_open_delimiter)
+          (annotation_name
+            (tag_identifier))
+          (annotation_value
+            (identifier))
+          (inline_expression_close))))))
 
 =======================================
 List with multiple words and annotation
 =======================================
 
-- This is important content {% highlight %}
+- This is important content {% type=highlight %}
 - Normal item
 
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
-        (text))
-      (list_item_annotation
-        (annotation_type)))
-    (list_item
-      (list_marker)
+        (text)
+        (list_item_annotation
+          (tag_open_delimiter)
+          (annotation_name
+            (tag_identifier))
+          (annotation_value
+            (identifier))
+          (inline_expression_close))))
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))))
 
@@ -109,61 +139,83 @@ List with multiple words and annotation
 Nested list with annotations
 =======================================
 
-- Parent item {% important %}
-- Child item {% note %}
+- Parent item {% type=important %}
+- Child item {% type=note %}
 - Another child
-- Another parent {% warning %}
+- Another parent {% type=warning %}
 
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
-        (text))
-      (list_item_annotation
-        (annotation_type)))
-    (list_item
-      (list_marker)
+        (text)
+        (list_item_annotation
+          (tag_open_delimiter)
+          (annotation_name
+            (tag_identifier))
+          (annotation_value
+            (identifier))
+          (inline_expression_close))))
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
-        (text))
-      (list_item_annotation
-        (annotation_type)))
-    (list_item
-      (list_marker)
+        (text)
+        (list_item_annotation
+          (tag_open_delimiter)
+          (annotation_name
+            (tag_identifier))
+          (annotation_value
+            (identifier))
+          (inline_expression_close))))
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))
-    (list_item
-      (list_marker)
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
-        (text))
-      (list_item_annotation
-        (annotation_type)))))
+        (text)
+        (list_item_annotation
+          (tag_open_delimiter)
+          (annotation_name
+            (tag_identifier))
+          (annotation_value
+            (identifier))
+          (inline_expression_close))))))
 
 =======================================
 List item annotation with attributes
 =======================================
 
-- Item one {% custom type="primary" %}
+- Item one {% type=custom type="primary" %}
 - Item two
 
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
-        (text))
-      (list_item_annotation
-        (annotation_type)
-        (attribute
-          (attribute_name)
-          (attribute_value
-            (string)))))
-    (list_item
-      (list_marker)
+        (text)
+        (list_item_annotation
+          (tag_open_delimiter)
+          (annotation_name
+            (tag_identifier))
+          (annotation_value
+            (identifier))
+          (attribute
+            (attribute_name)
+            (attribute_value
+              (value_expression
+                (json_value
+                  (string)))))
+          (inline_expression_close))))
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))))
 
@@ -171,27 +223,34 @@ List item annotation with attributes
 List annotation with expression attribute
 =======================================
 
-- Item one {% tag value=$variable %}
+- Item one {% type=tag value=$variable %}
 - Item two
 
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
-        (text))
-      (list_item_annotation
-        (annotation_type)
-        (attribute
-          (attribute_name)
-          (attribute_value
-            (expression
-              (variable
-                (identifier)))))))
-    (list_item
-      (list_marker)
+        (text)
+        (list_item_annotation
+          (tag_open_delimiter)
+          (annotation_name
+            (tag_identifier))
+          (annotation_value
+            (identifier))
+          (attribute
+            (attribute_name)
+            (attribute_value
+              (value_expression
+                (variable_value
+                  (variable_reference
+                    (variable
+                      (identifier)))))))
+          (inline_expression_close))))
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))))
 
@@ -199,52 +258,72 @@ List annotation with expression attribute
 Ordered list with all items annotated
 =======================================
 
-1. First {% important %}
-2. Second {% important %}
-3. Third {% important %}
+1. First {% type=important %}
+2. Second {% type=important %}
+3. Third {% type=important %}
 
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (ordered_list
+    (ordered_list_item
+      (ordered_list_marker)
       (list_paragraph
-        (text))
-      (list_item_annotation
-        (annotation_type)))
-    (list_item
-      (list_marker)
+        (text)
+        (list_item_annotation
+          (tag_open_delimiter)
+          (annotation_name
+            (tag_identifier))
+          (annotation_value
+            (identifier))
+          (inline_expression_close))))
+    (ordered_list_item
+      (ordered_list_marker)
       (list_paragraph
-        (text))
-      (list_item_annotation
-        (annotation_type)))
-    (list_item
-      (list_marker)
+        (text)
+        (list_item_annotation
+          (tag_open_delimiter)
+          (annotation_name
+            (tag_identifier))
+          (annotation_value
+            (identifier))
+          (inline_expression_close))))
+    (ordered_list_item
+      (ordered_list_marker)
       (list_paragraph
-        (text))
-      (list_item_annotation
-        (annotation_type)))))
+        (text)
+        (list_item_annotation
+          (tag_open_delimiter)
+          (annotation_name
+            (tag_identifier))
+          (annotation_value
+            (identifier))
+          (inline_expression_close))))))
 
 =======================================
 List with simple text and annotation
 =======================================
 
-- Simple text item {% highlight %}
+- Simple text item {% type=highlight %}
 - Normal item
 
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
-        (text))
-      (list_item_annotation
-        (annotation_type)))
-    (list_item
-      (list_marker)
+        (text)
+        (list_item_annotation
+          (tag_open_delimiter)
+          (annotation_name
+            (tag_identifier))
+          (annotation_value
+            (identifier))
+          (inline_expression_close))))
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))))
 
@@ -252,21 +331,26 @@ List with simple text and annotation
 List with text and another word annotation
 =======================================
 
-- Item content here {% info %}
+- Item content here {% type=info %}
 - Normal item
 
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
-        (text))
-      (list_item_annotation
-        (annotation_type)))
-    (list_item
-      (list_marker)
+        (text)
+        (list_item_annotation
+          (tag_open_delimiter)
+          (annotation_name
+            (tag_identifier))
+          (annotation_value
+            (identifier))
+          (inline_expression_close))))
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))))
 
@@ -274,32 +358,42 @@ List with text and another word annotation
 Mixed list with and without annotations
 =======================================
 
-- Item one {% important %}
+- Item one {% type=important %}
 - Item two
-- Item three {% warning %}
+- Item three {% type=warning %}
 - Item four
 
 ---
 
 (source_file
-  (list
-    (list_item
-      (list_marker)
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
-        (text))
-      (list_item_annotation
-        (annotation_type)))
-    (list_item
-      (list_marker)
+        (text)
+        (list_item_annotation
+          (tag_open_delimiter)
+          (annotation_name
+            (tag_identifier))
+          (annotation_value
+            (identifier))
+          (inline_expression_close))))
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))
-    (list_item
-      (list_marker)
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
-        (text))
-      (list_item_annotation
-        (annotation_type)))
-    (list_item
-      (list_marker)
+        (text)
+        (list_item_annotation
+          (tag_open_delimiter)
+          (annotation_name
+            (tag_identifier))
+          (annotation_value
+            (identifier))
+          (inline_expression_close))))
+    (unordered_list_item
+      (unordered_list_marker)
       (list_paragraph
         (text)))))

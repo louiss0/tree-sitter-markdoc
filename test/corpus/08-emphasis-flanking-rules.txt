@@ -247,13 +247,9 @@ Emphasis at start of line
 ---
 
 (source_file
-  (unordered_list
-    (unordered_list_item
-      (unordered_list_marker)
-      (list_paragraph
-        (text)
-        (text)
-        (text)))))
+  (paragraph
+    (emphasis)
+    (text)))
 
 =======================================
 Emphasis at end of line
@@ -339,15 +335,11 @@ Multiple emphasis runs in single line
 ---
 
 (source_file
-  (unordered_list
-    (unordered_list_item
-      (unordered_list_marker)
-      (list_paragraph
-        (text)
-        (text)
-        (text)
-        (emphasis)
-        (text)))))
+  (paragraph
+    (emphasis)
+    (text)
+    (emphasis)
+    (text)))
 
 =======================================
 Strong with emphasis nested inside
