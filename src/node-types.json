@@ -1,5 +1,59 @@
 [
   {
+    "type": "annotation",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "annotation_block",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "annotation_block",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "annotation_name",
+          "named": true
+        },
+        {
+          "type": "annotation_value",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "class_shorthand",
+          "named": true
+        },
+        {
+          "type": "id_shorthand",
+          "named": true
+        },
+        {
+          "type": "inline_expression_close",
+          "named": true
+        },
+        {
+          "type": "inline_expression_open",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "annotation_name",
     "named": true,
     "fields": {},
@@ -99,6 +153,70 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "blockquote",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "blockquote_item",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "blockquote_content",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "list_paragraph",
+          "named": true
+        },
+        {
+          "type": "tag_end",
+          "named": true
+        },
+        {
+          "type": "tag_open_block",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "blockquote_item",
+    "named": true,
+    "fields": {
+      "content": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "blockquote_content",
+            "named": true
+          }
+        ]
+      },
+      "marker": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "blockquote_marker",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -289,6 +407,57 @@
           }
         ]
       }
+    }
+  },
+  {
+    "type": "heading_text",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "annotation",
+          "named": true
+        },
+        {
+          "type": "emphasis",
+          "named": true
+        },
+        {
+          "type": "html_inline",
+          "named": true
+        },
+        {
+          "type": "image",
+          "named": true
+        },
+        {
+          "type": "inline_code",
+          "named": true
+        },
+        {
+          "type": "inline_expression",
+          "named": true
+        },
+        {
+          "type": "inline_tag",
+          "named": true
+        },
+        {
+          "type": "link",
+          "named": true
+        },
+        {
+          "type": "strong",
+          "named": true
+        },
+        {
+          "type": "text",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -721,37 +890,6 @@
     }
   },
   {
-    "type": "list_item_annotation",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "annotation_name",
-          "named": true
-        },
-        {
-          "type": "annotation_value",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "inline_expression_close",
-          "named": true
-        },
-        {
-          "type": "inline_expression_open",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "list_item_continuation",
     "named": true,
     "fields": {
@@ -817,6 +955,10 @@
       "required": true,
       "types": [
         {
+          "type": "annotation",
+          "named": true
+        },
+        {
           "type": "emphasis",
           "named": true
         },
@@ -842,10 +984,6 @@
         },
         {
           "type": "link",
-          "named": true
-        },
-        {
-          "type": "list_item_annotation",
           "named": true
         },
         {
@@ -917,33 +1055,6 @@
     }
   },
   {
-    "type": "markdoc_table_cell_annotation",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "annotation_name",
-          "named": true
-        },
-        {
-          "type": "annotation_value",
-          "named": true
-        },
-        {
-          "type": "inline_expression_close",
-          "named": true
-        },
-        {
-          "type": "inline_expression_open",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "markdoc_table_cell_content",
     "named": true,
     "fields": {},
@@ -951,10 +1062,6 @@
       "multiple": true,
       "required": true,
       "types": [
-        {
-          "type": "markdoc_table_cell_annotation",
-          "named": true
-        },
         {
           "type": "markdoc_table_cell_item",
           "named": true
@@ -970,6 +1077,10 @@
       "multiple": false,
       "required": true,
       "types": [
+        {
+          "type": "annotation",
+          "named": true
+        },
         {
           "type": "emphasis",
           "named": true
@@ -1348,10 +1459,6 @@
         },
         {
           "type": "link",
-          "named": true
-        },
-        {
-          "type": "list_item_annotation",
           "named": true
         },
         {
@@ -1840,7 +1947,7 @@
     "named": true
   },
   {
-    "type": "blockquote",
+    "type": "blockquote_marker",
     "named": true
   },
   {
@@ -1861,10 +1968,6 @@
   },
   {
     "type": "heading_marker",
-    "named": true
-  },
-  {
-    "type": "heading_text",
     "named": true
   },
   {

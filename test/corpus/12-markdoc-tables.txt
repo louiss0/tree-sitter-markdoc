@@ -48,6 +48,70 @@ Simple Markdoc table with header and one row
       (inline_expression_close))))
 
 ================================================================================
+Markdoc table with list-style rows
+================================================================================
+
+{% table %}
+* Heading 1
+* Heading 2
+---
+* Row 1 Cell 1
+* Row 1 Cell 2
+---
+* Row 2 Cell 1
+* Row 2 cell 2
+{% /table %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_table
+    (markdoc_table_open
+      (tag_open)
+      (tag_name)
+      (tag_close
+        (inline_expression_close)))
+    (markdoc_table_header
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (markdoc_table_cell_item
+            (text))))
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (markdoc_table_cell_item
+            (text)))))
+    (markdoc_table_separator)
+    (markdoc_table_row
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (markdoc_table_cell_item
+            (text))))
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (markdoc_table_cell_item
+            (text)))))
+    (markdoc_table_separator)
+    (markdoc_table_row
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (markdoc_table_cell_item
+            (text))))
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (markdoc_table_cell_item
+            (text)))))
+    (markdoc_table_close
+      (tag_open)
+      (tag_name)
+      (inline_expression_close))))
+
+================================================================================
 Markdoc table with multiple rows
 ================================================================================
 
@@ -210,15 +274,17 @@ Markdoc table with cell annotations
         (markdoc_table_cell_content
           (markdoc_table_cell_item
             (text))
-          (markdoc_table_cell_annotation
-            (inline_expression_open)
-            (annotation_name
-              (tag_identifier))
-            (annotation_value
-              (value_expression
-                (json_value
-                  (number))))
-            (inline_expression_close)))))
+          (markdoc_table_cell_item
+            (annotation
+              (annotation_block
+                (inline_expression_open)
+                (annotation_name
+                  (tag_identifier))
+                (annotation_value
+                  (value_expression
+                    (json_value
+                      (number))))
+                (inline_expression_close)))))))
     (markdoc_table_close
       (tag_open)
       (tag_name)

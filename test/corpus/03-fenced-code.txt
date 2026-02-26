@@ -563,7 +563,8 @@ echo "test"
     (code_fence_close))
   (heading
     (heading_marker)
-    (heading_text)))
+    (heading_text
+      (text))))
 
 ================================================================================
 Code block with paragraph after

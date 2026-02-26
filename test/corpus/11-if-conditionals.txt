@@ -244,7 +244,8 @@ Some paragraph content here.
     (if_tag_body
       (heading
         (heading_marker)
-        (heading_text))
+        (heading_text
+          (text)))
       (paragraph
         (text))
       (unordered_list

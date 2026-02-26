@@ -44,7 +44,7 @@ module.exports = grammar({
       [$.if_tag_body, $.if_tag_else_clause],
       [$.if_tag_close, $.inline_tag],
       [$.if_tag_close, $.paragraph],
-      [$.inline_tag, $.list_item_annotation],
+      [$.inline_tag, $.annotation],
       [$.inline_tag, $.annotation_name],
       [$._inline_expression_line],
     [$.list_paragraph],
@@ -98,13 +98,30 @@ module.exports = grammar({
       ),
 
     heading_marker: ($) => token(prec(3, /#{1,6}[ \t]/)), // Require space/tab after #
-    heading_text: ($) => token(prec(1, /[^\r\n]+/)),
+    heading_text: ($) =>
+      seq($._inline_line_start_with_annotation, repeat($._inline_content_with_annotation)),
 
     // Thematic break (horizontal rule)
     thematic_break: ($) => prec.dynamic(1, $._THEMATIC_BREAK),
 
-    // Blockquote (consume consecutive > lines as a single block)
-    blockquote: ($) => token(prec(2, />[^\r\n]*(\r?\n>[^\r\n]*)*\r?\n?/)),
+    blockquote: ($) =>
+      prec.right(
+        seq(
+          $.blockquote_item,
+          repeat(seq($._NEWLINE, $.blockquote_item)),
+          optional($._NEWLINE),
+        ),
+      ),
+
+    blockquote_item: ($) =>
+      prec.right(
+        seq(field("marker", $.blockquote_marker), optional(field("content", $.blockquote_content))),
+      ),
+
+    blockquote_content: ($) => choice($.tag_open_block, $.tag_end, $.list_paragraph),
+
+    blockquote_marker: ($) => token(prec(2, />[ \t]*/)),
+
 
     fenced_code_block: ($) =>
       seq(
@@ -247,13 +264,13 @@ module.exports = grammar({
         $._NEWLINE,
       ),
 
-    markdoc_table_cell_content: ($) =>
-      seq(repeat1($.markdoc_table_cell_item), optional($.markdoc_table_cell_annotation)),
+    markdoc_table_cell_content: ($) => repeat1($.markdoc_table_cell_item),
 
     markdoc_table_cell_item: ($) =>
       choice(
         $.inline_expression,
         $.inline_tag,
+        $.annotation,
         $.text,
         $.html_inline,
         $.link,
@@ -262,16 +279,6 @@ module.exports = grammar({
         $.inline_code,
         $.image,
         alias($.standalone_punct, $.text),
-      ),
-
-    markdoc_table_cell_annotation: ($) =>
-      seq(
-        $.inline_expression_open,
-        optional(WS),
-        $.annotation_name,
-        "=",
-        $.annotation_value,
-        $.inline_expression_close,
       ),
 
     tag_open_block: ($) =>
@@ -556,18 +563,25 @@ module.exports = grammar({
         ),
       ),
 
-    list_item_annotation: ($) =>
-      prec(
-        1,
-        seq(
-          $.inline_expression_open,
-          optional(WS),
-          $.annotation_name,
-          "=",
-          $.annotation_value,
-          repeat(seq(WS1, $.attribute)),
-          $.inline_expression_close,
+    annotation: ($) => prec(1, $.annotation_block),
+
+    annotation_block: ($) =>
+      seq(
+        $.inline_expression_open,
+        optional(WS),
+        choice(
+          seq(
+            $.annotation_name,
+            "=",
+            $.annotation_value,
+            repeat(seq(WS1, $.attribute)),
+          ),
+          seq(
+            choice($.id_shorthand, $.class_shorthand),
+            repeat(seq(optional(WS1), choice($.id_shorthand, $.class_shorthand))),
+          ),
         ),
+        $.inline_expression_close,
       ),
 
     list_marker: ($) => $._UNORDERED_LIST_MARKER,
@@ -624,14 +638,17 @@ module.exports = grammar({
       prec.right(
         1,
         seq(
-          $._inline_line_start,
-          repeat($._inline_content),
+          $._inline_line_start_with_annotation,
+          repeat($._inline_content_with_annotation),
           repeat(
             seq(
               $._LIST_CONTINUATION,
               choice(
-                $._inline_expression_line,
-                seq($._inline_line_start_no_expression, repeat($._inline_content)),
+                $._inline_expression_line_with_annotation,
+                seq(
+                  $._inline_line_start_no_expression_with_annotation,
+                  repeat($._inline_content_with_annotation),
+                ),
               ),
             ),
           ),
@@ -681,7 +698,19 @@ module.exports = grammar({
       choice(
         $.inline_expression,
         $.inline_tag,
-        $.list_item_annotation,
+        $.text,
+        $.html_inline,
+        $.link,
+        $.emphasis,
+        $.strong,
+        $.inline_code,
+      ),
+
+    _inline_first_with_annotation: ($) =>
+      choice(
+        $.inline_expression,
+        $.inline_tag,
+        $.annotation,
         $.text,
         $.html_inline,
         $.link,
@@ -694,6 +723,21 @@ module.exports = grammar({
       choice(
         $.inline_expression,
         $.inline_tag,
+        $.text,
+        $.html_inline,
+        $.link,
+        $.emphasis,
+        $.strong,
+        $.inline_code,
+        $.image,
+        alias($.standalone_punct, $.text),
+      ),
+
+    _inline_line_start_with_annotation: ($) =>
+      choice(
+        $.inline_expression,
+        $.inline_tag,
+        $.annotation,
         $.text,
         $.html_inline,
         $.link,
@@ -717,10 +761,30 @@ module.exports = grammar({
         alias($.standalone_punct, $.text),
       ),
 
+    _inline_line_start_no_expression_with_annotation: ($) =>
+      choice(
+        $.inline_tag,
+        $.annotation,
+        $.text,
+        $.html_inline,
+        $.link,
+        $.emphasis,
+        $.strong,
+        $.inline_code,
+        $.image,
+        alias($.standalone_punct, $.text),
+      ),
+
     _inline_expression_line: ($) => seq($.inline_expression, repeat1($._inline_content)),
+
+    _inline_expression_line_with_annotation: ($) =>
+      seq($.inline_expression, repeat1($._inline_content_with_annotation)),
 
     // Inline content after first element
     _inline_content: ($) => choice($._inline_first, $.image, alias($.standalone_punct, $.text)),
+
+    _inline_content_with_annotation: ($) =>
+      choice($._inline_first_with_annotation, $.image, alias($.standalone_punct, $.text)),
 
     text: ($) => token(prec(1, /[^\r\n{\[<!`*_]+/)),
 

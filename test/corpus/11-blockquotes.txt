@@ -7,7 +7,12 @@ Simple blockquote
 ---
 
 (source_file
-  (blockquote))
+  (blockquote
+    (blockquote_item
+      (blockquote_marker)
+      (blockquote_content
+        (list_paragraph
+          (text))))))
 
 =======================================
 Blockquote with nested tag
@@ -20,4 +25,24 @@ Blockquote with nested tag
 ---
 
 (source_file
-  (blockquote))
+  (blockquote
+    (blockquote_item
+      (blockquote_marker)
+      (blockquote_content
+        (tag_open_block
+          (tag_open)
+          (tag_name)
+          (tag_close
+            (inline_expression_close)))))
+    (blockquote_item
+      (blockquote_marker)
+      (blockquote_content
+        (list_paragraph
+          (text))))
+    (blockquote_item
+      (blockquote_marker)
+      (blockquote_content
+        (tag_end
+          (tag_open)
+          (tag_name)
+          (inline_expression_close))))))

@@ -298,7 +298,8 @@ Content here
         (inline_expression_close)))
     (heading
       (heading_marker)
-      (heading_text))
+      (heading_text
+        (text)))
     (paragraph
       (text))
     (tag_end
@@ -353,7 +354,8 @@ Regular {% $text %} here.
 (source_file
   (heading
     (heading_marker)
-    (heading_text))
+    (heading_text
+      (text)))
   (markdoc_tag
     (tag_open_block
       (tag_open)

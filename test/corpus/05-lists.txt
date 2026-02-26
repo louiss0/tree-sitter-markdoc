@@ -109,7 +109,8 @@ List after heading
 (source_file
   (heading
     (heading_marker)
-    (heading_text))
+    (heading_text
+      (text)))
   (unordered_list
     (unordered_list_item
       (unordered_list_marker)

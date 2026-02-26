@@ -106,7 +106,8 @@ Some content
 (source_file
   (heading
     (heading_marker)
-    (heading_text))
+    (heading_text
+      (text)))
   (html_block))
 
 =======================================

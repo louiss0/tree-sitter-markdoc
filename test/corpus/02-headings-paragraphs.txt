@@ -9,7 +9,8 @@ ATX heading level 1
 (source_file
   (heading
     (heading_marker)
-    (heading_text)))
+    (heading_text
+      (text))))
 
 ================================================================================
 ATX heading level 2
@@ -22,7 +23,8 @@ ATX heading level 2
 (source_file
   (heading
     (heading_marker)
-    (heading_text)))
+    (heading_text
+      (text))))
 
 ================================================================================
 ATX heading level 3
@@ -35,7 +37,8 @@ ATX heading level 3
 (source_file
   (heading
     (heading_marker)
-    (heading_text)))
+    (heading_text
+      (text))))
 
 ================================================================================
 ATX heading levels 4-6
@@ -52,13 +55,16 @@ ATX heading levels 4-6
 (source_file
   (heading
     (heading_marker)
-    (heading_text))
+    (heading_text
+      (text)))
   (heading
     (heading_marker)
-    (heading_text))
+    (heading_text
+      (text)))
   (heading
     (heading_marker)
-    (heading_text)))
+    (heading_text
+      (text))))
 
 ================================================================================
 Heading with trailing space
@@ -71,7 +77,8 @@ Heading with trailing space
 (source_file
   (heading
     (heading_marker)
-    (heading_text)))
+    (heading_text
+      (text))))
 
 ================================================================================
 Heading without space after marker (invalid)
@@ -167,9 +174,34 @@ Paragraph below heading.
 (source_file
   (heading
     (heading_marker)
-    (heading_text))
+    (heading_text
+      (text)))
   (paragraph
     (text)))
+
+================================================================================
+Heading with annotation
+================================================================================
+
+# foo {% width='200%' %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (heading
+    (heading_marker)
+    (heading_text
+      (text)
+      (annotation
+        (annotation_block
+          (inline_expression_open)
+          (annotation_name
+            (tag_identifier))
+          (annotation_value
+            (value_expression
+              (json_value
+                (string))))
+          (inline_expression_close))))))
 
 ================================================================================
 Mixed headings and paragraphs
@@ -196,22 +228,26 @@ Final paragraph.
 (source_file
   (heading
     (heading_marker)
-    (heading_text))
+    (heading_text
+      (text)))
   (paragraph
     (text))
   (heading
     (heading_marker)
-    (heading_text))
+    (heading_text
+      (text)))
   (paragraph
     (text))
   (heading
     (heading_marker)
-    (heading_text))
+    (heading_text
+      (text)))
   (paragraph
     (text))
   (heading
     (heading_marker)
-    (heading_text))
+    (heading_text
+      (text)))
   (paragraph
     (text)))
 
@@ -233,6 +269,7 @@ Content here.
     (yaml))
   (heading
     (heading_marker)
-    (heading_text))
+    (heading_text
+      (text)))
   (paragraph
     (text)))

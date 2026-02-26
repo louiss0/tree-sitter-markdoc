@@ -14,13 +14,14 @@ Unordered list with simple annotation
       (unordered_list_marker)
       (list_paragraph
         (text)
-        (list_item_annotation
-          (inline_expression_open)
-          (annotation_name
-            (tag_identifier))
-          (annotation_value
-            (identifier))
-          (inline_expression_close))))
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (identifier))
+            (inline_expression_close)))))
     (unordered_list_item
       (unordered_list_marker)
       (list_paragraph
@@ -46,13 +47,14 @@ Ordered list with simple annotation
       (ordered_list_marker)
       (list_paragraph
         (text)
-        (list_item_annotation
-          (inline_expression_open)
-          (annotation_name
-            (tag_identifier))
-          (annotation_value
-            (identifier))
-          (inline_expression_close))))
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (identifier))
+            (inline_expression_close)))))
     (ordered_list_item
       (ordered_list_marker)
       (list_paragraph
@@ -78,35 +80,38 @@ List with multiple annotations
       (unordered_list_marker)
       (list_paragraph
         (text)
-        (list_item_annotation
-          (inline_expression_open)
-          (annotation_name
-            (tag_identifier))
-          (annotation_value
-            (identifier))
-          (inline_expression_close))))
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (identifier))
+            (inline_expression_close)))))
     (unordered_list_item
       (unordered_list_marker)
       (list_paragraph
         (text)
-        (list_item_annotation
-          (inline_expression_open)
-          (annotation_name
-            (tag_identifier))
-          (annotation_value
-            (identifier))
-          (inline_expression_close))))
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (identifier))
+            (inline_expression_close)))))
     (unordered_list_item
       (unordered_list_marker)
       (list_paragraph
         (text)
-        (list_item_annotation
-          (inline_expression_open)
-          (annotation_name
-            (tag_identifier))
-          (annotation_value
-            (identifier))
-          (inline_expression_close))))))
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (identifier))
+            (inline_expression_close)))))))
 
 =======================================
 List with multiple words and annotation
@@ -123,13 +128,14 @@ List with multiple words and annotation
       (unordered_list_marker)
       (list_paragraph
         (text)
-        (list_item_annotation
-          (inline_expression_open)
-          (annotation_name
-            (tag_identifier))
-          (annotation_value
-            (identifier))
-          (inline_expression_close))))
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (identifier))
+            (inline_expression_close)))))
     (unordered_list_item
       (unordered_list_marker)
       (list_paragraph
@@ -152,24 +158,26 @@ Nested list with annotations
       (unordered_list_marker)
       (list_paragraph
         (text)
-        (list_item_annotation
-          (inline_expression_open)
-          (annotation_name
-            (tag_identifier))
-          (annotation_value
-            (identifier))
-          (inline_expression_close))))
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (identifier))
+            (inline_expression_close)))))
     (unordered_list_item
       (unordered_list_marker)
       (list_paragraph
         (text)
-        (list_item_annotation
-          (inline_expression_open)
-          (annotation_name
-            (tag_identifier))
-          (annotation_value
-            (identifier))
-          (inline_expression_close))))
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (identifier))
+            (inline_expression_close)))))
     (unordered_list_item
       (unordered_list_marker)
       (list_paragraph
@@ -178,13 +186,14 @@ Nested list with annotations
       (unordered_list_marker)
       (list_paragraph
         (text)
-        (list_item_annotation
-          (inline_expression_open)
-          (annotation_name
-            (tag_identifier))
-          (annotation_value
-            (identifier))
-          (inline_expression_close))))))
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (identifier))
+            (inline_expression_close)))))))
 
 =======================================
 List item annotation with attributes
@@ -201,19 +210,20 @@ List item annotation with attributes
       (unordered_list_marker)
       (list_paragraph
         (text)
-        (list_item_annotation
-          (inline_expression_open)
-          (annotation_name
-            (tag_identifier))
-          (annotation_value
-            (identifier))
-          (attribute
-            (attribute_name)
-            (attribute_value
-              (value_expression
-                (json_value
-                  (string)))))
-          (inline_expression_close))))
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (identifier))
+            (attribute
+              (attribute_name)
+              (attribute_value
+                (value_expression
+                  (json_value
+                    (string)))))
+            (inline_expression_close)))))
     (unordered_list_item
       (unordered_list_marker)
       (list_paragraph
@@ -234,21 +244,22 @@ List annotation with expression attribute
       (unordered_list_marker)
       (list_paragraph
         (text)
-        (list_item_annotation
-          (inline_expression_open)
-          (annotation_name
-            (tag_identifier))
-          (annotation_value
-            (identifier))
-          (attribute
-            (attribute_name)
-            (attribute_value
-              (value_expression
-                (variable_value
-                  (variable_reference
-                    (variable
-                      (identifier)))))))
-          (inline_expression_close))))
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (identifier))
+            (attribute
+              (attribute_name)
+              (attribute_value
+                (value_expression
+                  (variable_value
+                    (variable_reference
+                      (variable
+                        (identifier)))))))
+            (inline_expression_close)))))
     (unordered_list_item
       (unordered_list_marker)
       (list_paragraph
@@ -270,35 +281,38 @@ Ordered list with all items annotated
       (ordered_list_marker)
       (list_paragraph
         (text)
-        (list_item_annotation
-          (inline_expression_open)
-          (annotation_name
-            (tag_identifier))
-          (annotation_value
-            (identifier))
-          (inline_expression_close))))
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (identifier))
+            (inline_expression_close)))))
     (ordered_list_item
       (ordered_list_marker)
       (list_paragraph
         (text)
-        (list_item_annotation
-          (inline_expression_open)
-          (annotation_name
-            (tag_identifier))
-          (annotation_value
-            (identifier))
-          (inline_expression_close))))
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (identifier))
+            (inline_expression_close)))))
     (ordered_list_item
       (ordered_list_marker)
       (list_paragraph
         (text)
-        (list_item_annotation
-          (inline_expression_open)
-          (annotation_name
-            (tag_identifier))
-          (annotation_value
-            (identifier))
-          (inline_expression_close))))))
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (identifier))
+            (inline_expression_close)))))))
 
 =======================================
 List with simple text and annotation
@@ -315,13 +329,14 @@ List with simple text and annotation
       (unordered_list_marker)
       (list_paragraph
         (text)
-        (list_item_annotation
-          (inline_expression_open)
-          (annotation_name
-            (tag_identifier))
-          (annotation_value
-            (identifier))
-          (inline_expression_close))))
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (identifier))
+            (inline_expression_close)))))
     (unordered_list_item
       (unordered_list_marker)
       (list_paragraph
@@ -342,13 +357,14 @@ List with text and another word annotation
       (unordered_list_marker)
       (list_paragraph
         (text)
-        (list_item_annotation
-          (inline_expression_open)
-          (annotation_name
-            (tag_identifier))
-          (annotation_value
-            (identifier))
-          (inline_expression_close))))
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (identifier))
+            (inline_expression_close)))))
     (unordered_list_item
       (unordered_list_marker)
       (list_paragraph
@@ -371,13 +387,14 @@ Mixed list with and without annotations
       (unordered_list_marker)
       (list_paragraph
         (text)
-        (list_item_annotation
-          (inline_expression_open)
-          (annotation_name
-            (tag_identifier))
-          (annotation_value
-            (identifier))
-          (inline_expression_close))))
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (identifier))
+            (inline_expression_close)))))
     (unordered_list_item
       (unordered_list_marker)
       (list_paragraph
@@ -386,14 +403,57 @@ Mixed list with and without annotations
       (unordered_list_marker)
       (list_paragraph
         (text)
-        (list_item_annotation
-          (inline_expression_open)
-          (annotation_name
-            (tag_identifier))
-          (annotation_value
-            (identifier))
-          (inline_expression_close))))
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (identifier))
+            (inline_expression_close)))))
     (unordered_list_item
       (unordered_list_marker)
       (list_paragraph
         (text)))))
+
+=======================================
+Ordered list with id shorthand annotation
+=======================================
+
+1. Clean room {% #list %}
+
+---
+
+(source_file
+  (ordered_list
+    (ordered_list_item
+      (ordered_list_marker)
+      (list_paragraph
+        (text)
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (id_shorthand
+              (shorthand_id))
+            (inline_expression_close)))))))
+
+=======================================
+Unordered list with class shorthand annotation
+=======================================
+
+- Throw out the garbage {% .red %}
+
+---
+
+(source_file
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
+      (list_paragraph
+        (text)
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (class_shorthand
+              (shorthand_class))
+            (inline_expression_close)))))))
