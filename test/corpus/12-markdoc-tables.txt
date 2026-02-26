@@ -291,6 +291,64 @@ Markdoc table with cell annotations
       (inline_expression_close))))
 
 ================================================================================
+Markdoc table with shorthand annotations
+================================================================================
+
+{% table %}
+* Name
+* Status
+---
+* Bob
+* Active {% #status .green %}
+{% /table %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (markdoc_table
+    (markdoc_table_open
+      (tag_open)
+      (tag_name)
+      (tag_close
+        (inline_expression_close)))
+    (markdoc_table_header
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (markdoc_table_cell_item
+            (text))))
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (markdoc_table_cell_item
+            (text)))))
+    (markdoc_table_separator)
+    (markdoc_table_row
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (markdoc_table_cell_item
+            (text))))
+      (markdoc_table_cell
+        (list_marker)
+        (markdoc_table_cell_content
+          (markdoc_table_cell_item
+            (text))
+          (markdoc_table_cell_item
+            (annotation
+              (annotation_block
+                (inline_expression_open)
+                (id_shorthand
+                  (shorthand_id))
+                (class_shorthand
+                  (shorthand_class))
+                (inline_expression_close)))))))
+    (markdoc_table_close
+      (tag_open)
+      (tag_name)
+      (inline_expression_close))))
+
+================================================================================
 Markdoc table with inline expressions in cells
 ================================================================================
 

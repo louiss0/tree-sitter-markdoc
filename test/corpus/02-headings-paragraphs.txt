@@ -204,6 +204,58 @@ Heading with annotation
           (inline_expression_close))))))
 
 ================================================================================
+Heading with object annotation
+================================================================================
+
+# meta {% info={foo: "bar"} %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (heading
+    heading_marker: (heading_marker)
+    heading_text: (heading_text
+      (text)
+      (annotation
+        (annotation_block
+          (inline_expression_open)
+          (annotation_name
+            (tag_identifier))
+          (annotation_value
+            (value_expression
+              (json_value
+                (object_literal
+                  (pair
+                    key: (identifier)
+                    value: (json_value
+                      (string)))))))
+          (inline_expression_close))))))
+
+================================================================================
+Heading with shorthand annotation
+================================================================================
+
+# hero {% #banner .large .center %}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (heading
+    (heading_marker)
+    (heading_text
+      (text)
+      (annotation
+        (annotation_block
+          (inline_expression_open)
+          (id_shorthand
+            (shorthand_id))
+          (class_shorthand
+            (shorthand_class))
+          (class_shorthand
+            (shorthand_class))
+          (inline_expression_close))))))
+
+================================================================================
 Mixed headings and paragraphs
 ================================================================================
 

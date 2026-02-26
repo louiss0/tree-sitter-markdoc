@@ -46,3 +46,41 @@ Blockquote with nested tag
           (tag_open)
           (tag_name)
           (inline_expression_close))))))
+
+=======================================
+Blockquote with annotation
+=======================================
+
+> Note {% level=info %}
+> Styled {% #banner .wide %}
+
+---
+
+(source_file
+  (blockquote
+    (blockquote_item
+      (blockquote_marker)
+      (blockquote_content
+        (list_paragraph
+          (text)
+          (annotation
+            (annotation_block
+              (inline_expression_open)
+              (annotation_name
+                (tag_identifier))
+              (annotation_value
+                (identifier))
+              (inline_expression_close))))))
+    (blockquote_item
+      (blockquote_marker)
+      (blockquote_content
+        (list_paragraph
+          (text)
+          (annotation
+            (annotation_block
+              (inline_expression_open)
+              (id_shorthand
+                (shorthand_id))
+              (class_shorthand
+                (shorthand_class))
+              (inline_expression_close))))))))

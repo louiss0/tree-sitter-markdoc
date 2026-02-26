@@ -457,3 +457,247 @@ Unordered list with class shorthand annotation
             (class_shorthand
               (shorthand_class))
             (inline_expression_close)))))))
+
+=======================================
+Ordered list with numeric annotation
+=======================================
+
+1. Pack boxes {% order=3 %}
+
+---
+
+(source_file
+  (ordered_list
+    (ordered_list_item
+      (ordered_list_marker)
+      (list_paragraph
+        (text)
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (value_expression
+                (json_value
+                  (number))))
+            (inline_expression_close)))))))
+
+=======================================
+Ordered list with boolean annotation
+=======================================
+
+1. Toggle feature {% enabled=true %}
+
+---
+
+(source_file
+  (ordered_list
+    (ordered_list_item
+      (ordered_list_marker)
+      (list_paragraph
+        (text)
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (value_expression
+                (json_value
+                  (boolean))))
+            (inline_expression_close)))))))
+
+=======================================
+Unordered list with null annotation
+=======================================
+
+- No value {% reason=null %}
+
+---
+
+(source_file
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
+      (list_paragraph
+        (text)
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (value_expression
+                (json_value
+                  (null))))
+            (inline_expression_close)))))))
+
+=======================================
+Unordered list with array annotation
+=======================================
+
+- Add tags {% tags=["one", "two"] %}
+
+---
+
+(source_file
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
+      (list_paragraph
+        (text)
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (value_expression
+                (json_value
+                  (array_literal
+                    (json_value
+                      (string))
+                    (json_value
+                      (string))))))
+            (inline_expression_close)))))))
+
+=======================================
+Unordered list with object annotation
+=======================================
+
+- Store meta {% meta={role: "admin"} %}
+
+---
+
+(source_file
+  (unordered_list
+    items: (unordered_list_item
+      marker: (unordered_list_marker)
+      content: (list_paragraph
+        (text)
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (value_expression
+                (json_value
+                  (object_literal
+                    (pair
+                      key: (identifier)
+                      value: (json_value
+                        (string)))))))
+            (inline_expression_close)))))))
+
+=======================================
+Ordered list with variable annotation
+=======================================
+
+1. Use input {% value=$input %}
+
+---
+
+(source_file
+  (ordered_list
+    (ordered_list_item
+      (ordered_list_marker)
+      (list_paragraph
+        (text)
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (value_expression
+                (variable_value
+                  (variable_reference
+                    (variable
+                      (identifier))))))
+            (inline_expression_close)))))))
+
+=======================================
+Ordered list with call annotation
+=======================================
+
+1. Compute value {% value=format($input) %}
+
+---
+
+(source_file
+  (ordered_list
+    items: (ordered_list_item
+      marker: (ordered_list_marker)
+      content: (list_paragraph
+        (text)
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (value_expression
+                (call_expression
+                  function: (identifier)
+                  (value_expression
+                    (variable_value
+                      (variable_reference
+                        (variable
+                          (identifier))))))))
+            (inline_expression_close)))))))
+
+=======================================
+Unordered list with annotation attributes
+=======================================
+
+- Item with attrs {% type=note data="x" %}
+
+---
+
+(source_file
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
+      (list_paragraph
+        (text)
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (identifier))
+            (attribute
+              (attribute_name)
+              (attribute_value
+                (value_expression
+                  (json_value
+                    (string)))))
+            (inline_expression_close)))))))
+
+=======================================
+Unordered list with multiple shorthands
+=======================================
+
+- Classed item {% #primary .wide .highlight %}
+
+---
+
+(source_file
+  (unordered_list
+    (unordered_list_item
+      (unordered_list_marker)
+      (list_paragraph
+        (text)
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (id_shorthand
+              (shorthand_id))
+            (class_shorthand
+              (shorthand_class))
+            (class_shorthand
+              (shorthand_class))
+            (inline_expression_close)))))))
