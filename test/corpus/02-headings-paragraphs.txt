@@ -128,7 +128,7 @@ Line one
   (paragraph
     (text)
     (inline_expression
-      (tag_open_delimiter)
+      (inline_expression_open)
       (variable_value
         (variable_reference
           (variable

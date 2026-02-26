@@ -15,9 +15,9 @@ Simple Markdoc table with header and one row
 (source_file
   (markdoc_table
     (markdoc_table_open
-      (tag_open_delimiter)
+      (tag_open)
       (tag_name)
-      (tag_block_close
+      (tag_close
         (inline_expression_close)))
     (markdoc_table_header
       (markdoc_table_cell
@@ -43,7 +43,7 @@ Simple Markdoc table with header and one row
           (markdoc_table_cell_item
             (text)))))
     (markdoc_table_close
-      (tag_open_delimiter)
+      (tag_open)
       (tag_name)
       (inline_expression_close))))
 
@@ -67,9 +67,9 @@ Markdoc table with multiple rows
 (source_file
   (markdoc_table
     (markdoc_table_open
-      (tag_open_delimiter)
+      (tag_open)
       (tag_name)
-      (tag_block_close
+      (tag_close
         (inline_expression_close)))
     (markdoc_table_header
       (markdoc_table_cell
@@ -107,7 +107,7 @@ Markdoc table with multiple rows
           (markdoc_table_cell_item
             (text)))))
     (markdoc_table_close
-      (tag_open_delimiter)
+      (tag_open)
       (tag_name)
       (inline_expression_close))))
 
@@ -128,7 +128,7 @@ Markdoc table with attributes
 (source_file
   (markdoc_table
     (markdoc_table_open
-      (tag_open_delimiter)
+      (tag_open)
       (tag_name)
       (attribute
         (attribute_name)
@@ -136,7 +136,7 @@ Markdoc table with attributes
           (value_expression
             (json_value
               (boolean)))))
-      (tag_block_close
+      (tag_close
         (inline_expression_close)))
     (markdoc_table_header
       (markdoc_table_cell
@@ -162,7 +162,7 @@ Markdoc table with attributes
           (markdoc_table_cell_item
             (text)))))
     (markdoc_table_close
-      (tag_open_delimiter)
+      (tag_open)
       (tag_name)
       (inline_expression_close))))
 
@@ -183,9 +183,9 @@ Markdoc table with cell annotations
 (source_file
   (markdoc_table
     (markdoc_table_open
-      (tag_open_delimiter)
+      (tag_open)
       (tag_name)
-      (tag_block_close
+      (tag_close
         (inline_expression_close)))
     (markdoc_table_header
       (markdoc_table_cell
@@ -211,7 +211,7 @@ Markdoc table with cell annotations
           (markdoc_table_cell_item
             (text))
           (markdoc_table_cell_annotation
-            (tag_open_delimiter)
+            (inline_expression_open)
             (annotation_name
               (tag_identifier))
             (annotation_value
@@ -220,7 +220,7 @@ Markdoc table with cell annotations
                   (number))))
             (inline_expression_close)))))
     (markdoc_table_close
-      (tag_open_delimiter)
+      (tag_open)
       (tag_name)
       (inline_expression_close))))
 
@@ -241,9 +241,9 @@ Markdoc table with inline expressions in cells
 (source_file
   (markdoc_table
     (markdoc_table_open
-      (tag_open_delimiter)
+      (tag_open)
       (tag_name)
-      (tag_block_close
+      (tag_close
         (inline_expression_close)))
     (markdoc_table_header
       (markdoc_table_cell
@@ -263,7 +263,7 @@ Markdoc table with inline expressions in cells
         (markdoc_table_cell_content
           (markdoc_table_cell_item
             (inline_expression
-              (tag_open_delimiter)
+              (inline_expression_open)
               (variable_value
                 (variable_reference
                   (variable
@@ -275,7 +275,7 @@ Markdoc table with inline expressions in cells
         (markdoc_table_cell_content
           (markdoc_table_cell_item
             (inline_expression
-              (tag_open_delimiter)
+              (inline_expression_open)
               (variable_value
                 (variable_reference
                   (variable
@@ -283,6 +283,6 @@ Markdoc table with inline expressions in cells
                   (identifier)))
               (inline_expression_close))))))
     (markdoc_table_close
-      (tag_open_delimiter)
+      (tag_open)
       (tag_name)
       (inline_expression_close))))

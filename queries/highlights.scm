@@ -65,7 +65,7 @@
 
 ; List item annotations: {% type=value %} after list content
 (list_item_annotation
-  (tag_open_delimiter) @punctuation.bracket
+  (inline_expression_open) @punctuation.bracket
   (inline_expression_close) @punctuation.bracket)
 
 ; Annotation key/value (e.g., type=important)
@@ -148,9 +148,10 @@
 ; ============================================================================
 
 ; Tag delimiters: {% and %} and /%}
-(tag_open_delimiter) @punctuation.bracket
+(inline_expression_open) @punctuation.bracket
+(tag_open) @punctuation.bracket
 (inline_expression_close) @punctuation.bracket
-(tag_block_close) @punctuation.bracket
+(tag_close) @punctuation.bracket
 (tag_self_close_delimiter) @punctuation.bracket
 
 ; Tag names (e.g., callout, table, partial)

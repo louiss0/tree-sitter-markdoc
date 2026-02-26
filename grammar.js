@@ -34,20 +34,19 @@ module.exports = grammar({
 
   extras: ($) => [],
 
-  conflicts: ($) => [
-    [$.source_file],
-    [$.markdoc_tag],
-    [$.markdoc_tag, $._inline_line_start],
-    [$.if_tag],
-    [$.if_tag_else_clause],
-    [$.if_tag_body],
-    [$.if_tag_body, $.if_tag_else_clause],
-    [$.if_tag_close, $.inline_expression],
-    [$.if_tag_close, $.inline_tag],
-    [$.if_tag_close, $.paragraph],
-    [$.tag_self_close, $.list_item_annotation],
-    [$.tag_self_close, $.annotation_name],
-    [$._inline_expression_line],
+    conflicts: ($) => [
+      [$.source_file],
+      [$.markdoc_tag],
+      [$.markdoc_tag, $._inline_line_start],
+      [$.if_tag],
+      [$.if_tag_else_clause],
+      [$.if_tag_body],
+      [$.if_tag_body, $.if_tag_else_clause],
+      [$.if_tag_close, $.inline_tag],
+      [$.if_tag_close, $.paragraph],
+      [$.inline_tag, $.list_item_annotation],
+      [$.inline_tag, $.annotation_name],
+      [$._inline_expression_line],
     [$.list_paragraph],
     [$.paragraph],
   ],
@@ -139,20 +138,20 @@ module.exports = grammar({
         4,
         choice(
           // Self-closing tag on its own line
-          seq($.tag_self_close, $.line_break),
+          seq($.inline_tag, $.line_break),
           // Full tag with content on following lines
           seq(
-            $.tag_open,
+            $.tag_open_block,
             choice(
               // Empty tag
-              seq(repeat(choice($._NEWLINE, $._BLANK_LINE)), $.tag_close),
+              seq(repeat(choice($._NEWLINE, $._BLANK_LINE)), $.tag_end),
               // Tag with content
               seq(
                 repeat(choice($._NEWLINE, $._BLANK_LINE)),
                 $._block,
                 repeat(choice(seq($._BLANK_LINE, $._block), seq($._NEWLINE, $._block))),
                 repeat1(choice($._NEWLINE, $._BLANK_LINE)),
-                $.tag_close,
+                $.tag_end,
               ),
             ),
           ),
@@ -164,12 +163,12 @@ module.exports = grammar({
 
     if_tag_open: ($) =>
       seq(
-        $.tag_open_delimiter,
+        alias($.inline_expression_open, $.tag_open),
         optional(WS),
         $.if_keyword,
         WS1,
         $.value_expression,
-        $.tag_block_close,
+        $.tag_close,
       ),
 
     if_tag_body: ($) =>
@@ -177,13 +176,8 @@ module.exports = grammar({
         repeat(choice($._NEWLINE, $._BLANK_LINE)),
         $._block,
         repeat(
-          choice(
-            seq($._BLANK_LINE, $._block),
-            seq($._NEWLINE, $._block),
-            $.if_tag_else_clause,
-          ),
+          choice(seq($._BLANK_LINE, $._block), seq($._NEWLINE, $._block), $.if_tag_else_clause),
         ),
-        repeat(choice($._NEWLINE, $._BLANK_LINE)),
       ),
 
     if_tag_else_clause: ($) =>
@@ -197,7 +191,7 @@ module.exports = grammar({
 
     else_tag: ($) =>
       seq(
-        $.tag_open_delimiter,
+        alias($.inline_expression_open, $.tag_open),
         optional(WS),
         $.else_keyword,
         optional(seq(WS1, $.value_expression)),
@@ -206,9 +200,8 @@ module.exports = grammar({
 
     if_tag_close: ($) =>
       seq(
-        $.tag_open_delimiter,
-        optional(WS),
-        token("/"),
+        optional($._NEWLINE),
+        $.tag_close_start,
         optional(WS),
         $.if_keyword,
         $.inline_expression_close,
@@ -224,16 +217,17 @@ module.exports = grammar({
 
     markdoc_table_open: ($) =>
       seq(
-        $.tag_open_delimiter,
+        alias($.inline_expression_open, $.tag_open),
         optional(WS),
         alias($.table_keyword, $.tag_name),
-        repeat(seq(WS1, $.attribute)),
-        $.tag_block_close,
+        repeat(seq(TAG_WS1, $.attribute)),
+        $.tag_close,
+        $._NEWLINE,
       ),
 
     markdoc_table_close: ($) =>
       seq(
-        $.tag_open_delimiter,
+        alias($.inline_expression_open, $.tag_open),
         optional(WS),
         seq(token("/"), optional(WS)),
         alias($.table_keyword, $.tag_name),
@@ -272,31 +266,29 @@ module.exports = grammar({
 
     markdoc_table_cell_annotation: ($) =>
       seq(
-        $.tag_open_delimiter,
+        $.inline_expression_open,
         optional(WS),
         $.annotation_name,
-        optional(WS),
         "=",
-        optional(WS),
         $.annotation_value,
         $.inline_expression_close,
       ),
 
-    tag_open: ($) =>
+    tag_open_block: ($) =>
       prec.right(
         seq(
-          $.tag_open_delimiter,
+          alias($.inline_expression_open, $.tag_open),
           optional(WS),
           alias($.tag_identifier, $.tag_name),
-          repeat(seq(WS1, choice($.attribute, $.id_shorthand, $.class_shorthand))),
-          $.tag_block_close,
+          repeat(seq(TAG_WS1, choice($.attribute, $.id_shorthand, $.class_shorthand))),
+          $.tag_close,
         ),
       ),
 
-    tag_close: ($) =>
+    tag_end: ($) =>
       prec.right(
         seq(
-          $.tag_open_delimiter,
+          alias($.inline_expression_open, $.tag_open),
           optional(WS),
           seq(token("/"), optional(WS)),
           alias($.tag_identifier, $.tag_name),
@@ -305,21 +297,24 @@ module.exports = grammar({
       ),
 
     // Inline self-closing tag for use in paragraphs/lists
-    inline_tag: ($) => prec(2, choice($.tag_self_close)),
-
-    tag_self_close: ($) =>
-      prec.right(
-        seq(
-          $.tag_open_delimiter,
-          optional(WS),
-          alias($.tag_identifier, $.tag_name),
-          repeat(seq(WS1, choice($.attribute, $.id_shorthand, $.class_shorthand))),
-          $.tag_self_close_delimiter,
+    inline_tag: ($) =>
+      prec(
+        2,
+        prec.right(
+          seq(
+            alias($.inline_expression_open, $.tag_open),
+            optional(WS),
+            alias($.tag_identifier, $.tag_name),
+            repeat(seq(TAG_WS1, choice($.attribute, $.id_shorthand, $.class_shorthand))),
+            optional(TAG_WS1),
+            $.tag_self_close_delimiter,
+          ),
         ),
       ),
 
-    tag_open_delimiter: ($) => token(prec(6, "{%")),
-    tag_block_close: ($) => seq($.inline_expression_close, $._NEWLINE),
+    tag_close_start: ($) => token(prec(6, /\{%[ \t]*\//)),
+    inline_expression_open: ($) => token(prec(6, "{%")),
+    tag_close: ($) => $.inline_expression_close,
     inline_expression_close: ($) => token(prec(5, /[ \t]*%}/)),
     tag_self_close_delimiter: ($) => token(prec(6, /[ \t]*\/%}/)),
 
@@ -426,6 +421,7 @@ module.exports = grammar({
 
     identifier: ($) => token(prec(0, /[a-zA-Z_][a-zA-Z0-9_]*/)),
     tag_identifier: ($) => token(prec(1, /[a-z][a-z0-9_-]*/)),
+    function_identifier: ($) => token(prec(2, /[a-zA-Z_][a-zA-Z0-9_]*\(/)),
     annotation_name: ($) => $.tag_identifier,
     if_keyword: ($) => token(prec(2, "if")),
     else_keyword: ($) => token(prec(2, "else")),
@@ -444,7 +440,7 @@ module.exports = grammar({
       prec(
         2,
         seq(
-          $.tag_open_delimiter,
+          $.inline_expression_open,
           optional(WS),
           field("content", choice($.variable_value, $.inline_call_expression)),
           $.inline_expression_close,
@@ -454,8 +450,7 @@ module.exports = grammar({
     inline_call_expression: ($) =>
       prec.left(
         seq(
-          field("function", $.variable),
-          "(",
+          field("function", $.function_identifier),
           optional(WS),
           optional(
             seq(
@@ -565,12 +560,10 @@ module.exports = grammar({
       prec(
         1,
         seq(
-          $.tag_open_delimiter,
+          $.inline_expression_open,
           optional(WS),
           $.annotation_name,
-          optional(WS),
           "=",
-          optional(WS),
           $.annotation_value,
           repeat(seq(WS1, $.attribute)),
           $.inline_expression_close,

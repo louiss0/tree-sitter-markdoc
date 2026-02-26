@@ -10,7 +10,7 @@ Text {% $user.name %} here.
   (paragraph
     (text)
     (inline_expression
-      (tag_open_delimiter)
+      (inline_expression_open)
       (variable_value
         (variable_reference
           (variable
@@ -31,7 +31,7 @@ Value is {% $obj.prop.nested %}.
   (paragraph
     (text)
     (inline_expression
-      (tag_open_delimiter)
+      (inline_expression_open)
       (variable_value
         (variable_reference
           (variable
@@ -53,7 +53,7 @@ Index {% @index %} here.
   (paragraph
     (text)
     (inline_expression
-      (tag_open_delimiter)
+      (inline_expression_open)
       (variable_value
         (special_variable_reference
           (special_variable
@@ -73,7 +73,7 @@ Item {% $items[0] %} end.
   (paragraph
     (text)
     (inline_expression
-      (tag_open_delimiter)
+      (inline_expression_open)
       (variable_value
         (subscript_reference
           (variable_reference
@@ -88,7 +88,7 @@ Item {% $items[0] %} end.
 Function call with literal argument
 =======================================
 
-Value {% $formatDate("2024-01-01") %} end.
+Value {% formatDate("2024-01-01") %} end.
 
 ---
 
@@ -96,10 +96,9 @@ Value {% $formatDate("2024-01-01") %} end.
   (paragraph
     (text)
     (inline_expression
-      (tag_open_delimiter)
+      (inline_expression_open)
       (inline_call_expression
-        (variable
-          (identifier))
+        (function_identifier)
         (value_expression
           (json_value
             (string))))
@@ -110,7 +109,7 @@ Value {% $formatDate("2024-01-01") %} end.
 Function call with variable argument
 =======================================
 
-Output {% $titleCase($user.name) %} text.
+Output {% titleCase($user.name) %} text.
 
 ---
 
@@ -118,10 +117,9 @@ Output {% $titleCase($user.name) %} text.
   (paragraph
     (text)
     (inline_expression
-      (tag_open_delimiter)
+      (inline_expression_open)
       (inline_call_expression
-        (variable
-          (identifier))
+        (function_identifier)
         (value_expression
           (variable_value
             (variable_reference

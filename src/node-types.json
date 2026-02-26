@@ -195,7 +195,7 @@
           "named": true
         },
         {
-          "type": "tag_open_delimiter",
+          "type": "tag_open",
           "named": true
         },
         {
@@ -428,7 +428,7 @@
           "named": true
         },
         {
-          "type": "tag_open_delimiter",
+          "type": "tag_close_start",
           "named": true
         }
       ]
@@ -514,11 +514,11 @@
           "named": true
         },
         {
-          "type": "tag_block_close",
+          "type": "tag_close",
           "named": true
         },
         {
-          "type": "tag_open_delimiter",
+          "type": "tag_open",
           "named": true
         },
         {
@@ -575,7 +575,7 @@
         "required": true,
         "types": [
           {
-            "type": "variable",
+            "type": "function_identifier",
             "named": true
           }
         ]
@@ -625,7 +625,7 @@
           "named": true
         },
         {
-          "type": "tag_open_delimiter",
+          "type": "inline_expression_open",
           "named": true
         }
       ]
@@ -636,11 +636,31 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": true,
       "types": [
         {
-          "type": "tag_self_close",
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "class_shorthand",
+          "named": true
+        },
+        {
+          "type": "id_shorthand",
+          "named": true
+        },
+        {
+          "type": "tag_name",
+          "named": true
+        },
+        {
+          "type": "tag_open",
+          "named": true
+        },
+        {
+          "type": "tag_self_close_delimiter",
           "named": true
         }
       ]
@@ -725,7 +745,7 @@
           "named": true
         },
         {
-          "type": "tag_open_delimiter",
+          "type": "inline_expression_open",
           "named": true
         }
       ]
@@ -917,7 +937,7 @@
           "named": true
         },
         {
-          "type": "tag_open_delimiter",
+          "type": "inline_expression_open",
           "named": true
         }
       ]
@@ -1006,7 +1026,7 @@
           "named": true
         },
         {
-          "type": "tag_open_delimiter",
+          "type": "tag_open",
           "named": true
         }
       ]
@@ -1040,7 +1060,7 @@
           "named": true
         },
         {
-          "type": "tag_block_close",
+          "type": "tag_close",
           "named": true
         },
         {
@@ -1048,7 +1068,7 @@
           "named": true
         },
         {
-          "type": "tag_open_delimiter",
+          "type": "tag_open",
           "named": true
         }
       ]
@@ -1111,6 +1131,10 @@
           "named": true
         },
         {
+          "type": "inline_tag",
+          "named": true
+        },
+        {
           "type": "markdoc_table",
           "named": true
         },
@@ -1127,15 +1151,11 @@
           "named": true
         },
         {
-          "type": "tag_close",
+          "type": "tag_end",
           "named": true
         },
         {
-          "type": "tag_open",
-          "named": true
-        },
-        {
-          "type": "tag_self_close",
+          "type": "tag_open_block",
           "named": true
         },
         {
@@ -1481,7 +1501,7 @@
     }
   },
   {
-    "type": "tag_block_close",
+    "type": "tag_close",
     "named": true,
     "fields": {},
     "children": {
@@ -1496,7 +1516,7 @@
     }
   },
   {
-    "type": "tag_close",
+    "type": "tag_end",
     "named": true,
     "fields": {},
     "children": {
@@ -1512,14 +1532,14 @@
           "named": true
         },
         {
-          "type": "tag_open_delimiter",
+          "type": "tag_open",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "tag_open",
+    "type": "tag_open_block",
     "named": true,
     "fields": {},
     "children": {
@@ -1539,7 +1559,7 @@
           "named": true
         },
         {
-          "type": "tag_block_close",
+          "type": "tag_close",
           "named": true
         },
         {
@@ -1547,42 +1567,7 @@
           "named": true
         },
         {
-          "type": "tag_open_delimiter",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "tag_self_close",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "class_shorthand",
-          "named": true
-        },
-        {
-          "type": "id_shorthand",
-          "named": true
-        },
-        {
-          "type": "tag_name",
-          "named": true
-        },
-        {
-          "type": "tag_open_delimiter",
-          "named": true
-        },
-        {
-          "type": "tag_self_close_delimiter",
+          "type": "tag_open",
           "named": true
         }
       ]
@@ -1871,6 +1856,10 @@
     "named": false
   },
   {
+    "type": "function_identifier",
+    "named": true
+  },
+  {
     "type": "heading_marker",
     "named": true
   },
@@ -1896,6 +1885,10 @@
   },
   {
     "type": "inline_expression_close",
+    "named": true
+  },
+  {
+    "type": "inline_expression_open",
     "named": true
   },
   {
@@ -1931,6 +1924,10 @@
     "named": true
   },
   {
+    "type": "tag_close_start",
+    "named": true
+  },
+  {
     "type": "tag_identifier",
     "named": true
   },
@@ -1939,7 +1936,7 @@
     "named": true
   },
   {
-    "type": "tag_open_delimiter",
+    "type": "tag_open",
     "named": true
   },
   {

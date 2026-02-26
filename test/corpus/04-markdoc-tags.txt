@@ -7,12 +7,11 @@ Self-closing tag
 --------------------------------------------------------------------------------
 
 (source_file
-  (paragraph
+  (markdoc_tag
     (inline_tag
-      (tag_self_close
-        (tag_open_delimiter)
-        (tag_name)
-        (tag_self_close_delimiter)))))
+      (tag_open)
+      (tag_name)
+      (tag_self_close_delimiter))))
 
 ================================================================================
 Block tag without content
@@ -25,13 +24,13 @@ Block tag without content
 
 (source_file
   (markdoc_tag
-    (tag_open
-      (tag_open_delimiter)
+    (tag_open_block
+      (tag_open)
       (tag_name)
-      (tag_block_close
+      (tag_close
         (inline_expression_close)))
-    (tag_close
-      (tag_open_delimiter)
+    (tag_end
+      (tag_open)
       (tag_name)
       (inline_expression_close))))
 
@@ -47,15 +46,15 @@ Hello world
 
 (source_file
   (markdoc_tag
-    (tag_open
-      (tag_open_delimiter)
+    (tag_open_block
+      (tag_open)
       (tag_name)
-      (tag_block_close
+      (tag_close
         (inline_expression_close)))
     (paragraph
       (text))
-    (tag_close
-      (tag_open_delimiter)
+    (tag_end
+      (tag_open)
       (tag_name)
       (inline_expression_close))))
 
@@ -73,17 +72,17 @@ Second paragraph.
 
 (source_file
   (markdoc_tag
-    (tag_open
-      (tag_open_delimiter)
+    (tag_open_block
+      (tag_open)
       (tag_name)
-      (tag_block_close
+      (tag_close
         (inline_expression_close)))
     (paragraph
       (text))
     (paragraph
       (text))
-    (tag_close
-      (tag_open_delimiter)
+    (tag_end
+      (tag_open)
       (tag_name)
       (inline_expression_close))))
 
@@ -101,25 +100,25 @@ Content
 
 (source_file
   (markdoc_tag
-    (tag_open
-      (tag_open_delimiter)
+    (tag_open_block
+      (tag_open)
       (tag_name)
-      (tag_block_close
+      (tag_close
         (inline_expression_close)))
     (markdoc_tag
-      (tag_open
-        (tag_open_delimiter)
+      (tag_open_block
+        (tag_open)
         (tag_name)
-        (tag_block_close
+        (tag_close
           (inline_expression_close)))
       (paragraph
         (text))
-      (tag_close
-        (tag_open_delimiter)
+      (tag_end
+        (tag_open)
         (tag_name)
         (inline_expression_close)))
-    (tag_close
-      (tag_open_delimiter)
+    (tag_end
+      (tag_open)
       (tag_name)
       (inline_expression_close))))
 
@@ -134,8 +133,8 @@ Tag with string attribute
 
 (source_file
   (markdoc_tag
-    (tag_open
-      (tag_open_delimiter)
+    (tag_open_block
+      (tag_open)
       (tag_name)
       (attribute
         (attribute_name)
@@ -143,10 +142,10 @@ Tag with string attribute
           (value_expression
             (json_value
               (string)))))
-      (tag_block_close
+      (tag_close
         (inline_expression_close)))
-    (tag_close
-      (tag_open_delimiter)
+    (tag_end
+      (tag_open)
       (tag_name)
       (inline_expression_close))))
 
@@ -162,8 +161,8 @@ Click me
 
 (source_file
   (markdoc_tag
-    (tag_open
-      (tag_open_delimiter)
+    (tag_open_block
+      (tag_open)
       (tag_name)
       (attribute
         (attribute_name)
@@ -177,12 +176,12 @@ Click me
           (value_expression
             (json_value
               (string)))))
-      (tag_block_close
+      (tag_close
         (inline_expression_close)))
     (paragraph
       (text))
-    (tag_close
-      (tag_open_delimiter)
+    (tag_end
+      (tag_open)
       (tag_name)
       (inline_expression_close))))
 
@@ -195,24 +194,23 @@ Self-closing tag with attributes
 --------------------------------------------------------------------------------
 
 (source_file
-  (paragraph
+  (markdoc_tag
     (inline_tag
-      (tag_self_close
-        (tag_open_delimiter)
-        (tag_name)
-        (attribute
-          (attribute_name)
-          (attribute_value
-            (value_expression
-              (json_value
-                (string)))))
-        (attribute
-          (attribute_name)
-          (attribute_value
-            (value_expression
-              (json_value
-                (string)))))
-        (tag_self_close_delimiter)))))
+      (tag_open)
+      (tag_name)
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (value_expression
+            (json_value
+              (string)))))
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (value_expression
+            (json_value
+              (string)))))
+      (tag_self_close_delimiter))))
 
 ================================================================================
 Simple inline expression
@@ -226,7 +224,7 @@ Hello {% $name %}
   (paragraph
     (text)
     (inline_expression
-      (tag_open_delimiter)
+      (inline_expression_open)
       (variable_value
         (variable_reference
           (variable
@@ -245,7 +243,7 @@ Hello {% $user.name %}
   (paragraph
     (text)
     (inline_expression
-      (tag_open_delimiter)
+      (inline_expression_open)
       (variable_value
         (variable_reference
           (variable
@@ -264,7 +262,7 @@ Multiple inline expressions in paragraph
 (source_file
   (paragraph
     (inline_expression
-      (tag_open_delimiter)
+      (inline_expression_open)
       (variable_value
         (variable_reference
           (variable
@@ -272,7 +270,7 @@ Multiple inline expressions in paragraph
       (inline_expression_close))
     (text)
     (inline_expression
-      (tag_open_delimiter)
+      (inline_expression_open)
       (variable_value
         (variable_reference
           (variable
@@ -293,18 +291,18 @@ Content here
 
 (source_file
   (markdoc_tag
-    (tag_open
-      (tag_open_delimiter)
+    (tag_open_block
+      (tag_open)
       (tag_name)
-      (tag_block_close
+      (tag_close
         (inline_expression_close)))
     (heading
       (heading_marker)
       (heading_text))
     (paragraph
       (text))
-    (tag_close
-      (tag_open_delimiter)
+    (tag_end
+      (tag_open)
       (tag_name)
       (inline_expression_close))))
 
@@ -322,10 +320,10 @@ code()
 
 (source_file
   (markdoc_tag
-    (tag_open
-      (tag_open_delimiter)
+    (tag_open_block
+      (tag_open)
       (tag_name)
-      (tag_block_close
+      (tag_close
         (inline_expression_close)))
     (fenced_code_block
       (code_fence_open
@@ -333,8 +331,8 @@ code()
           (language)))
       (code)
       (code_fence_close))
-    (tag_close
-      (tag_open_delimiter)
+    (tag_end
+      (tag_open)
       (tag_name)
       (inline_expression_close))))
 
@@ -357,28 +355,28 @@ Regular {% $text %} here.
     (heading_marker)
     (heading_text))
   (markdoc_tag
-    (tag_open
-      (tag_open_delimiter)
+    (tag_open_block
+      (tag_open)
       (tag_name)
-      (tag_block_close
+      (tag_close
         (inline_expression_close)))
     (paragraph
       (text)
       (inline_expression
-        (tag_open_delimiter)
+        (inline_expression_open)
         (variable_value
           (variable_reference
             (variable
               (identifier))))
         (inline_expression_close)))
-    (tag_close
-      (tag_open_delimiter)
+    (tag_end
+      (tag_open)
       (tag_name)
       (inline_expression_close)))
   (paragraph
     (text)
     (inline_expression
-      (tag_open_delimiter)
+      (inline_expression_open)
       (variable_value
         (variable_reference
           (variable
@@ -403,14 +401,14 @@ Hello
   (frontmatter
     (yaml))
   (markdoc_tag
-    (tag_open
-      (tag_open_delimiter)
+    (tag_open_block
+      (tag_open)
       (tag_name)
-      (tag_block_close
+      (tag_close
         (inline_expression_close)))
     (paragraph
       (text))
-    (tag_close
-      (tag_open_delimiter)
+    (tag_end
+      (tag_open)
       (tag_name)
       (inline_expression_close))))

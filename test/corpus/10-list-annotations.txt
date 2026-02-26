@@ -15,7 +15,7 @@ Unordered list with simple annotation
       (list_paragraph
         (text)
         (list_item_annotation
-          (tag_open_delimiter)
+          (inline_expression_open)
           (annotation_name
             (tag_identifier))
           (annotation_value
@@ -47,7 +47,7 @@ Ordered list with simple annotation
       (list_paragraph
         (text)
         (list_item_annotation
-          (tag_open_delimiter)
+          (inline_expression_open)
           (annotation_name
             (tag_identifier))
           (annotation_value
@@ -79,7 +79,7 @@ List with multiple annotations
       (list_paragraph
         (text)
         (list_item_annotation
-          (tag_open_delimiter)
+          (inline_expression_open)
           (annotation_name
             (tag_identifier))
           (annotation_value
@@ -90,7 +90,7 @@ List with multiple annotations
       (list_paragraph
         (text)
         (list_item_annotation
-          (tag_open_delimiter)
+          (inline_expression_open)
           (annotation_name
             (tag_identifier))
           (annotation_value
@@ -101,7 +101,7 @@ List with multiple annotations
       (list_paragraph
         (text)
         (list_item_annotation
-          (tag_open_delimiter)
+          (inline_expression_open)
           (annotation_name
             (tag_identifier))
           (annotation_value
@@ -124,7 +124,7 @@ List with multiple words and annotation
       (list_paragraph
         (text)
         (list_item_annotation
-          (tag_open_delimiter)
+          (inline_expression_open)
           (annotation_name
             (tag_identifier))
           (annotation_value
@@ -153,7 +153,7 @@ Nested list with annotations
       (list_paragraph
         (text)
         (list_item_annotation
-          (tag_open_delimiter)
+          (inline_expression_open)
           (annotation_name
             (tag_identifier))
           (annotation_value
@@ -164,7 +164,7 @@ Nested list with annotations
       (list_paragraph
         (text)
         (list_item_annotation
-          (tag_open_delimiter)
+          (inline_expression_open)
           (annotation_name
             (tag_identifier))
           (annotation_value
@@ -179,7 +179,7 @@ Nested list with annotations
       (list_paragraph
         (text)
         (list_item_annotation
-          (tag_open_delimiter)
+          (inline_expression_open)
           (annotation_name
             (tag_identifier))
           (annotation_value
@@ -202,7 +202,7 @@ List item annotation with attributes
       (list_paragraph
         (text)
         (list_item_annotation
-          (tag_open_delimiter)
+          (inline_expression_open)
           (annotation_name
             (tag_identifier))
           (annotation_value
@@ -235,7 +235,7 @@ List annotation with expression attribute
       (list_paragraph
         (text)
         (list_item_annotation
-          (tag_open_delimiter)
+          (inline_expression_open)
           (annotation_name
             (tag_identifier))
           (annotation_value
@@ -271,7 +271,7 @@ Ordered list with all items annotated
       (list_paragraph
         (text)
         (list_item_annotation
-          (tag_open_delimiter)
+          (inline_expression_open)
           (annotation_name
             (tag_identifier))
           (annotation_value
@@ -282,7 +282,7 @@ Ordered list with all items annotated
       (list_paragraph
         (text)
         (list_item_annotation
-          (tag_open_delimiter)
+          (inline_expression_open)
           (annotation_name
             (tag_identifier))
           (annotation_value
@@ -293,7 +293,7 @@ Ordered list with all items annotated
       (list_paragraph
         (text)
         (list_item_annotation
-          (tag_open_delimiter)
+          (inline_expression_open)
           (annotation_name
             (tag_identifier))
           (annotation_value
@@ -316,7 +316,7 @@ List with simple text and annotation
       (list_paragraph
         (text)
         (list_item_annotation
-          (tag_open_delimiter)
+          (inline_expression_open)
           (annotation_name
             (tag_identifier))
           (annotation_value
@@ -343,7 +343,7 @@ List with text and another word annotation
       (list_paragraph
         (text)
         (list_item_annotation
-          (tag_open_delimiter)
+          (inline_expression_open)
           (annotation_name
             (tag_identifier))
           (annotation_value
@@ -372,7 +372,7 @@ Mixed list with and without annotations
       (list_paragraph
         (text)
         (list_item_annotation
-          (tag_open_delimiter)
+          (inline_expression_open)
           (annotation_name
             (tag_identifier))
           (annotation_value
@@ -387,7 +387,7 @@ Mixed list with and without annotations
       (list_paragraph
         (text)
         (list_item_annotation
-          (tag_open_delimiter)
+          (inline_expression_open)
           (annotation_name
             (tag_identifier))
           (annotation_value

@@ -3,8 +3,7 @@ Simple if with block content
 ================================================================================
 
 {% if $user %}
-Hello,
-{% $user.name %}!
+Hello, {% $user.name %}!
 {% /if %}
 
 --------------------------------------------------------------------------------
@@ -12,20 +11,20 @@ Hello,
 (source_file
   (if_tag
     (if_tag_open
-      (tag_open_delimiter)
+      (tag_open)
       (if_keyword)
       (value_expression
         (variable_value
           (variable_reference
             (variable
               (identifier)))))
-      (tag_block_close
+      (tag_close
         (inline_expression_close)))
     (if_tag_body
       (paragraph
         (text)
         (inline_expression
-          (tag_open_delimiter)
+          (inline_expression_open)
           (variable_value
             (variable_reference
               (variable
@@ -34,7 +33,7 @@ Hello,
           (inline_expression_close))
         (text)))
     (if_tag_close
-      (tag_open_delimiter)
+      (tag_close_start)
       (if_keyword)
       (inline_expression_close))))
 
@@ -43,8 +42,7 @@ If with else clause
 ================================================================================
 
 {% if $user %}
-Hello,
-{% $user.name %}!
+Hello, {% $user.name %}!
 {% else /%}
 Please sign in.
 {% /if %}
@@ -54,20 +52,20 @@ Please sign in.
 (source_file
   (if_tag
     (if_tag_open
-      (tag_open_delimiter)
+      (tag_open)
       (if_keyword)
       (value_expression
         (variable_value
           (variable_reference
             (variable
               (identifier)))))
-      (tag_block_close
+      (tag_close
         (inline_expression_close)))
     (if_tag_body
       (paragraph
         (text)
         (inline_expression
-          (tag_open_delimiter)
+          (inline_expression_open)
           (variable_value
             (variable_reference
               (variable
@@ -77,13 +75,13 @@ Please sign in.
         (text))
       (if_tag_else_clause
         (else_tag
-          (tag_open_delimiter)
+          (tag_open)
           (else_keyword)
           (tag_self_close_delimiter))
         (paragraph
           (text))))
     (if_tag_close
-      (tag_open_delimiter)
+      (tag_close_start)
       (if_keyword)
       (inline_expression_close))))
 
@@ -103,20 +101,20 @@ Welcome guest!
 (source_file
   (if_tag
     (if_tag_open
-      (tag_open_delimiter)
+      (tag_open)
       (if_keyword)
       (value_expression
         (variable_value
           (variable_reference
             (variable
               (identifier)))))
-      (tag_block_close
+      (tag_close
         (inline_expression_close)))
     (if_tag_body
       (paragraph
         (text)
         (inline_expression
-          (tag_open_delimiter)
+          (inline_expression_open)
           (variable_value
             (variable_reference
               (variable
@@ -126,7 +124,7 @@ Welcome guest!
         (text))
       (if_tag_else_clause
         (else_tag
-          (tag_open_delimiter)
+          (tag_open)
           (else_keyword)
           (value_expression
             (call_expression
@@ -144,7 +142,7 @@ Welcome guest!
           (text)
           (text))))
     (if_tag_close
-      (tag_open_delimiter)
+      (tag_close_start)
       (if_keyword)
       (inline_expression_close))))
 
@@ -153,8 +151,7 @@ If with multiple else clauses
 ================================================================================
 
 {% if $user %}
-Hello,
-{% $user.name %}!
+Hello, {% $user.name %}!
 {% else equals($role, "guest") /%}
 Welcome guest!
 {% else /%}
@@ -166,20 +163,20 @@ Please sign in.
 (source_file
   (if_tag
     (if_tag_open
-      (tag_open_delimiter)
+      (tag_open)
       (if_keyword)
       (value_expression
         (variable_value
           (variable_reference
             (variable
               (identifier)))))
-      (tag_block_close
+      (tag_close
         (inline_expression_close)))
     (if_tag_body
       (paragraph
         (text)
         (inline_expression
-          (tag_open_delimiter)
+          (inline_expression_open)
           (variable_value
             (variable_reference
               (variable
@@ -189,7 +186,7 @@ Please sign in.
         (text))
       (if_tag_else_clause
         (else_tag
-          (tag_open_delimiter)
+          (tag_open)
           (else_keyword)
           (value_expression
             (call_expression
@@ -208,13 +205,12 @@ Please sign in.
           (text))
         (paragraph
           (inline_tag
-            (tag_self_close
-              (tag_open_delimiter)
-              (tag_name)
-              (tag_self_close_delimiter)))
+            (tag_open)
+            (tag_name)
+            (tag_self_close_delimiter))
           (text))))
     (if_tag_close
-      (tag_open_delimiter)
+      (tag_close_start)
       (if_keyword)
       (inline_expression_close))))
 
@@ -236,14 +232,14 @@ Some paragraph content here.
 (source_file
   (if_tag
     (if_tag_open
-      (tag_open_delimiter)
+      (tag_open)
       (if_keyword)
       (value_expression
         (variable_value
           (variable_reference
             (variable
               (identifier)))))
-      (tag_block_close
+      (tag_close
         (inline_expression_close)))
     (if_tag_body
       (heading
@@ -261,6 +257,6 @@ Some paragraph content here.
           (list_paragraph
             (text)))))
     (if_tag_close
-      (tag_open_delimiter)
+      (tag_close_start)
       (if_keyword)
       (inline_expression_close))))

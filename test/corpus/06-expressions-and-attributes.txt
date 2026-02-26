@@ -9,7 +9,7 @@ Variable references in inline expressions
 (source_file
   (paragraph
     (inline_expression
-      (tag_open_delimiter)
+      (inline_expression_open)
       (variable_value
         (variable_reference
           (variable
@@ -28,7 +28,7 @@ Special variables in inline expressions
 (source_file
   (paragraph
     (inline_expression
-      (tag_open_delimiter)
+      (inline_expression_open)
       (variable_value
         (special_variable_reference
           (special_variable
@@ -46,7 +46,7 @@ Subscript variables in inline expressions
 (source_file
   (paragraph
     (inline_expression
-      (tag_open_delimiter)
+      (inline_expression_open)
       (variable_value
         (subscript_reference
           (variable_reference
@@ -60,17 +60,16 @@ Subscript variables in inline expressions
 Function calls in inline expressions
 =============================================================================
 
-{% $formatDate($date) %}
+{% formatDate($date) %}
 
 -----------------------------------------------------------------------------
 
 (source_file
   (paragraph
     (inline_expression
-      (tag_open_delimiter)
+      (inline_expression_open)
       (inline_call_expression
-        (variable
-          (identifier))
+        (function_identifier)
         (value_expression
           (variable_value
             (variable_reference
@@ -87,30 +86,29 @@ Attribute values with literals
 -----------------------------------------------------------------------------
 
 (source_file
-  (paragraph
+  (markdoc_tag
     (inline_tag
-      (tag_self_close
-        (tag_open_delimiter)
-        (tag_name)
-        (attribute
-          (attribute_name)
-          (attribute_value
-            (value_expression
-              (json_value
-                (string)))))
-        (attribute
-          (attribute_name)
-          (attribute_value
-            (value_expression
-              (json_value
-                (number)))))
-        (attribute
-          (attribute_name)
-          (attribute_value
-            (value_expression
-              (json_value
-                (boolean)))))
-        (tag_self_close_delimiter)))))
+      (tag_open)
+      (tag_name)
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (value_expression
+            (json_value
+              (string)))))
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (value_expression
+            (json_value
+              (number)))))
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (value_expression
+            (json_value
+              (boolean)))))
+      (tag_self_close_delimiter))))
 
 =============================================================================
 Attribute values with arrays and objects
@@ -121,83 +119,143 @@ Attribute values with arrays and objects
 -----------------------------------------------------------------------------
 
 (source_file
-  (paragraph
+  (markdoc_tag
     (inline_tag
-      (tag_self_close
-        (tag_open_delimiter)
-        (tag_name)
-        (attribute
-          (attribute_name)
-          (attribute_value
-            (value_expression
-              (json_value
-                (array_literal
+      (tag_open)
+      (tag_name)
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (value_expression
+            (json_value
+              (array_literal
+                (json_value
+                  (number))
+                (json_value
+                  (number)))))))
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (value_expression
+            (json_value
+              (object_literal
+                (pair
+                  (identifier)
                   (json_value
-                    (number))
-                  (json_value
-                    (number)))))))
-        (attribute
-          (attribute_name)
-          (attribute_value
-            (value_expression
-              (json_value
-                (object_literal
-                  (pair
-                    (identifier)
-                    (json_value
-                      (string))))))))
-        (tag_self_close_delimiter)))))
+                    (string))))))))
+      (tag_self_close_delimiter))))
 
 =============================================================================
 Attribute values with variables and functions
 =============================================================================
 
-{% card title=$title subtitle=titleCase($subtitle) index=@index item=$items[0] /%}
+{% card
+title=$title
+subtitle=titleCase($subtitle)
+index=@index
+item=$items[0]
+/%}
 
 -----------------------------------------------------------------------------
 
 (source_file
-  (paragraph
+  (markdoc_tag
     (inline_tag
-      (tag_self_close
-        (tag_open_delimiter)
-        (tag_name)
-        (attribute
-          (attribute_name)
-          (attribute_value
-            (value_expression
-              (variable_value
-                (variable_reference
-                  (variable
-                    (identifier)))))))
-        (attribute
-          (attribute_name)
-          (attribute_value
-            (value_expression
-              (call_expression
-                (identifier)
-                (value_expression
-                  (variable_value
-                    (variable_reference
-                      (variable
-                        (identifier)))))))))
-        (attribute
-          (attribute_name)
-          (attribute_value
-            (value_expression
-              (variable_value
-                (special_variable_reference
-                  (special_variable
-                    (identifier)))))))
-        (attribute
-          (attribute_name)
-          (attribute_value
-            (value_expression
-              (variable_value
-                (subscript_reference
+      (tag_open)
+      (tag_name)
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (value_expression
+            (variable_value
+              (variable_reference
+                (variable
+                  (identifier)))))))
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (value_expression
+            (call_expression
+              (identifier)
+              (value_expression
+                (variable_value
                   (variable_reference
                     (variable
-                      (identifier)))
-                  (array_subscript
-                    (number)))))))
-        (tag_self_close_delimiter)))))
+                      (identifier)))))))))
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (value_expression
+            (variable_value
+              (special_variable_reference
+                (special_variable
+                  (identifier)))))))
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (value_expression
+            (variable_value
+              (subscript_reference
+                (variable_reference
+                  (variable
+                    (identifier)))
+                (array_subscript
+                  (number)))))))
+      (tag_self_close_delimiter))))
+
+=============================================================================
+Attribute values with variables and functions pt 2
+=============================================================================
+
+{% card
+title=$title
+subtitle=titleCase($subtitle)
+index=@index
+item=$items[0] /%}
+
+-----------------------------------------------------------------------------
+
+(source_file
+  (markdoc_tag
+    (inline_tag
+      (tag_open)
+      (tag_name)
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (value_expression
+            (variable_value
+              (variable_reference
+                (variable
+                  (identifier)))))))
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (value_expression
+            (call_expression
+              (identifier)
+              (value_expression
+                (variable_value
+                  (variable_reference
+                    (variable
+                      (identifier)))))))))
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (value_expression
+            (variable_value
+              (special_variable_reference
+                (special_variable
+                  (identifier)))))))
+      (attribute
+        (attribute_name)
+        (attribute_value
+          (value_expression
+            (variable_value
+              (subscript_reference
+                (variable_reference
+                  (variable
+                    (identifier)))
+                (array_subscript
+                  (number)))))))
+      (tag_self_close_delimiter))))

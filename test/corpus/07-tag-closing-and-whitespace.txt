@@ -10,15 +10,15 @@ Content here
 
 (source_file
   (markdoc_tag
-    (tag_open
-      (tag_open_delimiter)
+    (tag_open_block
+      (tag_open)
       (tag_name)
-      (tag_block_close
+      (tag_close
         (inline_expression_close)))
     (paragraph
       (text))
-    (tag_close
-      (tag_open_delimiter)
+    (tag_end
+      (tag_open)
       (tag_name)
       (inline_expression_close))))
 
@@ -34,15 +34,15 @@ Text with space
 
 (source_file
   (markdoc_tag
-    (tag_open
-      (tag_open_delimiter)
+    (tag_open_block
+      (tag_open)
       (tag_name)
-      (tag_block_close
+      (tag_close
         (inline_expression_close)))
     (paragraph
       (text))
-    (tag_close
-      (tag_open_delimiter)
+    (tag_end
+      (tag_open)
       (tag_name)
       (inline_expression_close))))
 
@@ -87,16 +87,16 @@ Second paragraph with blank line between
 
 (source_file
   (markdoc_tag
-    (tag_open
-      (tag_open_delimiter)
+    (tag_open_block
+      (tag_open)
       (tag_name)
-      (tag_block_close
+      (tag_close
         (inline_expression_close)))
     (paragraph
       (text))
     (paragraph
       (text))
-    (tag_close
-      (tag_open_delimiter)
+    (tag_end
+      (tag_open)
       (tag_name)
       (inline_expression_close))))
