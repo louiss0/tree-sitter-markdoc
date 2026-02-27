@@ -156,6 +156,11 @@
     }
   },
   {
+    "type": "block_continuation",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "blockquote",
     "named": true,
     "fields": {},
@@ -164,7 +169,15 @@
       "required": true,
       "types": [
         {
-          "type": "blockquote_item",
+          "type": "block_continuation",
+          "named": true
+        },
+        {
+          "type": "blockquote_content",
+          "named": true
+        },
+        {
+          "type": "blockquote_marker",
           "named": true
         }
       ]
@@ -194,30 +207,9 @@
     }
   },
   {
-    "type": "blockquote_item",
+    "type": "blockquote_marker",
     "named": true,
-    "fields": {
-      "content": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "blockquote_content",
-            "named": true
-          }
-        ]
-      },
-      "marker": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "blockquote_marker",
-            "named": true
-          }
-        ]
-      }
-    }
+    "fields": {}
   },
   {
     "type": "boolean",
@@ -1944,10 +1936,6 @@
   },
   {
     "type": "attributes",
-    "named": true
-  },
-  {
-    "type": "blockquote_marker",
     "named": true
   },
   {

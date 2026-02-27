@@ -261,78 +261,71 @@
       }
     },
     "blockquote": {
-      "type": "PREC_RIGHT",
-      "value": 0,
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "ALIAS",
+          "content": {
             "type": "SYMBOL",
-            "name": "blockquote_item"
+            "name": "_block_quote_start"
           },
-          {
-            "type": "REPEAT",
-            "content": {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "SYMBOL",
-                  "name": "_NEWLINE"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "blockquote_item"
-                }
-              ]
-            }
-          },
-          {
-            "type": "CHOICE",
+          "named": true,
+          "value": "blockquote_marker"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "blockquote_content"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SEQ",
             "members": [
               {
-                "type": "SYMBOL",
-                "name": "_NEWLINE"
-              },
-              {
-                "type": "BLANK"
-              }
-            ]
-          }
-        ]
-      }
-    },
-    "blockquote_item": {
-      "type": "PREC_RIGHT",
-      "value": 0,
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "FIELD",
-            "name": "marker",
-            "content": {
-              "type": "SYMBOL",
-              "name": "blockquote_marker"
-            }
-          },
-          {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "FIELD",
-                "name": "content",
+                "type": "ALIAS",
                 "content": {
                   "type": "SYMBOL",
-                  "name": "blockquote_content"
-                }
+                  "name": "block_continuation"
+                },
+                "named": true,
+                "value": "blockquote_marker"
               },
               {
-                "type": "BLANK"
+                "type": "SYMBOL",
+                "name": "blockquote_content"
               }
             ]
           }
-        ]
-      }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_block_close"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "block_continuation"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        }
+      ]
+    },
+    "block_continuation": {
+      "type": "SYMBOL",
+      "name": "_block_continuation"
     },
     "blockquote_content": {
       "type": "CHOICE",
@@ -350,17 +343,6 @@
           "name": "list_paragraph"
         }
       ]
-    },
-    "blockquote_marker": {
-      "type": "TOKEN",
-      "content": {
-        "type": "PREC",
-        "value": 2,
-        "content": {
-          "type": "PATTERN",
-          "value": ">[ \\t]*"
-        }
-      }
     },
     "fenced_code_block": {
       "type": "SEQ",
@@ -3880,42 +3862,10 @@
       "_inline_line_start"
     ],
     [
-      "if_tag"
-    ],
-    [
       "if_tag_else_clause"
     ],
     [
       "if_tag_body"
-    ],
-    [
-      "if_tag_body",
-      "if_tag_else_clause"
-    ],
-    [
-      "if_tag_close",
-      "inline_tag"
-    ],
-    [
-      "if_tag_close",
-      "paragraph"
-    ],
-    [
-      "inline_tag",
-      "annotation"
-    ],
-    [
-      "inline_tag",
-      "annotation_name"
-    ],
-    [
-      "_inline_expression_line"
-    ],
-    [
-      "list_paragraph"
-    ],
-    [
-      "paragraph"
     ]
   ],
   "precedences": [],
@@ -3971,6 +3921,18 @@
     {
       "type": "SYMBOL",
       "name": "_HTML_BLOCK"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_block_quote_start"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_block_close"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_block_continuation"
     }
   ],
   "inline": [

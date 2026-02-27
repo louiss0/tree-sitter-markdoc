@@ -16,7 +16,10 @@ enum TokenType {
   SOFT_LINE_BREAK,
   THEMATIC_BREAK,
   HTML_COMMENT,
-  HTML_BLOCK
+  HTML_BLOCK,
+  BLOCK_QUOTE_START,
+  BLOCK_CLOSE,
+  BLOCK_CONTINUATION
 };
 
 #define MAX_FENCE_DEPTH 8
@@ -24,6 +27,9 @@ enum TokenType {
 typedef struct {
   bool at_start;
   bool in_frontmatter;
+  bool in_blockquote;
+  bool simulate;
+  uint8_t indentation;
   uint8_t fence_depth;
   char fence_chars[MAX_FENCE_DEPTH];
   uint8_t fence_lengths[MAX_FENCE_DEPTH];
@@ -33,6 +39,9 @@ void *tree_sitter_markdoc_external_scanner_create() {
   Scanner *scanner = (Scanner *)malloc(sizeof(Scanner));
   scanner->at_start = true;
   scanner->in_frontmatter = false;
+  scanner->in_blockquote = false;
+  scanner->simulate = false;
+  scanner->indentation = 0;
   scanner->fence_depth = 0;
   memset(scanner->fence_chars, 0, sizeof(scanner->fence_chars));
   memset(scanner->fence_lengths, 0, sizeof(scanner->fence_lengths));
@@ -49,6 +58,9 @@ unsigned tree_sitter_markdoc_external_scanner_serialize(void *payload, char *buf
   if (i < 255) {
     buffer[i++] = (char)(s->at_start ? 1 : 0);
     buffer[i++] = (char)(s->in_frontmatter ? 1 : 0);
+    buffer[i++] = (char)(s->in_blockquote ? 1 : 0);
+    buffer[i++] = (char)(s->simulate ? 1 : 0);
+    buffer[i++] = (char)s->indentation;
     buffer[i++] = (char)s->fence_depth;
     for (uint8_t depth = 0; depth < s->fence_depth && i + 1 < 255; depth++) {
       buffer[i++] = (char)s->fence_chars[depth];
@@ -62,6 +74,9 @@ void tree_sitter_markdoc_external_scanner_deserialize(void *payload, const char 
   Scanner *s = (Scanner *)payload;
   s->at_start = true;
   s->in_frontmatter = false;
+  s->in_blockquote = false;
+  s->simulate = false;
+  s->indentation = 0;
   s->fence_depth = 0;
   memset(s->fence_chars, 0, sizeof(s->fence_chars));
   memset(s->fence_lengths, 0, sizeof(s->fence_lengths));
@@ -72,6 +87,15 @@ void tree_sitter_markdoc_external_scanner_deserialize(void *payload, const char 
   }
   if (i < length) {
     s->in_frontmatter = buffer[i++] != 0;
+  }
+  if (i < length) {
+    s->in_blockquote = buffer[i++] != 0;
+  }
+  if (i < length) {
+    s->simulate = buffer[i++] != 0;
+  }
+  if (i < length) {
+    s->indentation = (uint8_t)buffer[i++];
   }
   if (i < length) {
     s->fence_depth = (uint8_t)buffer[i++];
@@ -92,6 +116,16 @@ static inline bool is_space_ch(int32_t c) {
 
 static inline bool is_digit_ch(int32_t c) {
   return c >= '0' && c <= '9';
+}
+
+static unsigned advance(Scanner *s, TSLexer *lexer) {
+  (void)s;
+  int32_t ch = lexer->lookahead;
+  lexer->advance(lexer, false);
+  if (ch == '\t') {
+    return 4;
+  }
+  return 1;
 }
 
 static bool scan_frontmatter_closing_delimiter(TSLexer *lexer, int32_t marker);
@@ -287,6 +321,7 @@ static bool is_markdoc_block_tag_line(TSLexer *lexer);
 static bool scan_unordered_or_thematic(Scanner *s, TSLexer *lexer, const bool *valid_symbols, unsigned indent);
 static bool scan_unordered_list_plus(TSLexer *lexer, const bool *valid_symbols, unsigned indent);
 static bool scan_ordered_list_marker(TSLexer *lexer, const bool *valid_symbols, unsigned indent);
+static bool scan_block_quote_marker(TSLexer *lexer);
 
 static bool scan_frontmatter_delimiter(TSLexer *lexer) {
   TSLexer saved_state = *lexer;
@@ -435,12 +470,49 @@ static bool is_heading_marker_line(TSLexer *lexer) {
   return ok;
 }
 
+static bool parse_block_quote(Scanner *s, TSLexer *lexer, const bool *valid_symbols) {
+  if (!valid_symbols[BLOCK_QUOTE_START]) {
+    return false;
+  }
+
+  if (lexer->get_column(lexer) != 0 || lexer->lookahead != '>') {
+    return false;
+  }
+
+  advance(s, lexer);
+  s->indentation = 0;
+  if (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+    s->indentation += advance(s, lexer) - 1;
+  }
+
+  lexer->mark_end(lexer);
+  lexer->result_symbol = BLOCK_QUOTE_START;
+  if (!s->simulate) {
+    s->in_blockquote = true;
+  }
+  return true;
+}
+
 static bool is_blockquote_line(TSLexer *lexer) {
   if (lexer->get_column(lexer) != 0) {
     return false;
   }
 
   return lexer->lookahead == '>';
+}
+
+static bool scan_block_quote_marker(TSLexer *lexer) {
+  if (lexer->get_column(lexer) != 0 || lexer->lookahead != '>') {
+    return false;
+  }
+
+  lexer->advance(lexer, false);
+  if (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
+    lexer->advance(lexer, false);
+  }
+
+  lexer->mark_end(lexer);
+  return true;
 }
 
 static bool is_fenced_code_line(TSLexer *lexer) {
@@ -886,6 +958,15 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
       }
     }
 
+    if (valid_symbols[BLOCK_QUOTE_START]) {
+      TSLexer quote_state = *lexer;
+      if (parse_block_quote(s, lexer, valid_symbols)) {
+        s->at_start = false;
+        return true;
+      }
+      *lexer = quote_state;
+    }
+
     TSLexer list_state = *lexer;
     unsigned indent = 0;
     while (lexer->lookahead == ' ' || lexer->lookahead == '\t') {
@@ -912,6 +993,55 @@ bool tree_sitter_markdoc_external_scanner_scan(void *payload, TSLexer *lexer,
     }
 
     *lexer = list_state;
+  }
+
+  if (valid_symbols[BLOCK_CONTINUATION] && s->in_blockquote) {
+    TSLexer continuation_state = *lexer;
+    if (is_newline(lexer->lookahead)) {
+      if (lexer->lookahead == '\r') {
+        lexer->advance(lexer, false);
+        if (lexer->lookahead == '\n') {
+          lexer->advance(lexer, false);
+        }
+      } else {
+        lexer->advance(lexer, false);
+      }
+      if (scan_block_quote_marker(lexer)) {
+        lexer->result_symbol = BLOCK_CONTINUATION;
+        s->in_blockquote = true;
+        s->at_start = false;
+        return true;
+      }
+    }
+    *lexer = continuation_state;
+  }
+
+  if (valid_symbols[BLOCK_CLOSE] && s->in_blockquote) {
+    TSLexer close_state = *lexer;
+    if (is_newline(lexer->lookahead)) {
+      if (lexer->lookahead == '\r') {
+        lexer->advance(lexer, false);
+        if (lexer->lookahead == '\n') {
+          lexer->advance(lexer, false);
+        }
+      } else {
+        lexer->advance(lexer, false);
+      }
+      if (!is_blockquote_line(lexer)) {
+        lexer->mark_end(lexer);
+        lexer->result_symbol = BLOCK_CLOSE;
+        s->in_blockquote = false;
+        s->at_start = false;
+        return true;
+      }
+    } else if (lexer->lookahead == 0) {
+      lexer->mark_end(lexer);
+      lexer->result_symbol = BLOCK_CLOSE;
+      s->in_blockquote = false;
+      s->at_start = false;
+      return true;
+    }
+    *lexer = close_state;
   }
 
   if (valid_symbols[CODE_FENCE_OPEN] && fence_depth == 0) {

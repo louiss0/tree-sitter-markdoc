@@ -8,11 +8,10 @@ Simple blockquote
 
 (source_file
   (blockquote
-    (blockquote_item
-      (blockquote_marker)
-      (blockquote_content
-        (list_paragraph
-          (text))))))
+    (blockquote_marker)
+    (blockquote_content
+      (list_paragraph
+        (text)))))
 
 =======================================
 Blockquote with nested tag
@@ -26,26 +25,23 @@ Blockquote with nested tag
 
 (source_file
   (blockquote
-    (blockquote_item
-      (blockquote_marker)
-      (blockquote_content
-        (tag_open_block
-          (tag_open)
-          (tag_name)
-          (tag_close
-            (inline_expression_close)))))
-    (blockquote_item
-      (blockquote_marker)
-      (blockquote_content
-        (list_paragraph
-          (text))))
-    (blockquote_item
-      (blockquote_marker)
-      (blockquote_content
-        (tag_end
-          (tag_open)
-          (tag_name)
-          (inline_expression_close))))))
+    (blockquote_marker)
+    (blockquote_content
+      (tag_open_block
+        (tag_open)
+        (tag_name)
+        (tag_close
+          (inline_expression_close))))
+    (blockquote_marker)
+    (blockquote_content
+      (list_paragraph
+        (text)))
+    (blockquote_marker)
+    (blockquote_content
+      (tag_end
+        (tag_open)
+        (tag_name)
+        (inline_expression_close)))))
 
 =======================================
 Blockquote with annotation
@@ -58,29 +54,27 @@ Blockquote with annotation
 
 (source_file
   (blockquote
-    (blockquote_item
-      (blockquote_marker)
-      (blockquote_content
-        (list_paragraph
-          (text)
-          (annotation
-            (annotation_block
-              (inline_expression_open)
-              (annotation_name
-                (tag_identifier))
-              (annotation_value
-                (identifier))
-              (inline_expression_close))))))
-    (blockquote_item
-      (blockquote_marker)
-      (blockquote_content
-        (list_paragraph
-          (text)
-          (annotation
-            (annotation_block
-              (inline_expression_open)
-              (id_shorthand
-                (shorthand_id))
-              (class_shorthand
-                (shorthand_class))
-              (inline_expression_close))))))))
+    (blockquote_marker)
+    (blockquote_content
+      (list_paragraph
+        (text)
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (annotation_name
+              (tag_identifier))
+            (annotation_value
+              (identifier))
+            (inline_expression_close)))))
+    (blockquote_marker)
+    (blockquote_content
+      (list_paragraph
+        (text)
+        (annotation
+          (annotation_block
+            (inline_expression_open)
+            (id_shorthand
+              (shorthand_id))
+            (class_shorthand
+              (shorthand_class))
+            (inline_expression_close)))))))
